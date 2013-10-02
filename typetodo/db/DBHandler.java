@@ -1,19 +1,20 @@
 package typetodo.db;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Date;
 
-import com.sun.jmx.snmp.tasks.Task;
+import typetodo.logic.Schedule.DeadlineTask;
+import typetodo.logic.Schedule.FloatingTask;
+import typetodo.logic.Schedule.Task;
+import typetodo.logic.Schedule.TimedTask;
 
 public class DBHandler {
 
-	public DBHandler(String fileName) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(fileName));
-		PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+	public static final String FILENAME = "file";
+
+	public DBHandler() throws IOException {
+		// BufferedReader reader = new BufferedReader(new FileReader(FILENAME));
+		// PrintWriter writer = new PrintWriter(new FileWriter(FILENAME));
 	}
 
 	private static final String MESSAGE_ADD = "Task successfully added.";
@@ -28,7 +29,7 @@ public class DBHandler {
 		return MESSAGE_ADD;
 	}
 
-	public String addTask(DeadLineTask task) {
+	public String addTask(DeadlineTask task) {
 		return MESSAGE_ADD;
 	}
 
