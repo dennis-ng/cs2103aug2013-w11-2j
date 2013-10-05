@@ -1,6 +1,6 @@
 package typetodo.logic;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class TimedTask extends Task {
 	private Date start;
@@ -42,11 +42,11 @@ public class TimedTask extends Task {
 		this.end = end;
 	}
 
-	private boolean isBusy() {
+	public boolean isBusy() {
 		return isBusy;
 	}
 
-	private void setBusy(boolean isBusy) {
+	public void setBusy(boolean isBusy) {
 		this.isBusy = isBusy;
 	}	
 }

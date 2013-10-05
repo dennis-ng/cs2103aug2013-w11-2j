@@ -1,6 +1,6 @@
 package typetodo.logic;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class DeadlineTask extends Task{
 	private Date deadline;
