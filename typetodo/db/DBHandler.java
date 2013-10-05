@@ -1,3 +1,7 @@
+/**
+ * Author : Dennis Ng
+ * Email	: a0097968@nus.edu.sg
+ */
 package typetodo.db;
 
 import java.io.BufferedReader;
