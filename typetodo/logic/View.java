@@ -1,7 +1,7 @@
 /**
  * 
  */
-package texttodo.logic;
+package typetodo.logic;
 
 import java.util.ArrayList;
 

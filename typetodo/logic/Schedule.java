@@ -1,109 +1,123 @@
-package texttodo.logic;
+package typetodo.logic;
+
+import java.sql.Date;
+import java.util.ArrayList;
+
+import typetodo.db.DBHandler;
+import typetodo.logic.Task.Status;
 
 public class Schedule {
+	private static final String WELCOME_MESSAGE = "Welcome to TypeToDo.\n";
+	private static final String MESSAGE_ADDED = "%s has been added to your schedule";
 	
-	public abstract class Task {
-		private String name;
-		private String description;
+	private static class ViewMode {
+		private static String mode;
+		private static Date date;
+		private static String keyword;
+		private static Status status;
 		
-		public String getName() {
-			return this.name;
-		}
-		
-		public String getDescription() {
-			return description;
-		}
-	}
-	
-	public class FloatingTask extends Task {
-	}
-	
-	public class TimedTask extends Task {
-		private int startTime;
-		private int endTime;
-		private String startDate;
-		private String endDate;
-		
-
-		public String getEndDate() {
-			return endDate;
-		}
-
-		public void setEndDate(String endDate) {
-			this.endDate = endDate;
-		}
-
-		public String getStartDate() {
-			return startDate;
-		}
-
-		public void setStartDate(String startDate) {
-			this.startDate = startDate;
-		}
-
-		public int getStartTime() {
-			return startTime;
-		}
-
-		public void setStartTime(int startTime) {
-			this.startTime = startTime;
-		}
-
-		public int getEndTime() {
-			return endTime;
-		}
-
-		public void setEndTime(int endTime) {
-			this.endTime = endTime;
+		private static String getMode() {
+			return mode;
 		}
 		
-	}
-	
-	public class DeadlineTask extends Task {
-		private int endTime;
-		private String endDate;
+		private static void setMode(String mode) {
+			ViewMode.mode = mode;
+		}
 		
-		public int getEndTime() {
-			return endTime;
+		private static Date getDate() {
+			return date;
 		}
-		public void setEndTime(int endTime) {
-			this.endTime = endTime;
+		
+		private static void setDate(Date date) {
+			ViewMode.date = date;
 		}
-		public String getEndDate() {
-			return endDate;
+		
+		private static String getKeyword() {
+			return keyword;
 		}
-		public void setEndDate(String endDate) {
-			this.endDate = endDate;
+		
+		private static void setKeyword(String keyword) {
+			ViewMode.keyword = keyword;
+		}
+		
+		private static Status getStatus() {
+			return status;
+		}
+		
+		private static void setStatus(Status status) {
+			ViewMode.status = status;
 		}
 	}
 	
-	String addFloatingTask(FloatingTask floatingTask) {
-		String feedBack = null;
-		return feedBack;
+	private String feedBack;
+	
+	DBHandler db = new DBHandler();
+	
+	View addTask(String name, String description) {
+		// Check if there is a duplicate entry//
+		db.addTask(new FloatingTask(name, description));
+		setFeedBack(String.format(MESSAGE_ADDED, name));
+		return generateView();
 	}
 	
-	String addTimedTask(TimedTask timedTask) {
-		String feedBack = null;
-		return feedBack;
+	View addTask(String name, String description, Date start, Date end, boolean isBusy) {
+		db.addTask(new TimedTask(name, description, start, end, isBusy));
+		setFeedBack(String.format(MESSAGE_ADDED, name));
+		return generateView();
 	}
 	
-	String addDeadlineTask(DeadlineTask deadLineTask) {
-		String feedBack = null;
-		return feedBack;
+	View addTask(String name, String description, Date deadline) {
+		db.addTask(new DeadlineTask(name, description, deadline));
+		setFeedBack(String.format(MESSAGE_ADDED, name));
+		return generateView();
 	}
 	
-	String deleteTask(Task task) {
-		String feedBack = null;
-		return feedBack;
+	View deleteTask(String taskName) {
+		db.deleteTask(taskName);
+		return generateView();
 	}
 	
-	String viewMode(String mode) {
-		String feedBack = null;
+	public View generateView() {
+		String mode = ViewMode.getMode();
+		ArrayList<Task> tasks = null;
+		View view = null;
+		
 		switch (mode) {
-			case "today":
+			case "date" :
+				tasks = db.retrieveList(ViewMode.getDate());
+				view = new View(getFeedBack(), tasks);
+				break;
+			
+			case "keyword" :
+				tasks = db.retrieveContains(ViewMode.getKeyword());
+				view = new View(getFeedBack(), tasks);
+				break;
+				
+			case "status" :
+				tasks = db.retrieveContains(ViewMode.getStatus().toString());
+				view = new View(getFeedBack(), tasks);
 				break;
 		}
-		return feedBack;
+		
+		return view;
+	}
+	
+	View setViewMode(Date date) {
+		ViewMode.setMode("date");
+		ViewMode.setDate(date);
+		return generateView();
+	}
+	
+	View setViewMode(String keyword) {
+		ViewMode.setMode("keyword");
+		ViewMode.setKeyword(keyword);
+		return generateView();
+	}
+	
+	View setViewMode(Status status) {
+		ViewMode.setMode(status.toString());
+		ViewMode.setStatus(status);
+		return generateView();
 	}
 	
 	String editFloatingTask(FloatingTask floatingTask, String name, String description) {
@@ -121,8 +135,14 @@ public class Schedule {
 		String feedBack = null;
 		return feedBack;
 	}
-	
-	
+
+	private String getFeedBack() {
+		return this.feedBack;
+	}
+
+	private void setFeedBack(String feedBack) {
+		this.feedBack = feedBack;
+	}
 }
 
 	
