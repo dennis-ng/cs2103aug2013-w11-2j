@@ -15,14 +15,6 @@ public class Schedule {
 	private static final String MESSAGE_EDITED = "";
 	private static final String MESSAGE_MARK = "";
 	
-	public static enum FieldName {
-		NAME, DESCRIPTION, START, END, DEADLINE, BUSYFIELD;
-	}
-	
-	public static enum TypeOfOperation {
-		ADD, DELETE, EDIT;
-	}
-	
 	private static class ViewMode {
 		private static String mode;
 		private static Date date;
@@ -74,7 +66,7 @@ public class Schedule {
 		public void undo() {
 			switch (type) {
 				case ADD :
-					db.deleteTask(taskAffected);
+					db.deleteTask(taskAffected.getTaskId());
 					break;
 				
 				case DELETE :
@@ -129,9 +121,12 @@ public class Schedule {
 	 */
 	public View addTask(String name, String description) {
 		FloatingTask taskToBeAdded = new FloatingTask(name, description);
+		int taskId;
 		
 		try {
-			db.addTask(taskToBeAdded);
+			taskId = db.addTask(taskToBeAdded);
+			taskToBeAdded.setTaskId(taskId);
+			
 			this.historyOfOperations.push(new Operation(TypeOfOperation.ADD, taskToBeAdded));
 		} catch (Exception e) {
 			//Handle
@@ -154,9 +149,11 @@ public class Schedule {
 	 */
 	public View addTask(String name, String description, Date start, Date end, boolean isBusy) {
 		TimedTask taskToBeAdded = new TimedTask(name, description, start, end, isBusy);
-		
+		int taskId;
 		try {
-			db.addTask(taskToBeAdded);
+			taskId = db.addTask(taskToBeAdded);
+			taskToBeAdded.setTaskId(taskId);
+			
 			this.historyOfOperations.push(new Operation(TypeOfOperation.ADD, taskToBeAdded));
 		} catch (Exception e) {
 			//Handle
@@ -176,9 +173,12 @@ public class Schedule {
 	 */
 	public View addTask(String name, String description, Date deadline) {
 		DeadlineTask taskToBeAdded = new DeadlineTask(name, description, deadline);
+		int taskId;
 		
 		try {
-			db.addTask(taskToBeAdded);
+			taskId = db.addTask(taskToBeAdded);
+			taskToBeAdded.setTaskId(taskId);
+			
 			this.historyOfOperations.push(new Operation(TypeOfOperation.ADD, taskToBeAdded));
 		} catch (Exception e) {
 			//Handle
@@ -197,7 +197,7 @@ public class Schedule {
 	public View deleteTask(int index) {
 		Task taskToBeDeleted = currentView.getTasks().get(index-1);
 		
-		if(db.deleteTask(taskToBeDeleted)) {
+		if(db.deleteTask(taskToBeDeleted.getTaskId())) {
 			this.historyOfOperations.push(new Operation(TypeOfOperation.DELETE, taskToBeDeleted));
 			this.setFeedBack(MESSAGE_DELETED);
 			this.currentView = generateView();
@@ -217,7 +217,7 @@ public class Schedule {
 		//what if there is a task with same name//
 		for (Task task : tasks) {
 			if (task.getName().equals(taskName)) {
-				db.deleteTask(task);
+				db.deleteTask(task.getTaskId());
 				this.historyOfOperations.push(new Operation(TypeOfOperation.DELETE, task));
 				this.currentView = generateView();
 				break;
@@ -305,9 +305,9 @@ public class Schedule {
 	
 	/**
 	 * Edits the NAME/DESCRIPTION field
-	 * @param index
-	 * @param fieldName
-	 * @param newValue
+	 * @param index index of task in current view
+	 * @param fieldName Name of field that is to be changed
+	 * @param newValue newValue to replace old value in desired field
 	 * @return returns a View object of the current View Mode
 	 */
 	public View editTask(int index, FieldName fieldName, String newValue) {
@@ -340,9 +340,9 @@ public class Schedule {
 
 	/**
 	 * Edits the START/END/DEADLINE field
-	 * @param index
-	 * @param fieldName
-	 * @param newValue
+	 * @param index of task in current view
+	 * @param fieldName Name of field that is to be changed
+	 * @param newValue to replace old value in desired field
 	 * @return returns a View object of the current View Mode
 	 */
 	public View editTask(int index, FieldName fieldName, Date newValue) {
@@ -384,9 +384,9 @@ public class Schedule {
 
 	/**
 	 * Edits ISBUSY field
-	 * @param index
-	 * @param fieldName
-	 * @param isBusy
+	 * @param index of task in current view
+	 * @param fieldName Name of field that is to be changed
+	 * @param isBusy Boolean value to replace the isBusy field
 	 * @return returns a View object of the current View Mode
 	 */
 	public View editTask(int index, FieldName fieldName, boolean isBusy) {
@@ -410,8 +410,8 @@ public class Schedule {
 	
 	/**
 	 * marks a certain task as completed
-	 * @param index
-	 * @return
+	 * @param index of task in current view
+	 * @return returns a View object of the current View Mode
 	 */
 	public View markTaskAsCompleted(int index) {
 		Task taskToMark = currentView.getTasks().get(index-1);
