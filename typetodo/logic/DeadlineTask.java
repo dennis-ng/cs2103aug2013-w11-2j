@@ -20,11 +20,11 @@ public class DeadlineTask extends Task{
 		this.setStatus(Status.INCOMPLETE);
 	}
 	
-	Date getDeadline() {
+	public Date getDeadline() {
 		return deadline;
 	}
 
-	void setDeadline(Date deadline) {
+	public void setDeadline(Date deadline) {
 		this.deadline = deadline;
 	}
 }
