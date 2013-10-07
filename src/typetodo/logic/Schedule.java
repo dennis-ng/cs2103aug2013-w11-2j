@@ -14,18 +14,21 @@ public class Schedule {
 	private static final String MESSAGE_SEARCH = "%d Tasks have been found";
 	private static final String MESSAGE_EDITED = "";
 	private static final String MESSAGE_MARK = "";
-	
+
+	private static enum Mode {
+		DATE, KEYWORD, STATUS;
+	}
 	private static class ViewMode {
-		private static String mode;
+		private static Mode mode;
 		private static Date date;
 		private static String keyword;
 		private static Status status;
 		
-		private static String getMode() {
+		private static Mode getMode() {
 			return mode;
 		}
 		
-		private static void setMode(String mode) {
+		private static void setMode(Mode mode) {
 			ViewMode.mode = mode;
 		}
 		
@@ -255,22 +258,22 @@ public class Schedule {
 	 * @return returns a View object of the current View Mode
 	 */
 	public View generateView() {
-		String mode = ViewMode.getMode();
+		Mode mode = ViewMode.getMode();
 		ArrayList<Task> tasks = null;
 		View view = null;
 		
 		switch (mode) {
-			case "date" :
+			case DATE :
 				tasks = db.retrieveList(ViewMode.getDate());
 				view = new View(getFeedBack(), tasks);
 				break;
 			
-			case "keyword" :
+			case KEYWORD :
 				tasks = db.retrieveContaining(ViewMode.getKeyword());
 				view = new View(getFeedBack(), tasks);
 				break;
 				
-			case "status" :
+			case STATUS :
 				tasks = db.retrieveContaining(ViewMode.getStatus().toString());
 				view = new View(getFeedBack(), tasks);
 				break;
@@ -303,7 +306,7 @@ public class Schedule {
 	 * @return returns a View object of the new View Mode
 	 */
 	public View setViewMode(Date date) {
-		ViewMode.setMode("date");
+		ViewMode.setMode(Mode.DATE);
 		ViewMode.setDate(date);
 		currentView= generateView();
 		return currentView;
@@ -315,7 +318,7 @@ public class Schedule {
 	 * @return returns a View object of the new View Mode
 	 */
 	public View setViewMode(String keyword) {
-		ViewMode.setMode("keyword");
+		ViewMode.setMode(Mode.KEYWORD);
 		ViewMode.setKeyword(keyword);
 		currentView= generateView();
 		return currentView;
@@ -327,7 +330,7 @@ public class Schedule {
 	 * @return
 	 */
 	public View setViewMode(Status status) {
-		ViewMode.setMode("statusout");
+		ViewMode.setMode(Mode.STATUS);
 		ViewMode.setStatus(status);
 		currentView = generateView();
 		return currentView;
