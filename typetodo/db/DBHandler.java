@@ -15,6 +15,8 @@ import typetodo.logic.FloatingTask;
 import typetodo.logic.Task;
 import typetodo.logic.TimedTask;
 
+import com.google.gson.Gson;
+
 public class DBHandler {
 
 	private static final String FILENAME = "TypeToDo.txt";
@@ -36,8 +38,7 @@ public class DBHandler {
 	}
 
 	private void writeToFile() {
-		// TODO Auto-generated method stub
-
+		Gson gson = new Gson();
 	}
 
 	/**
