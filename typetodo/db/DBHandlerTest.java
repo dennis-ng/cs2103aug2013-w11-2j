@@ -23,11 +23,13 @@ public class DBHandlerTest {
 		DBHandler db;
 		try {
 			FloatingTask floatingTask = new FloatingTask("Name", "Desc");
-			DeadlineTask deadlineTask = new DeadlineTask(1, "Name", "Desc",
-					new Date());
+			Date date = new Date();
+			DeadlineTask deadlineTask = new DeadlineTask(1, "Name", "Desc", date);
 			db = new DBHandler();
 			assertEquals("Add task", 1, db.addTask(floatingTask));
 			assertEquals("Update task", true, db.updateTask(deadlineTask));
+			assertEquals("Retreive", date,
+					((DeadlineTask) db.retrieveList(date).get(0)).getDeadline());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
