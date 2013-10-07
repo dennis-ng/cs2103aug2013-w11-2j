@@ -1,26 +1,43 @@
+/**
+ * Author : Dennis Ng
+ * Email	: a0097968@nus.edu.sg
+ */
 package typetodo.db;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import typetodo.logic.Schedule.DeadlineTask;
-import typetodo.logic.Schedule.FloatingTask;
-import typetodo.logic.Schedule.Task;
-import typetodo.logic.Schedule.TimedTask;
+import typetodo.logic.DeadlineTask;
+import typetodo.logic.FloatingTask;
+import typetodo.logic.Task;
+import typetodo.logic.TimedTask;
 
 public class DBHandler {
 
-	private static final String FILENAME = "file";
+	private static final String FILENAME = "TypeToDo.txt";
+	private final File saveFile;
+
+	private final List<Task> tasksCache;
 
 	public DBHandler() throws IOException {
+		saveFile = new File(FILENAME);
+		if (!saveFile.exists()) {
+			saveFile.createNewFile();
+		}
+		tasksCache = new ArrayList<Task>();
+		this.loadFile();
+	}
+
+	private void loadFile() {
 		// TODO
-		BufferedReader reader = new BufferedReader(new FileReader(FILENAME));
-		PrintWriter writer = new PrintWriter(new FileWriter(FILENAME));
+	}
+
+	private void writeToFile() {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -30,21 +47,20 @@ public class DBHandler {
 	 *         caller to know the taskId if undo is required.
 	 * @throws
 	 */
-	public int addTask(FloatingTask task) throws Exception {
-		// TODO
-		int taskId = 0;
-		return taskId;
-	}
-
-	public int addTask(TimedTask task) throws Exception {
-		// TODO
-		int taskId = 0;
-		return taskId;
-	}
-
-	public int addTask(DeadlineTask task) throws Exception {
-		// TODO
-		int taskId = 0;
+	public int addTask(Task newTask) throws Exception {
+		int taskId;
+		if (tasksCache.isEmpty()) {
+			taskId = 1;
+		} else {
+			taskId = tasksCache.get(tasksCache.size()).getTaskId() + 1;
+		}
+		if (((Integer) newTask.getTaskId()) != null) {
+			// TODO Replace with exception for taskId already exist
+			throw new Exception();
+		}
+		newTask.setTaskId(taskId);
+		tasksCache.add(newTask);
+		this.writeToFile();
 		return taskId;
 	}
 
@@ -53,9 +69,18 @@ public class DBHandler {
 	 * @param task
 	 * @return true: Deleted, false: Not found
 	 */
-	public boolean deleteTask(Task task) {
-		return false;
-		// TODO
+	public boolean deleteTask(int taskIdToDelete) {
+		boolean isDeleted = false;
+		// TODO Try to use HashMap to reduce complexity
+		for (int i = 0; i < tasksCache.size(); i++) {
+			if (tasksCache.get(i).getTaskId() == taskIdToDelete) {
+				tasksCache.remove(i);
+				this.writeToFile();
+				isDeleted = true;
+				return isDeleted;
+			}
+		}
+		return isDeleted;
 	}
 
 	/**
@@ -66,9 +91,19 @@ public class DBHandler {
 	 *           : If clash with time slot
 	 */
 	public boolean updateTask(Task task) throws Exception {
-		boolean updated = false;
-		// TODO
-		return updated;
+		// TODO Try to use HashMap to reduce complexity
+		boolean isUpdated = false;
+		// Below will throw NullErrorException if there is no taskId
+		int taskIdToUpdate = task.getTaskId();
+		for (int i = 0; i < tasksCache.size(); i++) {
+			if (tasksCache.get(i).getTaskId() == taskIdToUpdate) {
+				tasksCache.set(i, task);
+				this.writeToFile();
+				isUpdated = true;
+				return isUpdated;
+			}
+		}
+		return isUpdated;
 	}
 
 	/**
@@ -79,29 +114,90 @@ public class DBHandler {
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveList(Date day) {
-		// TODO
-		return null;
+		List<Task> deadlineTasks = new ArrayList<Task>();
+		List<Task> timedTasks = new ArrayList<Task>();
+		List<Task> floatingTasks = new ArrayList<Task>();
+		for (Task taskInCache : tasksCache) {
+			if (taskInCache instanceof DeadlineTask) {
+				if (!((DeadlineTask) taskInCache).getDeadline().before(day)) {
+					deadlineTasks.add(taskInCache);
+				}
+			} else if (taskInCache instanceof TimedTask) {
+				if (!(((TimedTask) taskInCache).getEnd().before(day) && ((TimedTask) taskInCache)
+						.getStart().after(day))) {
+					timedTasks.add(taskInCache);
+				}
+			} else if (taskInCache instanceof FloatingTask) {
+				floatingTasks.add(taskInCache);
+			}
+		}
+		ArrayList<Task> filteredTasks = new ArrayList<Task>();
+		filteredTasks.addAll(deadlineTasks);
+		filteredTasks.addAll(timedTasks);
+		filteredTasks.addAll(floatingTasks);
+		return filteredTasks;
 	}
 
 	/**
 	 * 
-	 * @param day
+	 * @param searchCriteria
 	 * @return An arraylist of all the tasks that meets the searching criteria.
 	 *         null will be returned if nothing is found.
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveContaining(String searchCriteria) {
-		// TODO
-		return null;
+		List<Task> deadlineTasks = new ArrayList<Task>();
+		List<Task> timedTasks = new ArrayList<Task>();
+		List<Task> floatingTasks = new ArrayList<Task>();
+		for (Task taskInCache : tasksCache) {
+			if (taskInCache.getName().contains(searchCriteria)
+					|| taskInCache.getDescription().contains(searchCriteria)) {
+				if (taskInCache instanceof DeadlineTask) {
+					deadlineTasks.add(taskInCache);
+				} else if (taskInCache instanceof TimedTask) {
+					timedTasks.add(taskInCache);
+				} else if (taskInCache instanceof FloatingTask) {
+					floatingTasks.add(taskInCache);
+				}
+			}
+		}
+		ArrayList<Task> filteredTasks = new ArrayList<Task>();
+		filteredTasks.addAll(deadlineTasks);
+		filteredTasks.addAll(timedTasks);
+		filteredTasks.addAll(floatingTasks);
+		return filteredTasks;
 	}
 
 	public boolean isAvailable(Date start, Date end) {
-		// TODO
-		return true;
+		boolean isAvailable = true;
+		for (Task taskInCache : tasksCache) {
+			if (taskInCache instanceof TimedTask) {
+				TimedTask timedTask = (TimedTask) taskInCache;
+				if (timedTask.isBusy()
+						&& !(timedTask.getStart().after(end) || timedTask.getEnd().before(
+								start))) {
+					isAvailable = false;
+					return isAvailable;
+				}
+			}
+		}
+		return isAvailable;
 	}
 
-	public ArrayList<Task> retrieveBusyTasks(Date start, Date end) {
-		// TODO
-		return null;
+	public Task retrieveBusyTask(Date start, Date end) {
+		Task busyTask = null;
+		for (Task taskInCache : tasksCache) {
+			if (taskInCache instanceof TimedTask) {
+				TimedTask timedTask = (TimedTask) taskInCache;
+				if (timedTask.isBusy()
+						&& !(timedTask.getStart().after(end) || timedTask.getEnd().before(
+								start))) {
+					busyTask = timedTask;
+					return busyTask;
+				}
+			}
+		}
+		return busyTask;
 	}
+
 }
