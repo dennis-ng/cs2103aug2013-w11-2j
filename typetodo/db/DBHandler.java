@@ -54,10 +54,10 @@ public class DBHandler {
 		} else {
 			taskId = tasksCache.get(tasksCache.size()).getTaskId() + 1;
 		}
-		if (((Integer) newTask.getTaskId()) != null) {
-			// TODO Replace with exception for taskId already exist
-			throw new Exception();
-		}
+		// if (((Integer) newTask.getTaskId()) != null) {
+		// // TODO Replace with exception for taskId already exist
+		// throw new Exception();
+		// }
 		newTask.setTaskId(taskId);
 		tasksCache.add(newTask);
 		this.writeToFile();
