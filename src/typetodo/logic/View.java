@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class View {
 	private String feedBack;
-	private ArrayList<Task> Tasks;
+	private ArrayList<Task> tasks;
 	
 	public View(String feedBack, ArrayList<Task> tasks) {
 		this.setFeedBack(feedBack);
@@ -29,10 +29,25 @@ public class View {
 	}
 
 	public ArrayList<Task> getTasks() {
-		return Tasks;
+		return tasks;
 	}
 
 	public void setTasks(ArrayList<Task> tasks) {
-		Tasks = tasks;
+		this.tasks = tasks;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		int index;
+		
+		sb.append("FEEDBACK: " + this.feedBack + "\n");
+		sb.append("TASKS:\n");
+		
+		for (int i = 0; i < this.tasks.size(); ++i) {
+			index = i+1;
+			sb.append(index + ". " + tasks.get(i));
+		}
+		
+		return sb.toString();
 	}
 }

@@ -194,13 +194,17 @@ public class Schedule {
 	 * @param index
 	 * @return returns a View object of the current View Mode
 	 */
-	public View deleteTask(int index) {
+	public View deleteTask (int index) {
+		//must throw out of bound exception!
 		Task taskToBeDeleted = currentView.getTasks().get(index-1);
 		
 		if(db.deleteTask(taskToBeDeleted.getTaskId())) {
 			this.historyOfOperations.push(new Operation(TypeOfOperation.DELETE, taskToBeDeleted));
 			this.setFeedBack(MESSAGE_DELETED);
 			this.currentView = generateView();
+		}
+		else {
+			this.setFeedBack("DELETE FAILED");
 		}
 		
 		return currentView;
@@ -211,17 +215,36 @@ public class Schedule {
 	 * @param taskName
 	 * @return returns a View object of the current View Mode
 	 */
-	public View deleteTask(String taskName) {
-		ArrayList<Task> tasks = currentView.getTasks();
+	public View deleteTask(String keyword) {
+		ArrayList<Task> tasks = db.retrieveContaining(keyword);
+		Task taskToBeDeleted = null;
 		
-		//what if there is a task with same name//
-		for (Task task : tasks) {
-			if (task.getName().equals(taskName)) {
-				db.deleteTask(task.getTaskId());
-				this.historyOfOperations.push(new Operation(TypeOfOperation.DELETE, task));
-				this.currentView = generateView();
-				break;
-			}
+		if (tasks == null) {
+			/*
+			 * there are no tasks in the system that matches the keyword, generate feedback.
+			 */
+			this.setFeedBack("There are no tasks that matches your given keyword!");
+			this.currentView = generateView();
+			return currentView;
+		}
+		else if(tasks.size() > 1) {	//means there is more than one task that matches the keyword
+			/* show user a temp view which contains the tasks that matches the keyword
+			 * so that he can specify which tasks he wants to delete
+			 */
+			this.setFeedBack("Please specify the index of the tasks that you wish to delete");
+			return generateView(tasks); //return view of results
+		}
+		else if (tasks.size() == 1) {
+			/*
+			 * there is only one task that matches, delete that task and update view
+			 */
+			taskToBeDeleted = tasks.get(0);
+			this.historyOfOperations.push(new Operation(TypeOfOperation.DELETE, taskToBeDeleted)); //add operation to history for possible undo
+			db.deleteTask(taskToBeDeleted.getTaskId()); //delete task from database
+			
+			this.setFeedBack(MESSAGE_DELETED); //set feedback
+			this.currentView = generateView(); //generate current view base on view mode and feedback
+			return currentView; 
 		}
 		
 		return currentView;
@@ -256,6 +279,10 @@ public class Schedule {
 		return view;
 	}
 
+	private View generateView(ArrayList<Task> tasks) {
+		return (new View(getFeedBack(), tasks));
+	}
+	
 	/**
 	 * Searches the schedule for tasks that contains a given keyword
 	 * @param keyword
@@ -278,7 +305,8 @@ public class Schedule {
 	public View setViewMode(Date date) {
 		ViewMode.setMode("date");
 		ViewMode.setDate(date);
-		return generateView();
+		currentView= generateView();
+		return currentView;
 	}
 	
 	/**
@@ -289,7 +317,8 @@ public class Schedule {
 	public View setViewMode(String keyword) {
 		ViewMode.setMode("keyword");
 		ViewMode.setKeyword(keyword);
-		return generateView();
+		currentView= generateView();
+		return currentView;
 	}
 	
 	/**
@@ -300,7 +329,8 @@ public class Schedule {
 	public View setViewMode(Status status) {
 		ViewMode.setMode("statusout");
 		ViewMode.setStatus(status);
-		return generateView();
+		currentView = generateView();
+		return currentView;
 	}
 	
 	/**
@@ -429,6 +459,7 @@ public class Schedule {
 		this.currentView = generateView();
 		return this.currentView;
 	}
+	
 	
 	/**
 	 * Undo the last operation

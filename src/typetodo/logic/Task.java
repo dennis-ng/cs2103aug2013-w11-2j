@@ -1,17 +1,16 @@
 package typetodo.logic;
 
 /**
- * This abstract class is used to create 3 types of task, namely, TimedTask,
- * Deadline Task, Floating Task
- * 
+ * This abstract class is used to create 3 types of task,
+ * namely, TimedTask, Deadline Task, Floating Task
  * @author Phan Shi Yu
- * 
+ *
  */
 public abstract class Task {
 	public static enum Status {
 		COMPLETED, INCOMPLETE, DISCARDED;
 	}
-
+	
 	private int taskId;
 	private String name;
 	private String description;
@@ -44,8 +43,12 @@ public abstract class Task {
 	public int getTaskId() {
 		return taskId;
 	}
-
+	
 	public void setTaskId(int taskId) {
 		this.taskId = taskId;
+	}
+	
+	public String toString() {
+		return (this.getName() + " " + this.getDescription());
 	}
 }
