@@ -20,7 +20,7 @@ public class CommandParser {
 			null);
 	private final static String catalog = "Here is catalog of standard inputs: \n"
 			+ "ADD: add <name> desc <description>\n"
-			+ "     add <name> desc <description> <deadline in ddMMMhhmm format>\n"
+			+ "     add <name> desc <description> <deadline in h:mm d-MMM yyyy format>\n"
 			+ "     add <name> desc <description> <start date> <end date> <isBusy>(type 'busy' if busy)\n"
 			+ "DELETE: delete <name>\n"
 			+ "        delete <index shown in list>\n"
@@ -220,7 +220,7 @@ public class CommandParser {
 	 * return boolean value of whether a string can be parsed into a date value.
 	 */
 	private static boolean isDate(String dateString) {
-		DateFormat df = new SimpleDateFormat("ddMMMHHmm");
+		DateFormat df = new SimpleDateFormat("h:mm d-MMM yyyy");
 		try {
 			df.parse(dateString);
 		} catch (ParseException e) {
@@ -242,7 +242,7 @@ public class CommandParser {
 
 	/** convert from string to date, and return date */
 	private static Date convertToDate(String dateString) throws ParseException {
-		Date date = new SimpleDateFormat("ddMMMhhmm", Locale.ENGLISH)
+		Date date = new SimpleDateFormat("h:mm d-MMM yyyy", Locale.ENGLISH)
 				.parse(dateString);
 		return date;
 	}
