@@ -193,8 +193,12 @@ public class CommandParser {
 
 	/** return substring of a sentence that removed the first word. */
 	private static String getContent(String userInput) {
-		String[] temp = userInput.split(" ", 2);
-		return temp[1];
+		if (userInput.contains(" ")) {
+			String[] temp = userInput.split(" ", 2);
+			return temp[1];
+		} else {
+			return "";
+		}
 	}
 
 	/** return string array that each element is a word from a text. */
