@@ -58,17 +58,19 @@ public class DBHandler {
 		Type collectionType = new TypeToken<List<Task>>() {
 		}.getType();
 		if (!fileToTextBuffer.toString().isEmpty()) {
-			System.out.println(fileToTextBuffer);
-			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
-			System.out.println(tasksCache.size());
+//			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
+
 		}
+		// TODO Create a custom comparator to sort list by taskId
 	}
 
 	private void writeToFile() {
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(savedFile));
-			writer.write(gson.toJson(tasksCache));
+			Type collectionType = new TypeToken<List<Task>>() {
+			}.getType();
+			writer.write(gson.toJson(tasksCache, collectionType));
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -87,7 +89,7 @@ public class DBHandler {
 		if (tasksCache.isEmpty()) {
 			taskId = 1;
 		} else {
-			taskId = tasksCache.get(tasksCache.size()).getTaskId() + 1;
+			taskId = tasksCache.get(tasksCache.size() - 1).getTaskId() + 1;
 		}
 		// if (((Integer) newTask.getTaskId()) != null) {
 		// // TODO Replace with exception for taskId already exist
