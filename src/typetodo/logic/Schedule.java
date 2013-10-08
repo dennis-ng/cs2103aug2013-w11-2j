@@ -14,6 +14,10 @@ public class Schedule {
 	private static final String MESSAGE_SEARCH = "%d Tasks have been found";
 	private static final String MESSAGE_EDITED = "";
 	private static final String MESSAGE_MARK = "";
+
+	private static enum Mode {
+		DATE, KEYWORD, STATUS;
+	}
 	
 	private static class ViewMode {
 		private static String mode;
