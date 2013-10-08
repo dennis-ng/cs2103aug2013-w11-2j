@@ -18,17 +18,18 @@ public class Schedule {
 	private static enum Mode {
 		DATE, KEYWORD, STATUS;
 	}
+	
 	private static class ViewMode {
-		private static Mode mode;
+		private static String mode;
 		private static Date date;
 		private static String keyword;
 		private static Status status;
 		
-		private static Mode getMode() {
+		private static String getMode() {
 			return mode;
 		}
 		
-		private static void setMode(Mode mode) {
+		private static void setMode(String mode) {
 			ViewMode.mode = mode;
 		}
 		
@@ -258,22 +259,22 @@ public class Schedule {
 	 * @return returns a View object of the current View Mode
 	 */
 	public View generateView() {
-		Mode mode = ViewMode.getMode();
+		String mode = ViewMode.getMode();
 		ArrayList<Task> tasks = null;
 		View view = null;
 		
 		switch (mode) {
-			case DATE :
+			case "date" :
 				tasks = db.retrieveList(ViewMode.getDate());
 				view = new View(getFeedBack(), tasks);
 				break;
 			
-			case KEYWORD :
+			case "keyword" :
 				tasks = db.retrieveContaining(ViewMode.getKeyword());
 				view = new View(getFeedBack(), tasks);
 				break;
 				
-			case STATUS :
+			case "status" :
 				tasks = db.retrieveContaining(ViewMode.getStatus().toString());
 				view = new View(getFeedBack(), tasks);
 				break;
@@ -306,7 +307,7 @@ public class Schedule {
 	 * @return returns a View object of the new View Mode
 	 */
 	public View setViewMode(Date date) {
-		ViewMode.setMode(Mode.DATE);
+		ViewMode.setMode("date");
 		ViewMode.setDate(date);
 		currentView= generateView();
 		return currentView;
@@ -318,7 +319,7 @@ public class Schedule {
 	 * @return returns a View object of the new View Mode
 	 */
 	public View setViewMode(String keyword) {
-		ViewMode.setMode(Mode.KEYWORD);
+		ViewMode.setMode("keyword");
 		ViewMode.setKeyword(keyword);
 		currentView= generateView();
 		return currentView;
@@ -330,7 +331,7 @@ public class Schedule {
 	 * @return
 	 */
 	public View setViewMode(Status status) {
-		ViewMode.setMode(Mode.STATUS);
+		ViewMode.setMode("statusout");
 		ViewMode.setStatus(status);
 		currentView = generateView();
 		return currentView;
