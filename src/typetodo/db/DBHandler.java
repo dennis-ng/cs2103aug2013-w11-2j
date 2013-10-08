@@ -58,7 +58,8 @@ public class DBHandler {
 		Type collectionType = new TypeToken<List<Task>>() {
 		}.getType();
 		if (!fileToTextBuffer.toString().isEmpty()) {
-//			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
+			// tasksCache = gson.fromJson(fileToTextBuffer.toString(),
+			// collectionType);
 
 		}
 		// TODO Create a custom comparator to sort list by taskId
@@ -85,16 +86,18 @@ public class DBHandler {
 	 * @throws
 	 */
 	public int addTask(Task newTask) throws Exception {
+		if (newTask.getTaskId() != 0) {
+			//TODO Check for conflict in the list since the taskId is given
+			tasksCache.add(newTask);
+			// TODO do a sort by taskId
+			return newTask.getTaskId();
+		}
 		int taskId;
 		if (tasksCache.isEmpty()) {
 			taskId = 1;
 		} else {
 			taskId = tasksCache.get(tasksCache.size() - 1).getTaskId() + 1;
 		}
-		// if (((Integer) newTask.getTaskId()) != null) {
-		// // TODO Replace with exception for taskId already exist
-		// throw new Exception();
-		// }
 		newTask.setTaskId(taskId);
 		tasksCache.add(newTask);
 		this.writeToFile();
