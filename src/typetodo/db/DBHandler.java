@@ -35,7 +35,9 @@ public class DBHandler {
 
 	public DBHandler() throws IOException {
 		savedFile = new File(FILENAME);
-		gson = new GsonBuilder().setPrettyPrinting().create();
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
+		gson = gsonBuilder.setPrettyPrinting().create();
 		tasksCache = new ArrayList<Task>();
 		if (!savedFile.exists()) {
 			savedFile.createNewFile();
@@ -55,20 +57,23 @@ public class DBHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Type collectionType = new TypeToken<List<Task>>() {
-		}.getType();
 		if (!fileToTextBuffer.toString().isEmpty()) {
 			// tasksCache = gson.fromJson(fileToTextBuffer.toString(),
 			// collectionType);
+			Type collectionType = new TypeToken<List<Task>>() {
+			}.getType();
+			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
 
 		}
 		// TODO Create a custom comparator to sort list by taskId
 	}
 
-	private void writeToFile() {
+	private void writeChangesToFile() {
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(savedFile));
+			// Type collectionType = new TypeToken<List<Task>>() {
+			// }.getType();
 			Type collectionType = new TypeToken<List<Task>>() {
 			}.getType();
 			writer.write(gson.toJson(tasksCache, collectionType));
@@ -87,8 +92,9 @@ public class DBHandler {
 	 */
 	public int addTask(Task newTask) throws Exception {
 		if (newTask.getTaskId() != 0) {
-			//TODO Check for conflict in the list since the taskId is given
+			// TODO Check for conflict in the list since the taskId is given
 			tasksCache.add(newTask);
+			this.writeChangesToFile();
 			// TODO do a sort by taskId
 			return newTask.getTaskId();
 		}
@@ -100,7 +106,7 @@ public class DBHandler {
 		}
 		newTask.setTaskId(taskId);
 		tasksCache.add(newTask);
-		this.writeToFile();
+		this.writeChangesToFile();
 		return taskId;
 	}
 
@@ -115,7 +121,7 @@ public class DBHandler {
 		for (int i = 0; i < tasksCache.size(); i++) {
 			if (tasksCache.get(i).getTaskId() == taskIdToDelete) {
 				tasksCache.remove(i);
-				this.writeToFile();
+				this.writeChangesToFile();
 				isDeleted = true;
 				return isDeleted;
 			}
@@ -138,7 +144,7 @@ public class DBHandler {
 		for (int i = 0; i < tasksCache.size(); i++) {
 			if (tasksCache.get(i).getTaskId() == taskIdToUpdate) {
 				tasksCache.set(i, task);
-				this.writeToFile();
+				this.writeChangesToFile();
 				isUpdated = true;
 				return isUpdated;
 			}
