@@ -4,8 +4,13 @@
  */
 package typetodo.db;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,29 +21,58 @@ import typetodo.logic.Task;
 import typetodo.logic.TimedTask;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 public class DBHandler {
 
 	private static final String FILENAME = "TypeToDo.txt";
-	private final File saveFile;
+	private final File savedFile;
 
-	private final List<Task> tasksCache;
+	private List<Task> tasksCache;
+
+	private final Gson gson;
 
 	public DBHandler() throws IOException {
-		saveFile = new File(FILENAME);
-		if (!saveFile.exists()) {
-			saveFile.createNewFile();
-		}
+		savedFile = new File(FILENAME);
+		gson = new GsonBuilder().setPrettyPrinting().create();
 		tasksCache = new ArrayList<Task>();
+		if (!savedFile.exists()) {
+			savedFile.createNewFile();
+		}
 		this.loadFile();
 	}
 
 	private void loadFile() {
-		// TODO
+		StringBuilder fileToTextBuffer = new StringBuilder();
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(savedFile));
+			String nextLine;
+			while ((nextLine = reader.readLine()) != null) {
+				fileToTextBuffer.append(nextLine);
+			}
+			reader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Type collectionType = new TypeToken<List<Task>>() {
+		}.getType();
+		if (!fileToTextBuffer.toString().isEmpty()) {
+			System.out.println(fileToTextBuffer);
+			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
+			System.out.println(tasksCache.size());
+		}
 	}
 
 	private void writeToFile() {
-		Gson gson = new Gson();
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(savedFile));
+			writer.write(gson.toJson(tasksCache));
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

@@ -26,8 +26,9 @@ public class DBHandlerTest {
 			Date date = new Date();
 			DeadlineTask deadlineTask = new DeadlineTask(1, "Name", "Desc", date);
 			db = new DBHandler();
+			assertEquals("Delete", true, (db.deleteTask(1)));
 			assertEquals("Add task", 1, db.addTask(floatingTask));
-			assertEquals("Update task", true, db.updateTask(deadlineTask));
+			// assertEquals("Update task", true, db.updateTask(deadlineTask));
 			assertEquals("Retreive", date,
 					((DeadlineTask) db.retrieveList(date).get(0)).getDeadline());
 		} catch (Exception e) {
