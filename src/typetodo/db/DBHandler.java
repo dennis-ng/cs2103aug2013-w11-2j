@@ -93,6 +93,7 @@ public class DBHandler {
 	public int addTask(Task newTask) throws Exception {
 		if (newTask.getTaskId() != 0) {
 			// TODO Check for conflict in the list since the taskId is given
+			// Supports for undoing deleted task
 			tasksCache.add(newTask);
 			this.writeChangesToFile();
 			// TODO do a sort by taskId
