@@ -12,24 +12,23 @@ public class Schedule {
 	private static final String MESSAGE_ADDED = "%s has been added to your schedule";
 	private static final String MESSAGE_DELETED = "%s has been deleted from your schedule";
 	private static final String MESSAGE_SEARCH = "%d Tasks have been found";
-	private static final String MESSAGE_EDITED = "";
+	private static final String MESSAGE_EDITED = "Edit successful";
 	private static final String MESSAGE_MARK = "";
 
 	private static enum Mode {
 		DATE, KEYWORD, STATUS;
 	}
-	
 	private static class ViewMode {
-		private static String mode;
+		private static Mode mode;
 		private static Date date;
 		private static String keyword;
 		private static Status status;
 		
-		private static String getMode() {
+		private static Mode getMode() {
 			return mode;
 		}
 		
-		private static void setMode(String mode) {
+		private static void setMode(Mode mode) {
 			ViewMode.mode = mode;
 		}
 		
@@ -259,22 +258,22 @@ public class Schedule {
 	 * @return returns a View object of the current View Mode
 	 */
 	public View generateView() {
-		String mode = ViewMode.getMode();
+		Mode mode = ViewMode.getMode();
 		ArrayList<Task> tasks = null;
 		View view = null;
 		
 		switch (mode) {
-			case "date" :
+			case DATE :
 				tasks = db.retrieveList(ViewMode.getDate());
 				view = new View(getFeedBack(), tasks);
 				break;
 			
-			case "keyword" :
+			case KEYWORD :
 				tasks = db.retrieveContaining(ViewMode.getKeyword());
 				view = new View(getFeedBack(), tasks);
 				break;
 				
-			case "status" :
+			case STATUS :
 				tasks = db.retrieveContaining(ViewMode.getStatus().toString());
 				view = new View(getFeedBack(), tasks);
 				break;
@@ -307,7 +306,7 @@ public class Schedule {
 	 * @return returns a View object of the new View Mode
 	 */
 	public View setViewMode(Date date) {
-		ViewMode.setMode("date");
+		ViewMode.setMode(Mode.DATE);
 		ViewMode.setDate(date);
 		currentView= generateView();
 		return currentView;
@@ -319,7 +318,7 @@ public class Schedule {
 	 * @return returns a View object of the new View Mode
 	 */
 	public View setViewMode(String keyword) {
-		ViewMode.setMode("keyword");
+		ViewMode.setMode(Mode.KEYWORD);
 		ViewMode.setKeyword(keyword);
 		currentView= generateView();
 		return currentView;
@@ -331,7 +330,7 @@ public class Schedule {
 	 * @return
 	 */
 	public View setViewMode(Status status) {
-		ViewMode.setMode("statusout");
+		ViewMode.setMode(Mode.STATUS);
 		ViewMode.setStatus(status);
 		currentView = generateView();
 		return currentView;
@@ -346,6 +345,7 @@ public class Schedule {
 	 */
 	public View editTask(int index, FieldName fieldName, String newValue) {
 		Task taskToBeEdited = currentView.getTasks().get(index-1);
+		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 		
 		switch (fieldName) {
 			case NAME :
@@ -362,7 +362,7 @@ public class Schedule {
 		
 		try {
 			db.updateTask(taskToBeEdited);
-			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskToBeEdited));
+			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
 			//Handle
 		}
@@ -381,7 +381,8 @@ public class Schedule {
 	 */
 	public View editTask(int index, FieldName fieldName, Date newValue) {
 		Task taskToBeEdited = currentView.getTasks().get(index-1);
-		
+		Task taskBeforeEdit = taskToBeEdited.makeCopy();
+
 		switch (fieldName) {
 			case START :
 				if (taskToBeEdited instanceof TimedTask) {
@@ -399,14 +400,14 @@ public class Schedule {
 				if (taskToBeEdited instanceof DeadlineTask) {
 					((DeadlineTask) taskToBeEdited).setDeadline(newValue);
 				}
-				
+				break;
 			default :
 				break;
 		}
 		
 		try {
 			db.updateTask(taskToBeEdited);
-			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskToBeEdited));
+			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
 			//Handle
 		}
@@ -425,6 +426,7 @@ public class Schedule {
 	 */
 	public View editTask(int index, FieldName fieldName, boolean isBusy) {
 		Task taskToBeEdited = currentView.getTasks().get(index-1);
+		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 		
 		if (taskToBeEdited instanceof TimedTask) {
 			((TimedTask) taskToBeEdited).setBusy(isBusy);
@@ -432,7 +434,7 @@ public class Schedule {
 		
 		try {
 			db.updateTask(taskToBeEdited);
-			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskToBeEdited));
+			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
 			//Handle
 		}

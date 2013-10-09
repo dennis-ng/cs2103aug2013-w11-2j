@@ -13,4 +13,8 @@ public class FloatingTask extends Task {
 		this.setDescription(description);
 		this.setStatus(Status.INCOMPLETE);
 	}
+	
+	public Task makeCopy() {
+		return new FloatingTask(this.getTaskId(), this.getName(), this.getDescription());
+	}
 }

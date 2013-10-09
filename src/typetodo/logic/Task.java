@@ -51,4 +51,6 @@ public abstract class Task {
 	public String toString() {
 		return (this.getName() + " " + this.getDescription());
 	}
+	
+	public abstract Task makeCopy();
 }

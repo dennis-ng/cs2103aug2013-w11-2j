@@ -27,4 +27,8 @@ public class DeadlineTask extends Task{
 	public void setDeadline(Date deadline) {
 		this.deadline = deadline;
 	}
+	
+	public Task makeCopy() {
+		return new DeadlineTask(this.getTaskId(), this.getName(), this.getDescription(), this.getDeadline());
+	}
 }

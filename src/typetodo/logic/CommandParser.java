@@ -1,12 +1,14 @@
 package typetodo.logic;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Date;
-import java.util.Locale;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Stack;
 
 import typetodo.logic.Task.Status;
 
@@ -48,54 +50,57 @@ public class CommandParser {
 	}
 
 	public View executeCommand(String userInput) throws ParseException {
+		//To determine which command to execute:
 		String commandString = getFirstWord(userInput);
+		COMMAND command = getCommand(commandString);
+		
 		String contentString = getContent(userInput);
-		COMMAND command = getCommand(commandString, contentString);
 		String[] contentArray = partitionString(contentString);
 
 		switch (command) {
 
 		case ADD:
-			String name = contentString.split(" desc ")[0];
-			String contentExcludeName = contentString.split(" desc ")[1];
-			int length = contentExcludeName.length();
+			String name = contentArray[0];
 
 			if (dateOccurrence(contentArray) == 0) {
-				return schedule.addTask(name, contentExcludeName);
+				return schedule.addTask(name, contentArray[1]);
 			}
 
 			else if (dateOccurrence(contentArray) == 1) {
-				String description = contentExcludeName.substring(0,
-						(length - 10));
-				Date deadline = convertToDate(contentExcludeName
-						.substring(length - 9));
+				String description = contentArray[1];
+				Date deadline = convertToDate(contentArray[2]);
 				return schedule.addTask(name, description, deadline);
 			}
 
 			else if (dateOccurrence(contentArray) == 2) {
-				String description = contentExcludeName.substring(0,
-						(length - 25));
-				Date start = convertToDate(contentExcludeName.substring(0, 9));
-				Date end = convertToDate(contentExcludeName.substring(10, 19));
+				String description = contentArray[1];
+				Date start = convertToDate(contentArray[2]);
+				Date end = convertToDate(contentArray[3]);
+				
 				Boolean isBusy = false;
-				if (contentExcludeName.substring(20) == "busy") {
-					isBusy = true;
-				} else {
-					isBusy = false;
+				try {
+					if (contentArray[4] == "busy") {
+						isBusy = true;
+					} else {
+						isBusy = false;
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					//move on
 				}
+				
 				return schedule.addTask(name, description, start, end, isBusy);
 			} else {
 				return VIEW_INVALID;
 			}
 
-		case DELETE:
+		case DELETE :
 			if (isNumeric(contentArray[0])) {
 				return schedule.deleteTask(Integer.parseInt(contentString));
 			} else {
 				return schedule.deleteTask(contentString);
 			}
 
-		case DISPLAY:
+		case DISPLAY :
 			if (isDate(contentString)) {
 				Date date = convertToDate(contentString);
 				schedule.setViewMode(date);
@@ -110,15 +115,17 @@ public class CommandParser {
 		case UPDATE:
 			int index = Integer.parseInt(contentArray[0]);
 			FieldName fieldName = convertToFieldName(contentArray[1]);
-			String newValue = contentString.split(fieldName + " ")[1];
+			String field_name = fieldName.toString();
+			String newValue = contentArray[2];
 
-			if (fieldName.equals("NAME") || fieldName.equals("DESCRIPTION")) {
+			if (field_name.equals("NAME") || field_name.equals("DESCRIPTION")) {
+				System.out.println("HELLO");
 				return schedule.editTask(index, fieldName, newValue);
-			} else if (fieldName.equals("START") || fieldName.equals("END")
-					|| fieldName.equals("DEADLINE")) {
+			} else if (field_name.equals("START") || field_name.equals("END")
+					|| field_name.equals("DEADLINE")) {
 				Date date = convertToDate(newValue);
 				return schedule.editTask(index, fieldName, date);
-			} else if (fieldName.equals("BUSYFIELD")) {
+			} else if (field_name.equals("BUSYFIELD")) {
 				boolean isBusy = convertToBoolean(newValue);
 				return schedule.editTask(index, fieldName, isBusy);
 			} else {
@@ -157,7 +164,7 @@ public class CommandParser {
 	 * parse users' command lines to the programme, according to different
 	 * command types.
 	 */
-	private static COMMAND getCommand(String command, String content) {
+	private static COMMAND getCommand(String command) {
 		String commandLowerCase = command.toLowerCase();
 		if (commandLowerCase == null) {
 			throw new Error(MESSAGE_ERROR_COMMAND);
@@ -193,18 +200,139 @@ public class CommandParser {
 
 	/** return substring of a sentence that removed the first word. */
 	private static String getContent(String userInput) {
-		if (userInput.contains(" ")) {
-			String[] temp = userInput.split(" ", 2);
-			return temp[1];
-		} else {
-			return "";
+		String[] temp = userInput.split(" ", 2);
+
+		if (temp.length < 2) {
+			return null;
 		}
+
+		return temp[1];
 	}
 
 	/** return string array that each element is a word from a text. */
-	private static String[] partitionString(String text) {
-		String[] temp = text.split(" ");
-		return temp;
+	private static String[] partitionString(String bodyOfUserInput) {
+		StringBuilder sb;
+		
+		if (bodyOfUserInput == null) {
+			return null;
+		}
+
+		ArrayList<String> listOfFields = new ArrayList<String>();
+		
+		String[] temp = bodyOfUserInput.split(" ");
+		
+		int indexOfLastDate = temp.length;
+		int indexOfDesc = temp.length;
+		int indexOfFieldName = temp.length;
+		
+		boolean hasDesc = false;
+		Stack<String> dates = new Stack<String>();
+		sb = new StringBuilder();
+		
+		//Finds all dates in body
+		for (int index = temp.length-3; index >= 0; index--) {
+			sb.append(temp[index] + " " + temp[index+1]+ " " + temp[index+2]);
+			if (isDate(sb.toString())) {
+				dates.push(sb.toString());
+				indexOfLastDate = index;
+			}
+			sb = new StringBuilder();
+		}
+		
+		//find index of 'desc'
+		for (int index = 0; index < indexOfLastDate; ++index) {
+			if (temp[index].equals("desc")) {
+				indexOfDesc = index;
+				hasDesc = true;
+				break;
+			}
+		}
+		
+		if (hasDesc) {
+			//extract name
+			sb = new StringBuilder();
+			for (int index = 0; index < indexOfDesc; ++index) {
+				sb.append(temp[index]);
+
+				if(index != indexOfDesc-1) {
+					sb.append(" ");
+				}
+			}
+			
+			listOfFields.add(sb.toString());
+			sb = new StringBuilder();
+			
+			//extract description
+			for (int index = indexOfDesc+1; index < indexOfLastDate; ++index) {
+				sb.append(temp[index]);
+				if(index != indexOfLastDate-1) {
+					sb.append(" ");
+				}
+			}
+			
+			listOfFields.add(sb.toString());
+			sb = new StringBuilder();
+		}
+		else  {
+			//find index of FIELDNAME
+			//boolean isUpperCase = true;
+			boolean hasFieldName = false;
+			for (int index = 0; index < indexOfLastDate; ++index) {
+				if (Character.isUpperCase(temp[index].charAt(0))) {
+					indexOfFieldName = index; //need to modify//
+					hasFieldName = true;
+					break;
+				}
+			}
+			
+			if (hasFieldName) {
+				//extract name/number
+				sb = new StringBuilder();
+				for (int index = 0; index < indexOfFieldName; ++index) {
+					sb.append(temp[index]);
+
+					if(index != indexOfFieldName-1) {
+						sb.append(" ");
+					}
+				}
+				
+				listOfFields.add(sb.toString());
+				sb = new StringBuilder();
+				
+				// add field name to array list:
+				listOfFields.add(temp[indexOfFieldName]);
+				
+				// extract new value
+				for (int index = indexOfFieldName+1; index < indexOfLastDate; ++index) {
+					sb.append(temp[index]);
+					if(index != indexOfLastDate-1) {
+						sb.append(" ");
+					}
+				}
+				if (!sb.toString().equals("")) {
+					listOfFields.add(sb.toString());
+				}
+				
+				sb = new StringBuilder();
+			}
+			else {
+				for (int index = 0; index < indexOfLastDate; ++index) {
+				listOfFields.add(temp[index]);
+				}
+			}
+		}
+		
+		//insert dates into the back of arraylist
+		while (!dates.isEmpty()) {
+			listOfFields.add(dates.pop());
+		}
+		
+		//lastly check if the busy flag is raised, if yes, insert 'busy' to back of arraylist
+		if (temp[temp.length-1].equals("busy")) {
+			listOfFields.add("busy");
+		}
+		
+		return listOfFields.toArray(new String[listOfFields.size()]);
 	}
 
 	/**
@@ -237,6 +365,7 @@ public class CommandParser {
 	private static int dateOccurrence(String[] array) {
 		int count = 0;
 		for (String element : array) {
+			//System.out.println(element);
 			if (isDate(element)) {
 				count++;
 			}

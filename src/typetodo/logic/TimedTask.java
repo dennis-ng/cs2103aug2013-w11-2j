@@ -49,4 +49,9 @@ public class TimedTask extends Task {
 	public void setBusy(boolean isBusy) {
 		this.isBusy = isBusy;
 	}	
+	
+	public Task makeCopy() {
+		return new TimedTask(this.getTaskId(), this.getName(), this.getDescription(), this.getStart(),
+				this.getEnd(), this.isBusy());
+	}
 }
