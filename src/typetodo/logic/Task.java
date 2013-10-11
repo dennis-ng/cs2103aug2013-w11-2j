@@ -1,5 +1,7 @@
 package typetodo.logic;
 
+import org.joda.time.DateTime;
+
 /**
  * This abstract class is used to create 3 types of task,
  * namely, TimedTask, Deadline Task, Floating Task
@@ -10,12 +12,22 @@ public abstract class Task {
 	public static enum Status {
 		COMPLETED, INCOMPLETE, DISCARDED;
 	}
-	
+
 	private int taskId;
 	private String name;
 	private String description;
 	private Status status;
-
+	private final DateTime dateCreated;
+	private DateTime dateModified;
+	
+	public Task(String name, String description) {
+		this.setName(name);
+		this.setDescription(description);
+		dateCreated = new DateTime();
+		dateModified = new DateTime();
+		this.setStatus(Status.INCOMPLETE);
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -53,4 +65,25 @@ public abstract class Task {
 	}
 	
 	public abstract Task makeCopy();
+
+	/**
+	 * @return the dateCreated
+	 */
+	public DateTime getDateCreated() {
+		return dateCreated;
+	}
+
+	/**
+	 * @return the dateModified
+	 */
+	public DateTime getDateModified() {
+		return dateModified;
+	}
+
+	/**
+	 * @param dateModified the dateModified to set
+	 */
+	public void setDateModified(DateTime dateModified) {
+		this.dateModified = dateModified;
+	}
 }
