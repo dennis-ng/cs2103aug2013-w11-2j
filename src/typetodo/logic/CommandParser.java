@@ -1,11 +1,8 @@
 package typetodo.logic;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Stack;
 
 import org.joda.time.DateTime;

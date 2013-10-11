@@ -1,7 +1,5 @@
 package typetodo.logic;
 
-import java.util.Date;
-
 import org.joda.time.DateTime;
 
 public class TimedTask extends Task {
@@ -10,21 +8,17 @@ public class TimedTask extends Task {
 	private boolean isBusy;
 	
 	public TimedTask(String name, String description, DateTime start, DateTime end, boolean isBusy) {
-		this.setName(name);
-		this.setDescription(description);
+		super(name, description);
 		this.setStart(start);
 		this.setEnd(end);
-		this.setStatus(Status.INCOMPLETE);
 		this.setBusy(isBusy);
 	}
 
 	public TimedTask(int taskId, String name, String description, DateTime start, DateTime end, boolean isBusy) {
+		super(name, description);
 		this.setTaskId(taskId);
-		this.setName(name);
-		this.setDescription(description);
 		this.setStart(start);
 		this.setEnd(end);
-		this.setStatus(Status.INCOMPLETE);
 		this.setBusy(isBusy);
 	}
 	

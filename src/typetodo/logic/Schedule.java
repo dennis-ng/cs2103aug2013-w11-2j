@@ -70,6 +70,7 @@ public class Schedule {
 		public void undo() {
 			switch (type) {
 				case ADD :
+					taskAffected.setDateModified(new DateTime());
 					db.deleteTask(taskAffected.getTaskId());
 					break;
 				
@@ -91,6 +92,7 @@ public class Schedule {
 					
 				case EDIT :
 					try {
+						taskAffected.setDateModified(new DateTime());
 						db.updateTask(taskAffected);
 					} catch (Exception e) {
 						//Handle possible exception
@@ -112,7 +114,7 @@ public class Schedule {
 	public Schedule() throws Exception {
 		this.feedBack = WELCOME_MESSAGE;
 		this.db = new DBHandler();
-		this.setViewMode(new DateTime().now());	//setting to today's date
+		this.setViewMode(new DateTime());	//setting to today's date
 		this.currentView = generateView();
 		this.historyOfOperations = new Stack<Operation>();
 	}
@@ -362,6 +364,7 @@ public class Schedule {
 		}
 		
 		try {
+			taskToBeEdited.setDateModified(new DateTime());
 			db.updateTask(taskToBeEdited);
 			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
@@ -407,6 +410,7 @@ public class Schedule {
 		}
 		
 		try {
+			taskToBeEdited.setDateModified(new DateTime());
 			db.updateTask(taskToBeEdited);
 			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
@@ -434,6 +438,7 @@ public class Schedule {
 		}
 		
 		try {
+			taskToBeEdited.setDateModified(new DateTime());
 			db.updateTask(taskToBeEdited);
 			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
@@ -456,6 +461,7 @@ public class Schedule {
 		taskToMark.setStatus(Status.COMPLETED);
 		
 		try {
+			taskToMark.setDateModified(new DateTime());
 			db.updateTask(taskToMark);
 			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskToMark));
 		} catch (Exception e) {
