@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.joda.time.DateTime;
+
 import typetodo.logic.DeadlineTask;
 import typetodo.logic.FloatingTask;
 import typetodo.logic.Task;
@@ -37,6 +39,7 @@ public class DBHandler {
 		savedFile = new File(FILENAME);
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
+		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class, new DateTimeTypeConverter());
 		gson = gsonBuilder.setPrettyPrinting().create();
 		tasksCache = new ArrayList<Task>();
 		if (!savedFile.exists()) {
@@ -160,18 +163,18 @@ public class DBHandler {
 	 *         nothing is found.
 	 * @throws Exception
 	 */
-	public ArrayList<Task> retrieveList(Date day) {
+	public ArrayList<Task> retrieveList(DateTime day) {
 		List<Task> deadlineTasks = new ArrayList<Task>();
 		List<Task> timedTasks = new ArrayList<Task>();
 		List<Task> floatingTasks = new ArrayList<Task>();
 		for (Task taskInCache : tasksCache) {
 			if (taskInCache instanceof DeadlineTask) {
-				if (!((DeadlineTask) taskInCache).getDeadline().before(day)) {
+				if (!((DeadlineTask) taskInCache).getDeadline().isBefore(day)) {
 					deadlineTasks.add(taskInCache);
 				}
 			} else if (taskInCache instanceof TimedTask) {
-				if (!(((TimedTask) taskInCache).getEnd().before(day) && ((TimedTask) taskInCache)
-						.getStart().after(day))) {
+				if (!(((TimedTask) taskInCache).getEnd().isBefore(day) && ((TimedTask) taskInCache)
+						.getStart().isAfter(day))) {
 					timedTasks.add(taskInCache);
 				}
 			} else if (taskInCache instanceof FloatingTask) {
@@ -215,13 +218,13 @@ public class DBHandler {
 		return filteredTasks;
 	}
 
-	public boolean isAvailable(Date start, Date end) {
+	public boolean isAvailable(DateTime start, DateTime end) {
 		boolean isAvailable = true;
 		for (Task taskInCache : tasksCache) {
 			if (taskInCache instanceof TimedTask) {
 				TimedTask timedTask = (TimedTask) taskInCache;
 				if (timedTask.isBusy()
-						&& !(timedTask.getStart().after(end) || timedTask.getEnd().before(
+						&& !(timedTask.getStart().isAfter(end) || timedTask.getEnd().isBefore(
 								start))) {
 					isAvailable = false;
 					return isAvailable;
@@ -231,13 +234,13 @@ public class DBHandler {
 		return isAvailable;
 	}
 
-	public Task retrieveBusyTask(Date start, Date end) {
+	public Task retrieveBusyTask(DateTime start, DateTime end) {
 		Task busyTask = null;
 		for (Task taskInCache : tasksCache) {
 			if (taskInCache instanceof TimedTask) {
 				TimedTask timedTask = (TimedTask) taskInCache;
 				if (timedTask.isBusy()
-						&& !(timedTask.getStart().after(end) || timedTask.getEnd().before(
+						&& !(timedTask.getStart().isAfter(end) || timedTask.getEnd().isBefore(
 								start))) {
 					busyTask = timedTask;
 					return busyTask;
