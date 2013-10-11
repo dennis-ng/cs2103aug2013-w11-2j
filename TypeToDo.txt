@@ -1,0 +1,21 @@
+[
+  {
+    "type": "DeadlineTask",
+    "properties": {
+      "deadline": "2013-10-15T23:59:00.000+08:00",
+      "taskId": 1,
+      "name": "test",
+      "description": "asdfasf",
+      "status": "INCOMPLETE"
+    }
+  },
+  {
+    "type": "FloatingTask",
+    "properties": {
+      "taskId": 2,
+      "name": "asdfasdf",
+      "description": "heheh",
+      "status": "INCOMPLETE"
+    }
+  }
+]
