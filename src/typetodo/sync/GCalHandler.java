@@ -7,7 +7,6 @@ import typetodo.logic.FloatingTask;
 import typetodo.logic.Task;
 import typetodo.logic.TimedTask;
 
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
@@ -15,63 +14,117 @@ import com.google.api.services.calendar.model.Events;
 
 public class GCalHandler {
 	private GCalAuthenticator authenticator;
-	private final com.google.api.services.calendar.Calendar client;
+	private final com.google.api.services.calendar.Calendar calendarClient;
+	private final com.google.api.services.tasks.Tasks tasksClient;
 	private String calendarId;
+	private String taskListId;
 	
 	public GCalHandler() {
 		authenticator = new GCalAuthenticator("TypeToDo");
-		client = authenticator.getClient();
+		calendarClient = authenticator.getClient();
+		tasksClient = authenticator.getTasksClient();
 		
 		if ((calendarId = hasTypeToDoCalendar()) == null) { //TypeToDo calendar does not exist
 			calendarId = addTypeToDoCalendar();
 		}
-	}
-	
-	public void addTaskToGCal(Task task) {
-		Event event = new Event();
 		
-		event.setSummary(task.getName()); //sets the title
-		event.setDescription(task.getDescription());
-		
-		if (task instanceof FloatingTask) {
-			
-		}
-		else if (task instanceof TimedTask) {
-			
-		}
-		else if (task instanceof DeadlineTask) {
-			
-		}	
-	}
-	
-	public void getAllTasksFromGCal() {
 		try {
-			//Get all tasks in TypeToDo Calendar
-			Events feed = client.events().list(calendarId).execute();
+			System.out.println("Accessing Your Tasklist..");
+			taskListId = tasksClient.tasklists().list().execute().getItems().get(0).getId();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public Task convertToTask(Event event) {
-		String title = event.getSummary();
-		String description = event.getDescription();
-		
-		DateTime start = event.getStart().getDateTime();
-		DateTime end = event.getEnd().getDateTime();
-		
-		boolean isBusy;
-		// PLS COMPLETE
+	public void addTaskToGCal(Task task) throws IOException {
+		if (task instanceof TimedTask) {
+			Event event = Converter.timedTaskToEvent((TimedTask) task);
+			Event result = calendarClient.events().insert(calendarId, event).execute();
+			task.setGoogleCalendarEventId(result.getId()); //append GCal's id to task
+		}
+		else if(task instanceof DeadlineTask) {
+			com.google.api.services.tasks.model.Task googleTask = 
+					Converter.DeadlineTaskToGoogleTask((DeadlineTask) task);
+			
+			com.google.api.services.tasks.model.Task result = 
+					tasksClient.tasks().insert(taskListId, googleTask).execute();
+			
+			task.setGoogleCalendarEventId(result.getId());
+		}
+		else if(task instanceof FloatingTask) {
+			com.google.api.services.tasks.model.Task googleTask = 
+					Converter.floatingTaskToGoogleTask((FloatingTask) task);
+			
+			com.google.api.services.tasks.model.Task result = 
+					tasksClient.tasks().insert(taskListId, googleTask).execute();
+			
+			task.setGoogleCalendarEventId(result.getId());
+		}
+	}
+	
+	public Events getAllTasksFromGCal() {
+		try {
+			//Get all tasks in TypeToDo Calendar
+			Events feed = calendarClient.events().list(calendarId).execute();
+			return feed;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 	
+	public boolean hasTask(Task task) {
+		if (task instanceof TimedTask) {
+			if (task.getGoogleId() != null) {
+				try {
+					if(task.getGoogleId() != null) {
+						if (calendarClient.events().get(calendarId, task.getGoogleId()).execute() != null){
+							return true;
+						}
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		else {
+			try {
+				if(task.getGoogleId() != null) {
+					if (!tasksClient.tasks().get(taskListId, task.getGoogleId()).execute().equals(null)) {
+						return true;
+					}
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	
+	public boolean hasDifferences(Task task) {
+		Event event;
+		if (task.getGoogleId() != null) {
+			try {
+				if ((event = calendarClient.events().get(calendarId, task.getGoogleId()).execute()) != null){
+					return true;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return false;
+	}
 	
 	private String addTypeToDoCalendar() {
 		com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
 		calendar.setSummary("TypeToDo");
 		try {
-			calendar = client.calendars().insert(calendar).execute();
+			calendar = calendarClient.calendars().insert(calendar).execute();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -82,7 +135,7 @@ public class GCalHandler {
 	
 	private String hasTypeToDoCalendar() {
 		try {
-			CalendarList feed = client.calendarList().list().execute();
+			CalendarList feed = calendarClient.calendarList().list().execute();
 			
 			if (feed.isEmpty()) {
 				return null;

@@ -18,6 +18,8 @@ import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.tasks.Tasks;
+import com.google.api.services.tasks.TasksScopes;
 
 /**
  * This class is used to gain access(via OAuth2) to the user's Google Calendar. Upon completion
@@ -50,7 +52,8 @@ public class GCalAuthenticator {
 	private HttpTransport httpTransport;
 
 	@SuppressWarnings("unused")
-	private Calendar client;
+	private Calendar calendarClient;
+	private Tasks tasksClient;
 	
 	/**
 	 * Constructor for GCalAuthenticator
@@ -59,7 +62,7 @@ public class GCalAuthenticator {
 	public GCalAuthenticator (String applicationName) {
 		this.APPLICATION_NAME = applicationName;
 		this.DATA_STORE_DIR =
-				new java.io.File(System.getProperty("user.home"), ".store/typetodo_credentials");
+				new java.io.File(System.getProperty("user.home"), ".store/typetodo.credentials");
 		this.JSON_FACTORY = JacksonFactory.getDefaultInstance();
 		
 		try {
@@ -73,15 +76,18 @@ public class GCalAuthenticator {
 			Credential credential = authorize();
 
 			// set up global Calendar instance
-			client = new Calendar.Builder(httpTransport, JSON_FACTORY, credential)
+			calendarClient = new Calendar.Builder(httpTransport, JSON_FACTORY, credential)
 			.setApplicationName(APPLICATION_NAME).build();
+			
+			// Tasks client
+		    setTasksClient(new com.google.api.services.tasks.Tasks.Builder(httpTransport, JSON_FACTORY, credential)
+			    .setApplicationName(APPLICATION_NAME).build());
 
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		System.exit(1);
 	}
 
 	/**
@@ -89,14 +95,14 @@ public class GCalAuthenticator {
 	 * @return client of type Calendar
 	 */
 	public Calendar getClient() {
-		return client;
+		return calendarClient;
 	}
 
 	/** Authorizes the installed application to access user's protected data. */
 	private Credential authorize() throws Exception {
 		// load client secrets
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-				new InputStreamReader(GCalAuthenticator.class.getResourceAsStream("/client_secrets.json")));
+				new InputStreamReader(this.getClass().getResourceAsStream("/client_secrets.json")));
 		if (clientSecrets.getDetails().getClientId().startsWith("Enter") ||
 				clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
 			System.out.println(
@@ -117,6 +123,8 @@ public class GCalAuthenticator {
 		Set<String> scopes = new HashSet<String>();
 		scopes.add(CalendarScopes.CALENDAR);
 		scopes.add(CalendarScopes.CALENDAR_READONLY);
+		scopes.add(TasksScopes.TASKS);
+		scopes.add(TasksScopes.TASKS_READONLY);
 
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
 				httpTransport, JSON_FACTORY, clientSecrets, scopes)
@@ -124,5 +132,19 @@ public class GCalAuthenticator {
 		.build();
 		// authorize
 		return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+	}
+
+	/**
+	 * @return the tasksClient
+	 */
+	public Tasks getTasksClient() {
+		return tasksClient;
+	}
+
+	/**
+	 * @param tasksClient the tasksClient to set
+	 */
+	public void setTasksClient(Tasks tasksClient) {
+		this.tasksClient = tasksClient;
 	}
 }

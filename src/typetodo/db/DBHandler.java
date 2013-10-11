@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -188,6 +187,33 @@ public class DBHandler {
 		return filteredTasks;
 	}
 
+	/**
+	 * 
+	 * @param day
+	 * @return An arraylist of all the tasks on this day. null will be returned if
+	 *         nothing is found.
+	 * @throws Exception
+	 */
+	public ArrayList<Task> retrieveAll() {
+		List<Task> deadlineTasks = new ArrayList<Task>();
+		List<Task> timedTasks = new ArrayList<Task>();
+		List<Task> floatingTasks = new ArrayList<Task>();
+		for (Task taskInCache : tasksCache) {
+			if (taskInCache instanceof DeadlineTask) {
+				deadlineTasks.add(taskInCache);
+			} else if (taskInCache instanceof TimedTask) {
+				timedTasks.add(taskInCache);
+			} else if (taskInCache instanceof FloatingTask) {
+				floatingTasks.add(taskInCache);
+			}
+		}
+		ArrayList<Task> filteredTasks = new ArrayList<Task>();
+		filteredTasks.addAll(deadlineTasks);
+		filteredTasks.addAll(timedTasks);
+		filteredTasks.addAll(floatingTasks);
+		return filteredTasks;
+	}
+	
 	/**
 	 * 
 	 * @param searchCriteria
