@@ -1,10 +1,17 @@
 package typetodo.ui;
 
 import java.text.ParseException;
-import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.Date;
-import typetodo.logic.*;
+import java.util.Scanner;
+
+import org.joda.time.DateTime;
+
+import typetodo.logic.CommandParser;
+import typetodo.logic.DeadlineTask;
+import typetodo.logic.FloatingTask;
+import typetodo.logic.Task;
+import typetodo.logic.TimedTask;
+import typetodo.logic.View;
 
 /** @author Wang Qi */
 public class TypeToDo {
@@ -54,7 +61,7 @@ public class TypeToDo {
 	private static void printTask(Task task) {
 		String name = task.getName();
 		String description = task.getDescription();
-		Date start, end, deadline;
+		DateTime start, end, deadline;
 		boolean isBusy;
 
 		if (task instanceof TimedTask) {

@@ -5,10 +5,11 @@ package typetodo.db;
 
 import static org.junit.Assert.assertEquals;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 
 import typetodo.logic.DeadlineTask;
@@ -26,9 +27,10 @@ public class DBHandlerTest {
 		try {
 			FloatingTask floatingTask = new FloatingTask("floatingTask1", "Desc");
 			FloatingTask floatingTask2 = new FloatingTask("floatingTask2", "Desc");
-			Date date = new Date();
-			Date deadline = new SimpleDateFormat("h:mm d-MMM yyyy", Locale.ENGLISH)
-					.parse("12:00 28-OCT 2014");
+			DateTime date = new DateTime();
+			DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm d-MMM yyyy").withLocale(Locale.ENGLISH);
+			DateTime deadline = fmt.parseDateTime("12:00 28-OCT 2014");
+			
 			DeadlineTask deadlineTask = new DeadlineTask(1, "deadlineTask", "Desc",
 					deadline);
 			db = new DBHandler();

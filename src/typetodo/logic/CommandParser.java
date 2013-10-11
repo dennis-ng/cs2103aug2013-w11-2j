@@ -1,14 +1,16 @@
 package typetodo.logic;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import typetodo.logic.Task.Status;
 
@@ -49,7 +51,7 @@ public class CommandParser {
 		return schedule.generateView();
 	}
 
-	public View executeCommand(String userInput) throws ParseException {
+	public View executeCommand(String userInput) throws IllegalArgumentException {
 		//To determine which command to execute:
 		String commandString = getFirstWord(userInput);
 		COMMAND command = getCommand(commandString);
@@ -68,14 +70,14 @@ public class CommandParser {
 
 			else if (dateOccurrence(contentArray) == 1) {
 				String description = contentArray[1];
-				Date deadline = convertToDate(contentArray[2]);
+				DateTime deadline = convertToDate(contentArray[2]);
 				return schedule.addTask(name, description, deadline);
 			}
 
 			else if (dateOccurrence(contentArray) == 2) {
 				String description = contentArray[1];
-				Date start = convertToDate(contentArray[2]);
-				Date end = convertToDate(contentArray[3]);
+				DateTime start = convertToDate(contentArray[2]);
+				DateTime end = convertToDate(contentArray[3]);
 				
 				Boolean isBusy = false;
 				try {
@@ -102,7 +104,7 @@ public class CommandParser {
 
 		case DISPLAY :
 			if (isDate(contentString)) {
-				Date date = convertToDate(contentString);
+				DateTime date = convertToDate(contentString);
 				schedule.setViewMode(date);
 			} else if (isStatus(contentString)) {
 				Status status = convertToStatus(contentString);
@@ -123,7 +125,7 @@ public class CommandParser {
 				return schedule.editTask(index, fieldName, newValue);
 			} else if (field_name.equals("START") || field_name.equals("END")
 					|| field_name.equals("DEADLINE")) {
-				Date date = convertToDate(newValue);
+				DateTime date = convertToDate(newValue);
 				return schedule.editTask(index, fieldName, date);
 			} else if (field_name.equals("BUSYFIELD")) {
 				boolean isBusy = convertToBoolean(newValue);
@@ -352,10 +354,10 @@ public class CommandParser {
 	 * return boolean value of whether a string can be parsed into a date value.
 	 */
 	private static boolean isDate(String dateString) {
-		DateFormat df = new SimpleDateFormat("h:mm d-MMM yyyy");
 		try {
-			df.parse(dateString);
-		} catch (ParseException e) {
+			DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
+			DateTime date = fmt.parseDateTime(dateString);
+		} catch (IllegalArgumentException e) {
 			return false;
 		}
 		return true;
@@ -374,9 +376,9 @@ public class CommandParser {
 	}
 
 	/** convert from string to date, and return date */
-	private static Date convertToDate(String dateString) throws ParseException {
-		Date date = new SimpleDateFormat("h:mm d-MMM yyyy", Locale.ENGLISH)
-				.parse(dateString);
+	private static DateTime convertToDate(String dateString) throws IllegalArgumentException {
+		DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
+		DateTime date = fmt.parseDateTime(dateString);
 		return date;
 	}
 

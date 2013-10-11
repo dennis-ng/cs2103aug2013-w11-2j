@@ -1,8 +1,9 @@
 package typetodo.logic;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Stack;
+
+import org.joda.time.DateTime;
 
 import typetodo.db.DBHandler;
 import typetodo.logic.Task.Status;
@@ -20,7 +21,7 @@ public class Schedule {
 	}
 	private static class ViewMode {
 		private static Mode mode;
-		private static Date date;
+		private static DateTime date;
 		private static String keyword;
 		private static Status status;
 		
@@ -32,11 +33,11 @@ public class Schedule {
 			ViewMode.mode = mode;
 		}
 		
-		private static Date getDate() {
+		private static DateTime getDate() {
 			return date;
 		}
 		
-		private static void setDate(Date date) {
+		private static void setDate(DateTime date) {
 			ViewMode.date = date;
 		}
 		
@@ -111,7 +112,7 @@ public class Schedule {
 	public Schedule() throws Exception {
 		this.feedBack = WELCOME_MESSAGE;
 		this.db = new DBHandler();
-		this.setViewMode(new Date());	//setting to today's date
+		this.setViewMode(new DateTime().now());	//setting to today's date
 		this.currentView = generateView();
 		this.historyOfOperations = new Stack<Operation>();
 	}
@@ -150,7 +151,7 @@ public class Schedule {
 	 * @param isBusy
 	 * @return returns a View object of the current View Mode
 	 */
-	public View addTask(String name, String description, Date start, Date end, boolean isBusy) {
+	public View addTask(String name, String description, DateTime start, DateTime end, boolean isBusy) {
 		TimedTask taskToBeAdded = new TimedTask(name, description, start, end, isBusy);
 		int taskId;
 		try {
@@ -174,7 +175,7 @@ public class Schedule {
 	 * @param deadline
 	 * @return returns a View object of the current View Mode
 	 */
-	public View addTask(String name, String description, Date deadline) {
+	public View addTask(String name, String description, DateTime deadline) {
 		DeadlineTask taskToBeAdded = new DeadlineTask(name, description, deadline);
 		int taskId;
 		
@@ -305,7 +306,7 @@ public class Schedule {
 	 * @param date
 	 * @return returns a View object of the new View Mode
 	 */
-	public View setViewMode(Date date) {
+	public View setViewMode(DateTime date) {
 		ViewMode.setMode(Mode.DATE);
 		ViewMode.setDate(date);
 		currentView= generateView();
@@ -379,7 +380,7 @@ public class Schedule {
 	 * @param newValue to replace old value in desired field
 	 * @return returns a View object of the current View Mode
 	 */
-	public View editTask(int index, FieldName fieldName, Date newValue) {
+	public View editTask(int index, FieldName fieldName, DateTime newValue) {
 		Task taskToBeEdited = currentView.getTasks().get(index-1);
 		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 

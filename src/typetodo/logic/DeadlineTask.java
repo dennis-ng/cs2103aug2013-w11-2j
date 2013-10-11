@@ -1,18 +1,21 @@
 package typetodo.logic;
 
-import java.util.Date;
+import org.joda.time.DateTime;
+
+import typetodo.db.DateTimeTypeConverter;
+import com.google.gson.*;
 
 public class DeadlineTask extends Task{
-	private Date deadline;
+	private DateTime deadline;
 	
-	public DeadlineTask(String name, String description, Date deadline) {
+	public DeadlineTask(String name, String description, DateTime deadline) {
 		this.setName(name);
 		this.setDescription(description);
 		this.setDeadline(deadline);
 		this.setStatus(Status.INCOMPLETE);
 	}
 
-	public DeadlineTask(int taskId, String name, String description, Date deadline) {
+	public DeadlineTask(int taskId, String name, String description, DateTime deadline) {
 		this.setTaskId(taskId);
 		this.setName(name);
 		this.setDescription(description);
@@ -20,11 +23,11 @@ public class DeadlineTask extends Task{
 		this.setStatus(Status.INCOMPLETE);
 	}
 	
-	public Date getDeadline() {
+	public DateTime getDeadline() {
 		return deadline;
 	}
 
-	public void setDeadline(Date deadline) {
+	public void setDeadline(DateTime deadline) {
 		this.deadline = deadline;
 	}
 	
