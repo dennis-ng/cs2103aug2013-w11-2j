@@ -1,75 +1,42 @@
 [
   {
+    "type": "FloatingTask",
+    "properties": {
+      "TaskId": 2,
+      "googleId": "MTcwNzk5NzQ1NjAyMjQ1MDIzNzU6MDoyMzE1MjAzMzM",
+      "name": "floatingtasktest",
+      "description": "hahaha",
+      "status": "INCOMPLETE",
+      "dateCreated": "2013-10-12T03:08:37.454+08:00",
+      "dateModified": "2013-10-12T03:08:37.454+08:00"
+    }
+  },
+  {
     "type": "DeadlineTask",
     "properties": {
-      "deadline": "2013-10-15T23:59:00.000+08:00",
-      "taskId": 1,
-      "name": "test",
-      "description": "asdfasf",
-      "status": "INCOMPLETE"
-    }
-  },
-  {
-    "type": "FloatingTask",
-    "properties": {
-      "taskId": 2,
-      "name": "asdfasdf",
-      "description": "heheh",
-      "status": "INCOMPLETE"
-    }
-  },
-  {
-    "type": "FloatingTask",
-    "properties": {
-      "taskId": 5,
-      "name": "asdfadf",
-      "description": "sdfsdf",
+      "deadline": "2013-10-13T23:59:00.000+08:00",
+      "TaskId": 3,
+      "googleId": "MTcwNzk5NzQ1NjAyMjQ1MDIzNzU6MDo3MzU4Nzg0Mjg",
+      "name": "deadlinetest",
+      "description": "deadline",
       "status": "INCOMPLETE",
-      "dateCreated": "2013-10-11T18:53:00.873+08:00"
+      "dateCreated": "2013-10-12T03:21:14.666+08:00",
+      "dateModified": "2013-10-12T03:21:14.666+08:00"
     }
   },
   {
-    "type": "FloatingTask",
+    "type": "TimedTask",
     "properties": {
-      "taskId": 6,
-      "name": "testmodified",
-      "description": "hahahah",
+      "start": "2013-10-14T14:00:00.000+08:00",
+      "end": "2013-10-14T18:00:00.000+08:00",
+      "isBusy": false,
+      "TaskId": 4,
+      "googleId": "d7193cqsde6sdfjpgfhjlr1uvo",
+      "name": "test timed task",
+      "description": "yeah i think its working",
       "status": "INCOMPLETE",
-      "dateCreated": "2013-10-11T18:55:17.917+08:00",
-      "dateModified": "2013-10-11T19:04:11.131+08:00"
-    }
-  },
-  {
-    "type": "FloatingTask",
-    "properties": {
-      "taskId": 7,
-      "name": "hello",
-      "description": "asdfsa",
-      "status": "INCOMPLETE",
-      "dateCreated": "2013-10-11T18:56:11.864+08:00",
-      "dateModified": "2013-10-11T18:56:11.864+08:00"
-    }
-  },
-  {
-    "type": "FloatingTask",
-    "properties": {
-      "taskId": 8,
-      "name": "hello",
-      "description": "asdfadf",
-      "status": "INCOMPLETE",
-      "dateCreated": "2013-10-11T18:59:58.041+08:00",
-      "dateModified": "2013-10-11T18:59:58.041+08:00"
-    }
-  },
-  {
-    "type": "FloatingTask",
-    "properties": {
-      "taskId": 9,
-      "name": "wahaha",
-      "description": "adasf",
-      "status": "INCOMPLETE",
-      "dateCreated": "2013-10-11T19:03:53.843+08:00",
-      "dateModified": "2013-10-11T19:03:53.843+08:00"
+      "dateCreated": "2013-10-12T03:29:20.649+08:00",
+      "dateModified": "2013-10-12T03:29:20.649+08:00"
     }
   }
 ]

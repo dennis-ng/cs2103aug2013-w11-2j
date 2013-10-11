@@ -1,5 +1,6 @@
 package typetodo.logic;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import typetodo.logic.Task.Status;
+import typetodo.sync.SyncHandler;
 
 /** @author Wang Qi */
 public class CommandParser {
@@ -40,7 +42,7 @@ public class CommandParser {
 	}
 
 	public enum COMMAND {
-		ADD, DELETE, DISPLAY, UPDATE, SEARCH, DONE, HOME, UNDO, HELP, INVALID, EXIT
+		ADD, DELETE, DISPLAY, UPDATE, SEARCH, DONE, HOME, UNDO, HELP, INVALID, SYNC, EXIT
 	}
 
 	// default view
@@ -153,6 +155,16 @@ public class CommandParser {
 
 		case EXIT:
 			System.exit(0);
+		
+		case SYNC:
+			try {
+				SyncHandler sh = new SyncHandler();
+				sh.syncToGoogleCalendar();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return schedule.generateView();
 
 		default:
 			throw new Error(MESSAGE_TYPE_ERROR);
@@ -187,7 +199,10 @@ public class CommandParser {
 			return COMMAND.UNDO;
 		} else if (exitSynonym.contains(commandLowerCase)) {
 			return COMMAND.EXIT;
-		} else {
+		} else if (commandLowerCase.equals("sync")) {
+			return COMMAND.SYNC;
+		}
+		else {
 			return COMMAND.INVALID;
 		}
 	}
@@ -353,7 +368,7 @@ public class CommandParser {
 	private static boolean isDate(String dateString) {
 		try {
 			DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
-			DateTime date = fmt.parseDateTime(dateString);
+			fmt.parseDateTime(dateString);
 		} catch (IllegalArgumentException e) {
 			return false;
 		}

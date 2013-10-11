@@ -13,13 +13,14 @@ public abstract class Task {
 		COMPLETED, INCOMPLETE, DISCARDED;
 	}
 
-	private int taskId;
+	private int TaskId;
+	private String googleId; //Retrive after sync
 	private String name;
 	private String description;
 	private Status status;
 	private final DateTime dateCreated;
 	private DateTime dateModified;
-	
+
 	public Task(String name, String description) {
 		this.setName(name);
 		this.setDescription(description);
@@ -53,11 +54,11 @@ public abstract class Task {
 	}
 
 	public int getTaskId() {
-		return taskId;
+		return TaskId;
 	}
 	
 	public void setTaskId(int taskId) {
-		this.taskId = taskId;
+		this.TaskId = taskId;
 	}
 	
 	public String toString() {
@@ -85,5 +86,19 @@ public abstract class Task {
 	 */
 	public void setDateModified(DateTime dateModified) {
 		this.dateModified = dateModified;
+	}
+
+	/**
+	 * @return the googleCalendarEventId
+	 */
+	public String getGoogleId() {
+		return googleId;
+	}
+
+	/**
+	 * @param googleCalendarEventId the googleCalendarEventId to set
+	 */
+	public void setGoogleCalendarEventId(String googleId) {
+		this.googleId = googleId;
 	}
 }
