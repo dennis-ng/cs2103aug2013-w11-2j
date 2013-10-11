@@ -2,16 +2,12 @@ package typetodo.logic;
 
 public class FloatingTask extends Task {
 	public FloatingTask(String name, String description) {
-		this.setName(name);
-		this.setDescription(description);
-		this.setStatus(Status.INCOMPLETE);
+		super(name, description);
 	}
 	
 	public FloatingTask(int taskId, String name, String description) {
+		super(name, description);
 		this.setTaskId(taskId);
-		this.setName(name);
-		this.setDescription(description);
-		this.setStatus(Status.INCOMPLETE);
 	}
 	
 	public Task makeCopy() {
