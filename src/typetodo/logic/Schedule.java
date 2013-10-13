@@ -1,5 +1,6 @@
 package typetodo.logic;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -7,7 +8,13 @@ import org.joda.time.DateTime;
 
 import typetodo.db.DBHandler;
 import typetodo.logic.Task.Status;
+import typetodo.sync.SyncHandler;
 
+/**
+ * The Schedule class.
+ * @author Phan Shi Yu
+ *
+ */
 public class Schedule {
 	private static final String WELCOME_MESSAGE = "Welcome to TypeToDo.\n";
 	private static final String MESSAGE_ADDED = "%s has been added to your schedule";
@@ -15,15 +22,24 @@ public class Schedule {
 	private static final String MESSAGE_SEARCH = "%d Tasks have been found";
 	private static final String MESSAGE_EDITED = "Edit successful";
 	private static final String MESSAGE_MARK = "";
+	private static final String MESSAGE_SYNC = "Sync successful";
 
 	private static enum Mode {
 		DATE, KEYWORD, STATUS;
 	}
+	
+	/**
+	 * The ViewMode class is used to store values used to construct the 
+	 * current View Object. 
+	 * @author Phan Shi YU
+	 *
+	 */
 	private static class ViewMode {
 		private static Mode mode;
 		private static DateTime date;
 		private static String keyword;
 		private static Status status;
+		private static boolean isTemp;
 		
 		private static Mode getMode() {
 			return mode;
@@ -56,8 +72,28 @@ public class Schedule {
 		private static void setStatus(Status status) {
 			ViewMode.status = status;
 		}
+
+		/**
+		 * @return the isTemp
+		 */
+		public static boolean isTemp() {
+			return isTemp;
+		}
+
+		/**
+		 * @param isTemp the isTemp to set
+		 */
+		public static void setTemp(boolean isTemp) {
+			ViewMode.isTemp = isTemp;
+		}
 	}
 	
+	/**
+	 * The Operation class is used to store the necessary information of a used operation 
+	 * such that it could be undone. 
+	 * @author Phan Shi Yu
+	 *
+	 */
 	private class Operation {
 		private final TypeOfOperation type;
 		private final Task taskAffected;
@@ -67,6 +103,9 @@ public class Schedule {
 			this.taskAffected = taskAffected;
 		}
 		
+		/**
+		 * Executes the reverse of the operation to mimic an undo.
+		 */
 		public void undo() {
 			switch (type) {
 				case ADD :
@@ -101,7 +140,7 @@ public class Schedule {
 			}
 			
 			setFeedBack("Undo is successful");
-			currentView = generateView();
+			refreshCurrentView();
 		}
 	
 	}
@@ -115,18 +154,77 @@ public class Schedule {
 		this.feedBack = WELCOME_MESSAGE;
 		this.db = new DBHandler();
 		this.setViewMode(new DateTime());	//setting to today's date
-		this.currentView = generateView();
+		this.refreshCurrentView();
 		this.historyOfOperations = new Stack<Operation>();
 	}
 
 	/**
-	 * Adds a floating task into the schedule
-	 * @param name
-	 * @param description
-	 * @return returns a View object of the current View Mode
+	 * Adds a floating task into the schedule.
+	 * @param title Title of floating task.
+	 * @param description Description of floating task
+	 * @return Returns true if add was successful and false if unsuccessful.
 	 */
-	public View addTask(String name, String description) {
-		FloatingTask taskToBeAdded = new FloatingTask(name, description);
+	public boolean addTask(String title, String description) {
+		FloatingTask taskToBeAdded = new FloatingTask(title, description);
+		int taskId;
+
+		try {
+			taskId = db.addTask(taskToBeAdded);
+			
+			taskToBeAdded.setTaskId(taskId);
+
+			this.historyOfOperations.push(new Operation(TypeOfOperation.ADD, taskToBeAdded));
+
+			setFeedBack(String.format(MESSAGE_ADDED, title));
+			this.refreshCurrentView();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	
+		return true;
+	}
+
+	/**
+	 * Adds a timed task into the schedule.
+	 * @param title Title of timed task.
+	 * @param description Description of timed task.
+	 * @param start Starting date and time of timed task.
+	 * @param end Ending date and time of timed task.
+	 * @param isBusy Boolean value to flag if given period(start to end) is a busy one. 
+	 * i.e no other tasks can be scheduled concurrently.
+	 * @return Returns true if add was successful and false if unsuccessful.
+	 */
+	public boolean addTask(String title, String description, DateTime start, DateTime end, boolean isBusy) {
+		TimedTask taskToBeAdded = new TimedTask(title, description, start, end, isBusy);
+		int taskId;
+
+		try {
+			taskId = db.addTask(taskToBeAdded);
+			taskToBeAdded.setTaskId(taskId);
+			
+			this.historyOfOperations.push(new Operation(TypeOfOperation.ADD, taskToBeAdded));
+
+			setFeedBack(String.format(MESSAGE_ADDED, title));
+			this.refreshCurrentView();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Adds a deadline task into the schedule.
+	 * @param title Title of deadline task.
+	 * @param description Description of deadline task.
+	 * @param deadline Deadline of deadline task.
+	 * @return Returns true if add was successful and false if unsuccessful.
+	 */
+	public boolean addTask(String title, String description, DateTime deadline) {
+		DeadlineTask taskToBeAdded = new DeadlineTask(title, description, deadline);
 		int taskId;
 		
 		try {
@@ -134,94 +232,46 @@ public class Schedule {
 			taskToBeAdded.setTaskId(taskId);
 			
 			this.historyOfOperations.push(new Operation(TypeOfOperation.ADD, taskToBeAdded));
+
+			setFeedBack(String.format(MESSAGE_ADDED, title));
+			this.refreshCurrentView();
 		} catch (Exception e) {
-			//Handle
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
 		}
-		
-		setFeedBack(String.format(MESSAGE_ADDED, name));
-		this.currentView = generateView();
-			
-		return currentView;
+		return true;
 	}
 	
 	/**
-	 * Adds a timed task into the schedule
-	 * @param name
-	 * @param description
-	 * @param start
-	 * @param end
-	 * @param isBusy
-	 * @return returns a View object of the current View Mode
+	 * Deletes a task in current view.
+	 * @param index Index of task as displayed in current view.
+	 * @return returns true if task is successfully deleted.
 	 */
-	public View addTask(String name, String description, DateTime start, DateTime end, boolean isBusy) {
-		TimedTask taskToBeAdded = new TimedTask(name, description, start, end, isBusy);
-		int taskId;
-		try {
-			taskId = db.addTask(taskToBeAdded);
-			taskToBeAdded.setTaskId(taskId);
-			
-			this.historyOfOperations.push(new Operation(TypeOfOperation.ADD, taskToBeAdded));
-		} catch (Exception e) {
-			//Handle
-		}
-		
-		setFeedBack(String.format(MESSAGE_ADDED, name));
-		this.currentView = generateView();
-		return currentView;
-	}
-	
-	/**
-	 * Adds a deadline task into the schedule
-	 * @param name
-	 * @param description
-	 * @param deadline
-	 * @return returns a View object of the current View Mode
-	 */
-	public View addTask(String name, String description, DateTime deadline) {
-		DeadlineTask taskToBeAdded = new DeadlineTask(name, description, deadline);
-		int taskId;
-		
-		try {
-			taskId = db.addTask(taskToBeAdded);
-			taskToBeAdded.setTaskId(taskId);
-			
-			this.historyOfOperations.push(new Operation(TypeOfOperation.ADD, taskToBeAdded));
-		} catch (Exception e) {
-			//Handle
-		}
-		
-		setFeedBack(String.format(MESSAGE_ADDED, name));
-		this.currentView = generateView();
-		return currentView;
-	}
-	
-	/**
-	 * Deletes a task base on its index of the current view
-	 * @param index
-	 * @return returns a View object of the current View Mode
-	 */
-	public View deleteTask (int index) {
-		//must throw out of bound exception!
+	public boolean deleteTask (int index) {
+		//TODO: must throw out of bound exception!
 		Task taskToBeDeleted = currentView.getTasks().get(index-1);
 		
 		if(db.deleteTask(taskToBeDeleted.getTaskId())) {
 			this.historyOfOperations.push(new Operation(TypeOfOperation.DELETE, taskToBeDeleted));
 			this.setFeedBack(MESSAGE_DELETED);
-			this.currentView = generateView();
+			this.refreshCurrentView();
 		}
 		else {
 			this.setFeedBack("DELETE FAILED");
+			return false;
 		}
 		
-		return currentView;
+		return true;
 	}
 	
 	/**
-	 * Deletes a task base on its name shown in the current view
-	 * @param taskName
-	 * @return returns a View object of the current View Mode
+	 * Deletes a task in database with a given keyword. If there are more than one task that 
+	 * matches the keyword, a View containing the tasks that matched would be generated.
+	 * @param keyword  
+	 * @return
 	 */
-	public View deleteTask(String keyword) {
+	public boolean deleteTask(String keyword) {
 		ArrayList<Task> tasks = db.retrieveContaining(keyword);
 		Task taskToBeDeleted = null;
 		
@@ -230,15 +280,17 @@ public class Schedule {
 			 * there are no tasks in the system that matches the keyword, generate feedback.
 			 */
 			this.setFeedBack("There are no tasks that matches your given keyword!");
-			this.currentView = generateView();
-			return currentView;
+			this.refreshCurrentView();
+			return true;
 		}
 		else if(tasks.size() > 1) {	//means there is more than one task that matches the keyword
 			/* show user a temp view which contains the tasks that matches the keyword
 			 * so that he can specify which tasks he wants to delete
 			 */
 			this.setFeedBack("Please specify the index of the tasks that you wish to delete");
-			return generateView(tasks); //return view of results
+			//TODO
+			this.currentView = generateView(tasks); //return view of results
+			return true;
 		}
 		else if (tasks.size() == 1) {
 			/*
@@ -249,11 +301,11 @@ public class Schedule {
 			db.deleteTask(taskToBeDeleted.getTaskId()); //delete task from database
 			
 			this.setFeedBack(MESSAGE_DELETED); //set feedback
-			this.currentView = generateView(); //generate current view base on view mode and feedback
-			return currentView; 
+			this.refreshCurrentView(); //generate current view base on view mode and feedback
+			return true;
 		}
 		
-		return currentView;
+		return false;
 	}
 	
 	/**
@@ -297,7 +349,7 @@ public class Schedule {
 	public View search(String keyword) {
 		int numberOfResults;
 		
-		this.currentView = setViewMode(keyword);
+		setViewMode(keyword);
 		numberOfResults = this.currentView.getTasks().size();
 		setFeedBack(String.format(MESSAGE_SEARCH, numberOfResults));
 		return currentView;
@@ -308,11 +360,10 @@ public class Schedule {
 	 * @param date
 	 * @return returns a View object of the new View Mode
 	 */
-	public View setViewMode(DateTime date) {
+	public void setViewMode(DateTime date) {
 		ViewMode.setMode(Mode.DATE);
 		ViewMode.setDate(date);
-		currentView= generateView();
-		return currentView;
+		this.refreshCurrentView();
 	}
 	
 	/**
@@ -320,11 +371,10 @@ public class Schedule {
 	 * @param keyword
 	 * @return returns a View object of the new View Mode
 	 */
-	public View setViewMode(String keyword) {
+	public void setViewMode(String keyword) {
 		ViewMode.setMode(Mode.KEYWORD);
 		ViewMode.setKeyword(keyword);
-		currentView= generateView();
-		return currentView;
+		this.refreshCurrentView();
 	}
 	
 	/**
@@ -335,24 +385,25 @@ public class Schedule {
 	public View setViewMode(Status status) {
 		ViewMode.setMode(Mode.STATUS);
 		ViewMode.setStatus(status);
-		currentView = generateView();
+		refreshCurrentView();
 		return currentView;
 	}
 	
+
 	/**
-	 * Edits the NAME/DESCRIPTION field
-	 * @param index index of task in current view
-	 * @param fieldName Name of field that is to be changed
-	 * @param newValue newValue to replace old value in desired field
-	 * @return returns a View object of the current View Mode
+	 * Edits and updates the title/description of an existing task.
+	 * @param index Index of task as displayed in current view.
+	 * @param fieldName Name of field to be edited. Eg. TITLE, DESCRIPTION
+	 * @param newValue New value to replace the existing value.
+	 * @return Returns the current View object.
 	 */
 	public View editTask(int index, FieldName fieldName, String newValue) {
 		Task taskToBeEdited = currentView.getTasks().get(index-1);
 		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 		
 		switch (fieldName) {
-			case NAME :
-				taskToBeEdited.setName((String) newValue);
+			case TITLE :
+				taskToBeEdited.setTitle((String) newValue);
 				break;
 			
 			case DESCRIPTION :
@@ -372,13 +423,13 @@ public class Schedule {
 		}
 		
 		this.setFeedBack(MESSAGE_EDITED);
-		this.currentView = generateView();
+		this.refreshCurrentView();
 		return this.currentView;
 	}
 
 	/**
 	 * Edits the START/END/DEADLINE field
-	 * @param index of task in current view
+	 * @param Index of task as displayed in current view.
 	 * @param fieldName Name of field that is to be changed
 	 * @param newValue to replace old value in desired field
 	 * @return returns a View object of the current View Mode
@@ -418,13 +469,13 @@ public class Schedule {
 		}
 		
 		this.setFeedBack(MESSAGE_EDITED);
-		this.currentView = generateView();
+		this.refreshCurrentView();
 		return this.currentView;
 	}
 
 	/**
 	 * Edits ISBUSY field
-	 * @param index of task in current view
+	 * @param Index of task as displayed in current view.
 	 * @param fieldName Name of field that is to be changed
 	 * @param isBusy Boolean value to replace the isBusy field
 	 * @return returns a View object of the current View Mode
@@ -446,13 +497,13 @@ public class Schedule {
 		}
 		
 		this.setFeedBack(MESSAGE_EDITED);
-		this.currentView = generateView();
+		this.refreshCurrentView();
 		return this.currentView;
 	}
 	
 	/**
 	 * marks a certain task as completed
-	 * @param index of task in current view
+	 * @param Index of task as displayed in current view.
 	 * @return returns a View object of the current View Mode
 	 */
 	public View markTaskAsCompleted(int index) {
@@ -469,7 +520,7 @@ public class Schedule {
 		}
 		
 		this.setFeedBack(MESSAGE_MARK);
-		this.currentView = generateView();
+		this.refreshCurrentView();
 		return this.currentView;
 	}
 	
@@ -483,12 +534,34 @@ public class Schedule {
 		return currentView;
 	}
 	
+	public View sync() {
+		try {
+			SyncHandler sh = new SyncHandler();
+			sh.syncToGoogleCalendar();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		this.setFeedBack(MESSAGE_SYNC);
+		this.refreshCurrentView();
+		return currentView;
+	}
+	
 	private String getFeedBack() {
 		return this.feedBack;
 	}
 
 	private void setFeedBack(String feedBack) {
 		this.feedBack = feedBack;
+	}
+	
+	public View getCurrentView() {
+		return this.currentView;
+	}
+	
+	private void refreshCurrentView() {
+		this.currentView = generateView();
 	}
 }
 

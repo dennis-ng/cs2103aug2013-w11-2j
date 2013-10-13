@@ -11,7 +11,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import typetodo.logic.Task.Status;
-import typetodo.sync.SyncHandler;
 
 /** @author Wang Qi */
 public class CommandParser {
@@ -37,8 +36,8 @@ public class CommandParser {
 	private final static View VIEW_CATALOG = new View(catalog, null);
 
 	// initialize
-	public CommandParser() throws Exception {
-		schedule = new Schedule();
+	public CommandParser(Schedule schedule) {
+		this.schedule = schedule;
 	}
 
 	public enum COMMAND {
@@ -50,7 +49,7 @@ public class CommandParser {
 		return schedule.generateView();
 	}
 
-	public View executeCommand(String userInput) throws IllegalArgumentException {
+	public void executeCommand(String userInput) throws IllegalArgumentException {
 		//To determine which command to execute:
 		String commandString = getFirstWord(userInput);
 		COMMAND command = getCommand(commandString);
@@ -64,13 +63,13 @@ public class CommandParser {
 			String name = contentArray[0];
 
 			if (dateOccurrence(contentArray) == 0) {
-				return schedule.addTask(name, contentArray[1]);
+				schedule.addTask(name, contentArray[1]);
 			}
 
 			else if (dateOccurrence(contentArray) == 1) {
 				String description = contentArray[1];
 				DateTime deadline = convertToDate(contentArray[2]);
-				return schedule.addTask(name, description, deadline);
+				schedule.addTask(name, description, deadline);
 			}
 
 			else if (dateOccurrence(contentArray) == 2) {
@@ -89,18 +88,20 @@ public class CommandParser {
 					//move on
 				}
 				
-				return schedule.addTask(name, description, start, end, isBusy);
+				schedule.addTask(name, description, start, end, isBusy);
 			} else {
-				return VIEW_INVALID;
+				//TODO: invalid new view
 			}
+			break;
 
 		case DELETE :
 			if (isNumeric(contentArray[0])) {
-				return schedule.deleteTask(Integer.parseInt(contentString));
+				schedule.deleteTask(Integer.parseInt(contentString));
 			} else {
-				return schedule.deleteTask(contentString);
+				schedule.deleteTask(contentString);
 			}
-
+			break;
+			
 		case DISPLAY :
 			if (isDate(contentString)) {
 				DateTime date = convertToDate(contentString);
@@ -111,7 +112,8 @@ public class CommandParser {
 			} else {
 				schedule.setViewMode(contentString);
 			}
-			return schedule.generateView();
+			schedule.generateView();
+			break;
 
 		case UPDATE:
 			int index = Integer.parseInt(contentArray[0]);
@@ -119,52 +121,52 @@ public class CommandParser {
 			String field_name = fieldName.toString();
 			String newValue = contentArray[2];
 
-			if (field_name.equals("NAME") || field_name.equals("DESCRIPTION")) {
-				System.out.println("HELLO");
-				return schedule.editTask(index, fieldName, newValue);
+			if (field_name.equals("TITLE") || field_name.equals("DESCRIPTION")) {
+				schedule.editTask(index, fieldName, newValue);
 			} else if (field_name.equals("START") || field_name.equals("END")
 					|| field_name.equals("DEADLINE")) {
 				DateTime date = convertToDate(newValue);
-				return schedule.editTask(index, fieldName, date);
+				schedule.editTask(index, fieldName, date);
 			} else if (field_name.equals("BUSYFIELD")) {
 				boolean isBusy = convertToBoolean(newValue);
-				return schedule.editTask(index, fieldName, isBusy);
+				schedule.editTask(index, fieldName, isBusy);
 			} else {
-				return VIEW_INVALID;
+				//TODO: invalid view
 			}
+			break;
 
-		case SEARCH:
-			return schedule.search(contentString);
+		case SEARCH :
+			schedule.search(contentString);
+			break;
 
-		case DONE:
-			return schedule
-					.markTaskAsCompleted(Integer.parseInt(contentString));
+		case DONE :
+			schedule.markTaskAsCompleted(Integer.parseInt(contentString));
+			break;
 
-		case HOME:
+		case HOME :
 			schedule.setViewMode("today");
-			return schedule.generateView();
+			schedule.generateView();
+			break;
 
-		case UNDO:
-			return schedule.undoLastOperation();
+		case UNDO :
+			schedule.undoLastOperation();
+			break;
 
 		case HELP:
-			return VIEW_CATALOG;
-
-		case INVALID:
-			return VIEW_INVALID;
-
-		case EXIT:
+			//TODO: view catalog
+			break;
+			
+		case INVALID :
+			//TODO: view invalid
+			break;
+			
+		case EXIT :
 			System.exit(0);
+			break;
 		
-		case SYNC:
-			try {
-				SyncHandler sh = new SyncHandler();
-				sh.syncToGoogleCalendar();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return schedule.generateView();
+		case SYNC :
+			schedule.sync();
+			break;
 
 		default:
 			throw new Error(MESSAGE_TYPE_ERROR);
@@ -421,7 +423,7 @@ public class CommandParser {
 	/** convert from string to FieldName and return FieldName. */
 	private static FieldName convertToFieldName(String fnString) {
 		if (fnString.equals("NAME")) {
-			return FieldName.NAME;
+			return FieldName.TITLE;
 		} else if (fnString.equals("DESCRIPTION")) {
 			return FieldName.DESCRIPTION;
 		} else if (fnString.equals("START")) {

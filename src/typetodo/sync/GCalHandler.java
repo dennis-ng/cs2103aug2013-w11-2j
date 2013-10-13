@@ -48,6 +48,7 @@ public class GCalHandler {
 		else if(task instanceof DeadlineTask) {
 			Event event = Converter.deadlineTaskToGoogleEvent((DeadlineTask) task);
 			Event result = calendarClient.events().insert(calendarId, event).execute();
+			System.out.println("Results id " + result.getId());
 			task.setGoogleId(result.getId()); //append GCal's id to task
 		}
 		else if(task instanceof FloatingTask) {
@@ -78,8 +79,15 @@ public class GCalHandler {
 			if (task.getGoogleId() != null) {
 				try {
 					if(task.getGoogleId() != null) {
-						if (calendarClient.events().get(calendarId, task.getGoogleId()) != null){
+						Event event = calendarClient.events().get(calendarId, task.getGoogleId()).execute();
+						if ((!event.equals(null)) && (!event.getStatus().equals("cancelled"))){
+							System.out.println(calendarId + " " + task.getGoogleId());
 							return true;
+						}
+						else {
+							System.out.println(calendarId + " " + task.getGoogleId());
+							System.out.println(event.getStatus());
+							System.out.println("failed");
 						}
 					}
 				} catch (IOException e) {

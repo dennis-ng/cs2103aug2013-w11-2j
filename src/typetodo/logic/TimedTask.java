@@ -47,7 +47,7 @@ public class TimedTask extends Task {
 	}	
 	
 	public Task makeCopy() {
-		return new TimedTask(this.getTaskId(), this.getName(), this.getDescription(), this.getStart(),
+		return new TimedTask(this.getTaskId(), this.getTitle(), this.getDescription(), this.getStart(),
 				this.getEnd(), this.isBusy());
 	}
 }

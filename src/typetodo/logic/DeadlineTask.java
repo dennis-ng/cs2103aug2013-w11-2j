@@ -25,6 +25,6 @@ public class DeadlineTask extends Task{
 	}
 	
 	public Task makeCopy() {
-		return new DeadlineTask(this.getTaskId(), this.getName(), this.getDescription(), this.getDeadline());
+		return new DeadlineTask(this.getTaskId(), this.getTitle(), this.getDescription(), this.getDeadline());
 	}
 }

@@ -15,26 +15,26 @@ public abstract class Task {
 
 	private int TaskId;
 	private String googleId; //Retrive after sync
-	private String name;
+	private String title;
 	private String description;
 	private Status status;
 	private DateTime dateCreated;
 	private DateTime dateModified;
 
 	public Task(String name, String description) {
-		this.setName(name);
+		this.setTitle(name);
 		this.setDescription(description);
 		dateCreated = new DateTime();
 		dateModified = new DateTime();
 		this.setStatus(Status.INCOMPLETE);
 	}
 	
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String name) {
+		this.title = name;
 	}
 
 	public String getDescription() {
@@ -62,7 +62,7 @@ public abstract class Task {
 	}
 	
 	public String toString() {
-		return (this.getName() + " " + this.getDescription());
+		return (this.getTitle() + " " + this.getDescription());
 	}
 	
 	public abstract Task makeCopy();

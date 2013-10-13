@@ -11,6 +11,6 @@ public class FloatingTask extends Task {
 	}
 	
 	public Task makeCopy() {
-		return new FloatingTask(this.getTaskId(), this.getName(), this.getDescription());
+		return new FloatingTask(this.getTaskId(), this.getTitle(), this.getDescription());
 	}
 }
