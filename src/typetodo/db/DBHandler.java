@@ -163,7 +163,6 @@ public class DBHandler {
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveList(DateTime day) {
-		this.loadFile(); //shiyu
 		List<Task> deadlineTasks = new ArrayList<Task>();
 		List<Task> timedTasks = new ArrayList<Task>();
 		List<Task> floatingTasks = new ArrayList<Task>();
@@ -196,7 +195,6 @@ public class DBHandler {
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveAll() {
-		this.loadFile(); //shiyu
 		List<Task> deadlineTasks = new ArrayList<Task>();
 		List<Task> timedTasks = new ArrayList<Task>();
 		List<Task> floatingTasks = new ArrayList<Task>();
@@ -228,7 +226,7 @@ public class DBHandler {
 		List<Task> timedTasks = new ArrayList<Task>();
 		List<Task> floatingTasks = new ArrayList<Task>();
 		for (Task taskInCache : tasksCache) {
-			if (taskInCache.getName().contains(searchCriteria)
+			if (taskInCache.getTitle().contains(searchCriteria)
 					|| taskInCache.getDescription().contains(searchCriteria)) {
 				if (taskInCache instanceof DeadlineTask) {
 					deadlineTasks.add(taskInCache);

@@ -29,7 +29,7 @@ public class Converter {
 
 	public static Event timedTaskToEvent(TimedTask task) {
 		Event event = new Event();
-		event.setSummary(task.getName());
+		event.setSummary(task.getTitle());
 		event.setDescription(task.getDescription());
 
 		DateTime start = toGoogleDateTime(((TimedTask) task).getStart());
@@ -52,7 +52,7 @@ public class Converter {
 		com.google.api.services.tasks.model.Task googleTask = 
 				new com.google.api.services.tasks.model.Task();
 		
-		String name = task.getName();
+		String name = task.getTitle();
 		String description = task.getDescription();
 		
 		googleTask.setTitle(name);
@@ -64,7 +64,7 @@ public class Converter {
 	public static Event deadlineTaskToGoogleEvent(DeadlineTask task) {
 		Event googleEvent = new Event();
 		
-		String name = task.getName();
+		String name = task.getTitle();
 		String description = task.getDescription();
 		DateTime deadline = toGoogleDateTime(((DeadlineTask) task).getDeadline());
 		
