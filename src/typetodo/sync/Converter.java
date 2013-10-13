@@ -61,22 +61,22 @@ public class Converter {
 		return googleTask;
 	}
 	
-	public static com.google.api.services.tasks.model.Task DeadlineTaskToGoogleTask(DeadlineTask task) {
-		com.google.api.services.tasks.model.Task googleTask = 
-				new com.google.api.services.tasks.model.Task();
+	public static Event deadlineTaskToGoogleEvent(DeadlineTask task) {
+		Event googleEvent = new Event();
 		
 		String name = task.getName();
 		String description = task.getDescription();
 		DateTime deadline = toGoogleDateTime(((DeadlineTask) task).getDeadline());
 		
-		googleTask.setTitle(name);
-		googleTask.setNotes(description);
-		googleTask.setDue(deadline);
-			
-		return googleTask;
+		googleEvent.setSummary(name);
+		googleEvent.setDescription(description);
+		googleEvent.setStart(new EventDateTime().setDateTime(deadline));
+		googleEvent.setEnd(new EventDateTime().setDateTime(deadline));
+		
+		return googleEvent;
 	}
 	
-	public static Task EventToTask(Event event) {
+	public static Task googleEventToTask(Event event) {
 		Task task = null;
 		
 		String name = event.getSummary();
@@ -86,11 +86,13 @@ public class Converter {
 		org.joda.time.DateTime end = toJodaDateTime(event.getEnd().getDateTime());
 		
 		boolean isBusy = false;
-		if (event.getTransparency().equals("opaque")) {
-			isBusy = true;
-		}
-		else if (event.getTransparency().equals("transparent")) {
-			isBusy = false;
+		if (event.getTransparency() != null) {
+			if (event.getTransparency().equals("opaque")) {
+				isBusy = true;
+			}
+			/*else if (event.getTransparency().equals("transparent")) {
+				isBusy = false
+			}*/
 		}
 		
 		if (start.isEqual(end)) {
@@ -99,6 +101,17 @@ public class Converter {
 		if (!start.isEqual(end)) {
 			task = new TimedTask(name, description, start, end, isBusy);
 		}
+		
+		return task;
+	}
+	
+	public static Task googleTaskToTask(com.google.api.services.tasks.model.Task googleTask) {
+		Task task = null;
+		
+		String name = googleTask.getTitle();
+		String description = googleTask.getNotes();
+		
+		task = new FloatingTask(name, description);
 		
 		return task;
 	}
