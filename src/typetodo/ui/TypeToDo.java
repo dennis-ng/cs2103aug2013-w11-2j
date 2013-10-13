@@ -9,20 +9,23 @@ import org.joda.time.DateTime;
 import typetodo.logic.CommandParser;
 import typetodo.logic.DeadlineTask;
 import typetodo.logic.FloatingTask;
+import typetodo.logic.Schedule;
 import typetodo.logic.Task;
 import typetodo.logic.TimedTask;
 import typetodo.logic.View;
 
 /** @author Wang Qi */
 public class TypeToDo {
+	public static Schedule schedule;
 	public static CommandParser parser;
 	public static Scanner scanner = new Scanner(System.in);
 
 	private static final String MESSAGE_PROMPT = "Enter command here: ";
 
 	public static void main(String[] args) throws Exception {
-		parser = new CommandParser();
-		initialiseApp();
+		schedule = new Schedule();
+		parser = new CommandParser(schedule);
+		printView(initialiseApp());
 		executeProgram();
 	}
 
@@ -59,7 +62,7 @@ public class TypeToDo {
 	 * task.
 	 */
 	private static void printTask(Task task) {
-		String name = task.getName();
+		String name = task.getTitle();
 		String description = task.getDescription();
 		DateTime start, end, deadline;
 		boolean isBusy;
@@ -94,7 +97,7 @@ public class TypeToDo {
 	 * @throws ParseException
 	 */
 	private static View executeCommand(String userInput) throws ParseException {
-		View executedResult = parser.executeCommand(userInput);
-		return executedResult;
+		parser.executeCommand(userInput);
+		return schedule.getCurrentView();
 	}
 }

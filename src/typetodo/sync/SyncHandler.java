@@ -29,11 +29,17 @@ public class SyncHandler {
 			Task task = tasks.get(index);
 			try {
 				if(!gcal.hasTask(task)) { //if task is not in google calendar
+					System.out.println(task.getTitle()+ " is already in google system");
+					
 					//Case 1a: task had not be sync before
 					if (task.getDateModified().isAfter(lastSyncDate)) {
 						gcal.addTaskToGCal(task);
 						try {
-							db.updateTask(task);
+							System.out.println("MY ID IS " + task.getGoogleId());
+							if(db.updateTask(task)) {
+								System.out.println("UDPATED WHAT");
+							}
+							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -42,13 +48,13 @@ public class SyncHandler {
 					//Case 1b: task was added but later deleted. Delete from local db
 					else if (task.getDateModified().isBefore(lastSyncDate)) {
 						db.deleteTask(task.getTaskId());
-						System.out.println("\"" + task.getName() + "\" has been deleted from db");
+						System.out.println("\"" + task.getTitle() + "\" has been deleted from db");
 					}
 				}
 				//case 2: Task already exists in google calendar, have to check for updates
 				else { 
 					//check for differences and take the one the lastest modified date
-					System.out.println("\"" + task.getName() + "\" exists in Google Calendar");
+					System.out.println("\"" + task.getTitle() + "\" exists in Google Calendar");
 					System.out.println("Searching for differences in task");
 					
 					Task taskToBeUpdated;
@@ -62,14 +68,14 @@ public class SyncHandler {
 						
 						try {
 							db.updateTask(taskToBeUpdated);
-							System.out.println("\"" + taskToBeUpdated.getName() + "\" has been updated in db");
+							System.out.println("\"" + taskToBeUpdated.getTitle() + "\" has been updated in db");
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
 					else {
-						System.out.println("\"" + task.getName() + "\" has been updated in Google Calendar");
+						System.out.println("\"" + task.getTitle() + "\" has been updated in Google Calendar");
 					}
 					
 				}

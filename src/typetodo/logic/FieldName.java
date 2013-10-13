@@ -1,5 +1,5 @@
 package typetodo.logic;
 
 public enum FieldName {
-	NAME, DESCRIPTION, START, END, DEADLINE, BUSYFIELD;
+	TITLE, DESCRIPTION, START, END, DEADLINE, BUSYFIELD;
 }
