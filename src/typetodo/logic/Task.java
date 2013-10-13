@@ -18,7 +18,7 @@ public abstract class Task {
 	private String name;
 	private String description;
 	private Status status;
-	private final DateTime dateCreated;
+	private DateTime dateCreated;
 	private DateTime dateModified;
 
 	public Task(String name, String description) {
@@ -67,6 +67,9 @@ public abstract class Task {
 	
 	public abstract Task makeCopy();
 
+	public void setDateCreated(DateTime dateCreated) {
+		this.dateCreated = dateCreated;
+	}
 	/**
 	 * @return the dateCreated
 	 */
@@ -89,7 +92,7 @@ public abstract class Task {
 	}
 
 	/**
-	 * @return the googleCalendarEventId
+	 * @return the googleId
 	 */
 	public String getGoogleId() {
 		return googleId;
@@ -98,7 +101,7 @@ public abstract class Task {
 	/**
 	 * @param googleCalendarEventId the googleCalendarEventId to set
 	 */
-	public void setGoogleCalendarEventId(String googleId) {
+	public void setGoogleId(String googleId) {
 		this.googleId = googleId;
 	}
 }

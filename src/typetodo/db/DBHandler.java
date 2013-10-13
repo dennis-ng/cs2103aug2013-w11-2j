@@ -163,6 +163,7 @@ public class DBHandler {
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveList(DateTime day) {
+		this.loadFile(); //shiyu
 		List<Task> deadlineTasks = new ArrayList<Task>();
 		List<Task> timedTasks = new ArrayList<Task>();
 		List<Task> floatingTasks = new ArrayList<Task>();
@@ -190,11 +191,12 @@ public class DBHandler {
 	/**
 	 * 
 	 * @param day
-	 * @return An arraylist of all the tasks on this day. null will be returned if
+	 * @return An arraylist of all the tasks in the system. null will be returned if
 	 *         nothing is found.
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveAll() {
+		this.loadFile(); //shiyu
 		List<Task> deadlineTasks = new ArrayList<Task>();
 		List<Task> timedTasks = new ArrayList<Task>();
 		List<Task> floatingTasks = new ArrayList<Task>();
