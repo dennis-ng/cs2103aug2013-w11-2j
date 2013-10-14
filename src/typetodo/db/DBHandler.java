@@ -16,10 +16,10 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import typetodo.logic.DeadlineTask;
-import typetodo.logic.FloatingTask;
-import typetodo.logic.Task;
-import typetodo.logic.TimedTask;
+import typetodo.model.DeadlineTask;
+import typetodo.model.FloatingTask;
+import typetodo.model.Task;
+import typetodo.model.TimedTask;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

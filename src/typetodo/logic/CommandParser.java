@@ -10,7 +10,9 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import typetodo.logic.Task.Status;
+import typetodo.model.FieldName;
+import typetodo.model.View;
+import typetodo.model.Task.Status;
 
 /** @author Wang Qi */
 public class CommandParser {
@@ -42,11 +44,6 @@ public class CommandParser {
 
 	public enum COMMAND {
 		ADD, DELETE, DISPLAY, UPDATE, SEARCH, DONE, HOME, UNDO, HELP, INVALID, SYNC, EXIT
-	}
-
-	// default view
-	public View initialise() {
-		return schedule.generateView();
 	}
 
 	public void executeCommand(String userInput) throws IllegalArgumentException {
@@ -112,7 +109,6 @@ public class CommandParser {
 			} else {
 				schedule.setViewMode(contentString);
 			}
-			schedule.generateView();
 			break;
 
 		case UPDATE:
@@ -144,8 +140,7 @@ public class CommandParser {
 			break;
 
 		case HOME :
-			schedule.setViewMode("today");
-			schedule.generateView();
+			schedule.setViewMode(new DateTime());
 			break;
 
 		case UNDO :

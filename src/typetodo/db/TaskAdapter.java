@@ -5,7 +5,7 @@ package typetodo.db;
 
 import java.lang.reflect.Type;
 
-import typetodo.logic.Task;
+import typetodo.model.Task;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -37,7 +37,7 @@ public class TaskAdapter implements JsonSerializer<Task>,
 
 		try {
 			return context.deserialize(element,
-					Class.forName("typetodo.logic." + type));
+					Class.forName("typetodo.model." + type));
 		} catch (ClassNotFoundException e) {
 			throw new JsonParseException("Unknown element type: " + type, e);
 		}
