@@ -3,10 +3,10 @@ package typetodo.sync;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import typetodo.logic.DeadlineTask;
-import typetodo.logic.FloatingTask;
-import typetodo.logic.Task;
-import typetodo.logic.TimedTask;
+import typetodo.model.DeadlineTask;
+import typetodo.model.FloatingTask;
+import typetodo.model.Task;
+import typetodo.model.TimedTask;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;

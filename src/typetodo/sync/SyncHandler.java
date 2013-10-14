@@ -8,7 +8,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import typetodo.db.DBHandler;
-import typetodo.logic.Task;
+import typetodo.model.Task;
 
 public class SyncHandler {
 	public DateTime lastSyncDate;
