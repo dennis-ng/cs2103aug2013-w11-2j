@@ -7,12 +7,12 @@ import java.util.Scanner;
 import org.joda.time.DateTime;
 
 import typetodo.logic.CommandParser;
-import typetodo.logic.DeadlineTask;
-import typetodo.logic.FloatingTask;
 import typetodo.logic.Schedule;
-import typetodo.logic.Task;
-import typetodo.logic.TimedTask;
-import typetodo.logic.View;
+import typetodo.model.DeadlineTask;
+import typetodo.model.FloatingTask;
+import typetodo.model.Task;
+import typetodo.model.TimedTask;
+import typetodo.model.View;
 
 /** @author Wang Qi */
 public class TypeToDo {
@@ -25,13 +25,8 @@ public class TypeToDo {
 	public static void main(String[] args) throws Exception {
 		schedule = new Schedule();
 		parser = new CommandParser(schedule);
-		printView(initialiseApp());
+		printView(schedule.getCurrentView());
 		executeProgram();
-	}
-
-	// initialization
-	private static View initialiseApp() {
-		return parser.initialise();
 	}
 
 	private static void executeProgram() throws ParseException {

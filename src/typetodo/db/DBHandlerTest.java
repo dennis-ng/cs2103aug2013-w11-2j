@@ -12,8 +12,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 
-import typetodo.logic.DeadlineTask;
-import typetodo.logic.FloatingTask;
+import typetodo.model.DeadlineTask;
+import typetodo.model.FloatingTask;
 
 /**
  * @author DennZ

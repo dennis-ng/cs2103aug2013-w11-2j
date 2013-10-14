@@ -7,7 +7,14 @@ import java.util.Stack;
 import org.joda.time.DateTime;
 
 import typetodo.db.DBHandler;
-import typetodo.logic.Task.Status;
+import typetodo.model.DeadlineTask;
+import typetodo.model.FieldName;
+import typetodo.model.FloatingTask;
+import typetodo.model.Task;
+import typetodo.model.TimedTask;
+import typetodo.model.TypeOfOperation;
+import typetodo.model.View;
+import typetodo.model.Task.Status;
 import typetodo.sync.SyncHandler;
 
 /**
@@ -17,12 +24,13 @@ import typetodo.sync.SyncHandler;
  */
 public class Schedule {
 	private static final String WELCOME_MESSAGE = "Welcome to TypeToDo.\n";
-	private static final String MESSAGE_ADDED = "%s has been added to your schedule";
-	private static final String MESSAGE_DELETED = "%s has been deleted from your schedule";
+	private static final String MESSAGE_ADDED = "\"%s\" has been added to your schedule";
+	private static final String MESSAGE_DELETED = "\"%s\" has been deleted from your schedule";
 	private static final String MESSAGE_SEARCH = "%d Tasks have been found";
 	private static final String MESSAGE_EDITED = "Edit successful";
 	private static final String MESSAGE_MARK = "";
 	private static final String MESSAGE_SYNC = "Sync successful";
+	private static final String MESSAGE_VIEW = "Showing all tasks of %s";
 
 	private static enum Mode {
 		DATE, KEYWORD, STATUS;
@@ -254,7 +262,7 @@ public class Schedule {
 		
 		if(db.deleteTask(taskToBeDeleted.getTaskId())) {
 			this.historyOfOperations.push(new Operation(TypeOfOperation.DELETE, taskToBeDeleted));
-			this.setFeedBack(MESSAGE_DELETED);
+			setFeedBack(String.format(MESSAGE_DELETED, taskToBeDeleted.getTitle()));
 			this.refreshCurrentView();
 		}
 		else {
@@ -269,7 +277,7 @@ public class Schedule {
 	 * Deletes a task in database with a given keyword. If there are more than one task that 
 	 * matches the keyword, a View containing the tasks that matched would be generated.
 	 * @param keyword  
-	 * @return
+	 * @return 
 	 */
 	public boolean deleteTask(String keyword) {
 		ArrayList<Task> tasks = db.retrieveContaining(keyword);
@@ -300,7 +308,7 @@ public class Schedule {
 			this.historyOfOperations.push(new Operation(TypeOfOperation.DELETE, taskToBeDeleted)); //add operation to history for possible undo
 			db.deleteTask(taskToBeDeleted.getTaskId()); //delete task from database
 			
-			this.setFeedBack(MESSAGE_DELETED); //set feedback
+			setFeedBack(String.format(MESSAGE_DELETED, taskToBeDeleted.getTitle())); //set feedback
 			this.refreshCurrentView(); //generate current view base on view mode and feedback
 			return true;
 		}
@@ -312,7 +320,7 @@ public class Schedule {
 	 * returns a View object of the current View Mode
 	 * @return returns a View object of the current View Mode
 	 */
-	public View generateView() {
+	private View generateView() {
 		Mode mode = ViewMode.getMode();
 		ArrayList<Task> tasks = null;
 		View view = null;
@@ -346,30 +354,29 @@ public class Schedule {
 	 * @param keyword
 	 * @return returns a view object that displays the search results
 	 */
-	public View search(String keyword) {
+	public void search(String keyword) {
 		int numberOfResults;
 		
 		setViewMode(keyword);
 		numberOfResults = this.currentView.getTasks().size();
 		setFeedBack(String.format(MESSAGE_SEARCH, numberOfResults));
-		return currentView;
+		this.refreshCurrentView();
 	}
 	
 	/**
 	 * Sets the current view mode into date mode
 	 * @param date
-	 * @return returns a View object of the new View Mode
 	 */
 	public void setViewMode(DateTime date) {
 		ViewMode.setMode(Mode.DATE);
 		ViewMode.setDate(date);
+		setFeedBack(String.format(MESSAGE_VIEW, date));
 		this.refreshCurrentView();
 	}
 	
 	/**
 	 * Sets the current view mode into keyword mode.
 	 * @param keyword
-	 * @return returns a View object of the new View Mode
 	 */
 	public void setViewMode(String keyword) {
 		ViewMode.setMode(Mode.KEYWORD);
@@ -380,13 +387,11 @@ public class Schedule {
 	/**
 	 * Sets the current view mode into status mode, e.g view all COMPLETED, DELETED etc.
 	 * @param status
-	 * @return
 	 */
-	public View setViewMode(Status status) {
+	public void setViewMode(Status status) {
 		ViewMode.setMode(Mode.STATUS);
 		ViewMode.setStatus(status);
 		refreshCurrentView();
-		return currentView;
 	}
 	
 
@@ -397,7 +402,7 @@ public class Schedule {
 	 * @param newValue New value to replace the existing value.
 	 * @return Returns the current View object.
 	 */
-	public View editTask(int index, FieldName fieldName, String newValue) {
+	public boolean editTask(int index, FieldName fieldName, String newValue) {
 		Task taskToBeEdited = currentView.getTasks().get(index-1);
 		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 		
@@ -419,12 +424,13 @@ public class Schedule {
 			db.updateTask(taskToBeEdited);
 			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
-			//Handle
+			//TODO
+			return false;
 		}
 		
 		this.setFeedBack(MESSAGE_EDITED);
 		this.refreshCurrentView();
-		return this.currentView;
+		return true;
 	}
 
 	/**
@@ -434,7 +440,7 @@ public class Schedule {
 	 * @param newValue to replace old value in desired field
 	 * @return returns a View object of the current View Mode
 	 */
-	public View editTask(int index, FieldName fieldName, DateTime newValue) {
+	public boolean editTask(int index, FieldName fieldName, DateTime newValue) {
 		Task taskToBeEdited = currentView.getTasks().get(index-1);
 		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 
@@ -465,12 +471,13 @@ public class Schedule {
 			db.updateTask(taskToBeEdited);
 			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
-			//Handle
+			//TODO
+			return false;
 		}
 		
 		this.setFeedBack(MESSAGE_EDITED);
 		this.refreshCurrentView();
-		return this.currentView;
+		return true;
 	}
 
 	/**
@@ -480,7 +487,7 @@ public class Schedule {
 	 * @param isBusy Boolean value to replace the isBusy field
 	 * @return returns a View object of the current View Mode
 	 */
-	public View editTask(int index, FieldName fieldName, boolean isBusy) {
+	public boolean editTask(int index, FieldName fieldName, boolean isBusy) {
 		Task taskToBeEdited = currentView.getTasks().get(index-1);
 		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 		
@@ -493,12 +500,13 @@ public class Schedule {
 			db.updateTask(taskToBeEdited);
 			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskBeforeEdit));
 		} catch (Exception e) {
-			//Handle
+			//TODO
+			return false;
 		}
 		
 		this.setFeedBack(MESSAGE_EDITED);
 		this.refreshCurrentView();
-		return this.currentView;
+		return true;
 	}
 	
 	/**
@@ -506,7 +514,7 @@ public class Schedule {
 	 * @param Index of task as displayed in current view.
 	 * @return returns a View object of the current View Mode
 	 */
-	public View markTaskAsCompleted(int index) {
+	public boolean markTaskAsCompleted(int index) {
 		Task taskToMark = currentView.getTasks().get(index-1);
 		
 		taskToMark.setStatus(Status.COMPLETED);
@@ -516,12 +524,14 @@ public class Schedule {
 			db.updateTask(taskToMark);
 			this.historyOfOperations.push(new Operation(TypeOfOperation.EDIT, taskToMark));
 		} catch (Exception e) {
-			//Handle
+			//TODO
+			return false;
 		}
 		
 		this.setFeedBack(MESSAGE_MARK);
 		this.refreshCurrentView();
-		return this.currentView;
+		
+		return true;
 	}
 	
 	
