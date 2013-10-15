@@ -25,26 +25,35 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-public class DBHandler {
+public class DbHandler {
 
 	private static final String FILENAME = "TypeToDo.txt";
 	private final File savedFile;
 
 	private List<Task> tasksCache;
 
+	private static DbHandler mainDbHandler;
 	private final Gson gson;
 
-	public DBHandler() throws IOException {
+	private DbHandler() throws IOException {
 		savedFile = new File(FILENAME);
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
-		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class, new DateTimeTypeConverter());
+		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
+				new DateTimeTypeConverter());
 		gson = gsonBuilder.setPrettyPrinting().create();
 		tasksCache = new ArrayList<Task>();
 		if (!savedFile.exists()) {
 			savedFile.createNewFile();
 		}
 		this.loadFile();
+	}
+
+	public static DbHandler getInstance() throws IOException {
+		if (mainDbHandler == null) {
+			mainDbHandler = new DbHandler();
+		}
+		return mainDbHandler;
 	}
 
 	private void loadFile() {
@@ -190,8 +199,8 @@ public class DBHandler {
 	/**
 	 * 
 	 * @param day
-	 * @return An arraylist of all the tasks in the system. null will be returned if
-	 *         nothing is found.
+	 * @return An arraylist of all the tasks in the system. null will be returned
+	 *         if nothing is found.
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveAll() {
@@ -213,7 +222,7 @@ public class DBHandler {
 		filteredTasks.addAll(floatingTasks);
 		return filteredTasks;
 	}
-	
+
 	/**
 	 * 
 	 * @param searchCriteria
@@ -250,8 +259,8 @@ public class DBHandler {
 			if (taskInCache instanceof TimedTask) {
 				TimedTask timedTask = (TimedTask) taskInCache;
 				if (timedTask.isBusy()
-						&& !(timedTask.getStart().isAfter(end) || timedTask.getEnd().isBefore(
-								start))) {
+						&& !(timedTask.getStart().isAfter(end) || timedTask.getEnd()
+								.isBefore(start))) {
 					isAvailable = false;
 					return isAvailable;
 				}
@@ -266,8 +275,8 @@ public class DBHandler {
 			if (taskInCache instanceof TimedTask) {
 				TimedTask timedTask = (TimedTask) taskInCache;
 				if (timedTask.isBusy()
-						&& !(timedTask.getStart().isAfter(end) || timedTask.getEnd().isBefore(
-								start))) {
+						&& !(timedTask.getStart().isAfter(end) || timedTask.getEnd()
+								.isBefore(start))) {
 					busyTask = timedTask;
 					return busyTask;
 				}
