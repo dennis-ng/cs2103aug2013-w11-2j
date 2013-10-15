@@ -19,7 +19,7 @@ import typetodo.model.FloatingTask;
  * @author DennZ
  * 
  */
-public class DBHandlerTest {
+public class DbHandlerTest {
 
 	@Test
 	public void test() {
