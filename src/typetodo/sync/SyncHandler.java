@@ -7,77 +7,82 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import typetodo.db.DBHandler;
+import typetodo.db.DbHandler;
 import typetodo.model.Task;
 
 public class SyncHandler {
 	public DateTime lastSyncDate;
-	
-	private GCalHandler gcal;
-	private DBHandler db;
-	
+
+	private final GCalHandler gcal;
+	private final DbHandler db;
+
 	public SyncHandler() throws IOException {
-		db = new DBHandler();
+		db = DbHandler.getInstance();
 		gcal = new GCalHandler();
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
-		lastSyncDate = fmt.parseDateTime("17:00 10-OCT 2013"); //for testing
+		lastSyncDate = fmt.parseDateTime("17:00 10-OCT 2013"); // for testing
 	}
-	
+
 	public void syncToGoogleCalendar() {
 		ArrayList<Task> tasks = db.retrieveAll();
 		for (int index = 0; index < tasks.size(); ++index) {
 			Task task = tasks.get(index);
 			try {
-				if(!gcal.hasTask(task)) { //if task is not in google calendar
-					System.out.println(task.getTitle()+ " is already in google system");
-					
-					//Case 1a: task had not be sync before
+				if (!gcal.hasTask(task)) { // if task is not in google calendar
+					System.out.println(task.getTitle() + " is already in google system");
+
+					// Case 1a: task had not be sync before
 					if (task.getDateModified().isAfter(lastSyncDate)) {
 						gcal.addTaskToGCal(task);
 						try {
 							System.out.println("MY ID IS " + task.getGoogleId());
-							if(db.updateTask(task)) {
+							if (db.updateTask(task)) {
 								System.out.println("UDPATED WHAT");
 							}
-							
+
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
-					//Case 1b: task was added but later deleted. Delete from local db
+					// Case 1b: task was added but later deleted. Delete from local db
 					else if (task.getDateModified().isBefore(lastSyncDate)) {
 						db.deleteTask(task.getTaskId());
-						System.out.println("\"" + task.getTitle() + "\" has been deleted from db");
+						System.out.println("\"" + task.getTitle()
+								+ "\" has been deleted from db");
 					}
 				}
-				//case 2: Task already exists in google calendar, have to check for updates
-				else { 
-					//check for differences and take the one the lastest modified date
-					System.out.println("\"" + task.getTitle() + "\" exists in Google Calendar");
+				// case 2: Task already exists in google calendar, have to check for
+				// updates
+				else {
+					// check for differences and take the one the lastest modified date
+					System.out.println("\"" + task.getTitle()
+							+ "\" exists in Google Calendar");
 					System.out.println("Searching for differences in task");
-					
+
 					Task taskToBeUpdated;
-					//Checks for update 
+					// Checks for update
 					if ((taskToBeUpdated = gcal.getUpdate(task)) != null) {
-						//Set updating parameters
+						// Set updating parameters
 						taskToBeUpdated.setTaskId(task.getTaskId());
 						taskToBeUpdated.setGoogleId(task.getGoogleId());
 						taskToBeUpdated.setDateCreated(task.getDateCreated());
-						taskToBeUpdated.setDateModified(new DateTime()); //set modded day to today.
-						
+						taskToBeUpdated.setDateModified(new DateTime()); // set modded day
+																															// to today.
+
 						try {
 							db.updateTask(taskToBeUpdated);
-							System.out.println("\"" + taskToBeUpdated.getTitle() + "\" has been updated in db");
+							System.out.println("\"" + taskToBeUpdated.getTitle()
+									+ "\" has been updated in db");
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+					} else {
+						System.out.println("\"" + task.getTitle()
+								+ "\" has been updated in Google Calendar");
 					}
-					else {
-						System.out.println("\"" + task.getTitle() + "\" has been updated in Google Calendar");
-					}
-					
+
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -86,6 +91,5 @@ public class SyncHandler {
 		}
 		System.out.println("All Tasks have been Sync to google Calendar");
 	}
-	
-}
 
+}
