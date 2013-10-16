@@ -3,18 +3,19 @@ package typetodo.model;
 import org.joda.time.DateTime;
 
 /**
- * This abstract class is used to create 3 types of task,
- * namely, TimedTask, Deadline Task, Floating Task
+ * This abstract class is used to create 3 types of task, namely, TimedTask,
+ * Deadline Task, Floating Task
+ * 
  * @author Phan Shi Yu
- *
+ * 
  */
-public abstract class Task {
+public abstract class Task implements Comparable<Task> {
 	public static enum Status {
 		COMPLETED, INCOMPLETE, DISCARDED;
 	}
 
 	private int TaskId;
-	private String googleId; //Retrive after sync
+	private String googleId; // Retrive after sync
 	private String title;
 	private String description;
 	private Status status;
@@ -28,7 +29,7 @@ public abstract class Task {
 		dateModified = new DateTime();
 		this.setStatus(Status.INCOMPLETE);
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
@@ -56,20 +57,21 @@ public abstract class Task {
 	public int getTaskId() {
 		return TaskId;
 	}
-	
+
 	public void setTaskId(int taskId) {
 		this.TaskId = taskId;
 	}
-	
+
 	public String toString() {
 		return (this.getTitle() + " " + this.getDescription());
 	}
-	
+
 	public abstract Task makeCopy();
 
 	public void setDateCreated(DateTime dateCreated) {
 		this.dateCreated = dateCreated;
 	}
+
 	/**
 	 * @return the dateCreated
 	 */
@@ -85,7 +87,8 @@ public abstract class Task {
 	}
 
 	/**
-	 * @param dateModified the dateModified to set
+	 * @param dateModified
+	 *          the dateModified to set
 	 */
 	public void setDateModified(DateTime dateModified) {
 		this.dateModified = dateModified;
@@ -99,9 +102,16 @@ public abstract class Task {
 	}
 
 	/**
-	 * @param googleCalendarEventId the googleCalendarEventId to set
+	 * @param googleCalendarEventId
+	 *          the googleCalendarEventId to set
 	 */
 	public void setGoogleId(String googleId) {
 		this.googleId = googleId;
+	}
+
+	public int compareTo(Task taskToCompare) {
+		int comparedId = taskToCompare.getTaskId();
+		// Sort tasks by taskId in ascending order
+		return this.TaskId - comparedId;
 	}
 }

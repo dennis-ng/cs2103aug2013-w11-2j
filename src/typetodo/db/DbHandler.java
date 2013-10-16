@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -74,9 +75,8 @@ public class DbHandler {
 			Type collectionType = new TypeToken<List<Task>>() {
 			}.getType();
 			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
-
+			Collections.sort(tasksCache);
 		}
-		// TODO Create a custom comparator to sort list by taskId
 	}
 
 	private void writeChangesToFile() {
@@ -102,14 +102,22 @@ public class DbHandler {
 	 * @throws
 	 */
 	public int addTask(Task newTask) throws Exception {
+		// Check for conflict of existing task in the list
+		if (alreadyExist(newTask)) {
+			throw new Exception("Task with the same id already exist");
+		}
+
+		// Supports for undoing deleted task
 		if (newTask.getTaskId() != 0) {
-			// TODO Check for conflict in the list since the taskId is given
-			// Supports for undoing deleted task
 			tasksCache.add(newTask);
+			// Sort is to make sure that the tasks are always stored in an order by
+			// taskId
+			Collections.sort(tasksCache);
 			this.writeChangesToFile();
-			// TODO do a sort by taskId
 			return newTask.getTaskId();
 		}
+
+		// Generate a new taskId to add a totally new task
 		int taskId;
 		if (tasksCache.isEmpty()) {
 			taskId = 1;
@@ -120,6 +128,19 @@ public class DbHandler {
 		tasksCache.add(newTask);
 		this.writeChangesToFile();
 		return taskId;
+	}
+
+	private boolean alreadyExist(Task task) {
+		int taskId = task.getTaskId();
+		if (taskId == 0) {
+			return false;
+		}
+		for (int i = 0; i < tasksCache.size(); i++) {
+			if (tasksCache.get(i).getTaskId() == taskId) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
