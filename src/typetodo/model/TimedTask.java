@@ -55,6 +55,15 @@ public class TimedTask extends Task {
 				this.getDescription(), this.getStart(), this.getEnd(), this.isBusy());
 	}
 
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("TITLE: " + this.getTitle() + " ");
+		sb.append("DESCRIPTION: " + this.getDescription() + " ");
+		sb.append("PERIOD: " + this.getStart() + " TO " + this.getEnd());
+
+		return sb.toString();
+	}
+
 	public static final Comparator<TimedTask> COMPARE_BY_DATE = new Comparator<TimedTask>() {
 		@Override
 		public int compare(TimedTask task1, TimedTask task2) {
