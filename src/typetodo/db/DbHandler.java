@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.joda.time.DateTime;
 
@@ -28,11 +29,14 @@ import com.google.gson.reflect.TypeToken;
 
 public class DbHandler {
 
+	// Constants
 	private static final String FILENAME = "TypeToDo.txt";
 	private final File savedFile;
 
-	private List<Task> tasksCache;
+	// Variables
+	private TreeMap<Integer, Task> tasksCache;
 
+	// Controllers and external libraries
 	private static DbHandler mainDbHandler;
 	private final Gson gson;
 
@@ -43,7 +47,8 @@ public class DbHandler {
 		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
 				new DateTimeTypeConverter());
 		gson = gsonBuilder.setPrettyPrinting().create();
-		tasksCache = new ArrayList<Task>();
+		// Create a comparator to sort by type of tasks and end datetime
+		tasksCache = new TreeMap<Integer, Task>();
 		if (!savedFile.exists()) {
 			savedFile.createNewFile();
 		}
@@ -70,12 +75,9 @@ public class DbHandler {
 			e.printStackTrace();
 		}
 		if (!fileToTextBuffer.toString().isEmpty()) {
-			// tasksCache = gson.fromJson(fileToTextBuffer.toString(),
-			// collectionType);
-			Type collectionType = new TypeToken<List<Task>>() {
+			Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
 			}.getType();
 			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
-			Collections.sort(tasksCache);
 		}
 	}
 
@@ -83,9 +85,7 @@ public class DbHandler {
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(savedFile));
-			// Type collectionType = new TypeToken<List<Task>>() {
-			// }.getType();
-			Type collectionType = new TypeToken<List<Task>>() {
+			Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
 			}.getType();
 			writer.write(gson.toJson(tasksCache, collectionType));
 			writer.close();
@@ -102,87 +102,61 @@ public class DbHandler {
 	 * @throws
 	 */
 	public int addTask(Task newTask) throws Exception {
-		// Check for conflict of existing task in the list
-		if (alreadyExist(newTask)) {
-			throw new Exception("Task with the same id already exist");
-		}
-
 		// Supports for undoing deleted task
 		if (newTask.getTaskId() != 0) {
-			tasksCache.add(newTask);
-			// Sort is to make sure that the tasks are always stored in an order by
-			// taskId
-			Collections.sort(tasksCache);
+			if (tasksCache.containsKey(newTask.getTaskId())) {
+				// TODO create a specific exception
+				throw new Exception("Task with the same id already exist.");
+			}
+			tasksCache.put(newTask.getTaskId(), newTask);
 			this.writeChangesToFile();
 			return newTask.getTaskId();
 		}
 
 		// Generate a new taskId to add a totally new task
-		int taskId;
+		int newTaskIdGenerated;
 		if (tasksCache.isEmpty()) {
-			taskId = 1;
+			newTaskIdGenerated = 1;
 		} else {
-			taskId = tasksCache.get(tasksCache.size() - 1).getTaskId() + 1;
+			newTaskIdGenerated = tasksCache.lastKey() + 1;
 		}
-		newTask.setTaskId(taskId);
-		tasksCache.add(newTask);
+		newTask.setTaskId(newTaskIdGenerated);
+		tasksCache.put(newTaskIdGenerated, newTask);
 		this.writeChangesToFile();
-		return taskId;
-	}
-
-	private boolean alreadyExist(Task task) {
-		int taskId = task.getTaskId();
-		if (taskId == 0) {
-			return false;
-		}
-		for (int i = 0; i < tasksCache.size(); i++) {
-			if (tasksCache.get(i).getTaskId() == taskId) {
-				return true;
-			}
-		}
-		return false;
+		return newTaskIdGenerated;
 	}
 
 	/**
 	 * 
 	 * @param task
-	 * @return true: Deleted, false: Not found
+	 * @return Will return true when deleted, and false if not found
 	 */
 	public boolean deleteTask(int taskIdToDelete) {
-		boolean isDeleted = false;
-		// TODO Try to use HashMap to reduce complexity
-		for (int i = 0; i < tasksCache.size(); i++) {
-			if (tasksCache.get(i).getTaskId() == taskIdToDelete) {
-				tasksCache.remove(i);
-				this.writeChangesToFile();
-				isDeleted = true;
-				return isDeleted;
-			}
+		if (tasksCache.containsKey(taskIdToDelete)) {
+			tasksCache.remove(taskIdToDelete);
+			return true;
+		} else {
+			return false;
 		}
-		return isDeleted;
 	}
 
 	/**
 	 * 
-	 * @param task
+	 * @param taskToUpdate
 	 * @return true: Updated, false: Not found
 	 * @throws Exception
 	 *           : If clash with time slot
 	 */
-	public boolean updateTask(Task task) throws Exception {
-		// TODO Try to use HashMap to reduce complexity
-		boolean isUpdated = false;
-		// Below will throw NullErrorException if there is no taskId
-		int taskIdToUpdate = task.getTaskId();
-		for (int i = 0; i < tasksCache.size(); i++) {
-			if (tasksCache.get(i).getTaskId() == taskIdToUpdate) {
-				tasksCache.set(i, task);
-				this.writeChangesToFile();
-				isUpdated = true;
-				return isUpdated;
-			}
+	public boolean updateTask(Task taskToUpdate) throws Exception {
+		int taskIdToUpdate = taskToUpdate.getTaskId();
+		if (taskIdToUpdate == 0) {
+			// TODO create specific exception
+			throw new Exception("The task did not contain a taskId");
 		}
-		return isUpdated;
+		if (tasksCache.put(taskIdToUpdate, taskToUpdate) != null) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -193,28 +167,24 @@ public class DbHandler {
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveList(DateTime day) {
-		List<Task> deadlineTasks = new ArrayList<Task>();
-		List<Task> timedTasks = new ArrayList<Task>();
-		List<Task> floatingTasks = new ArrayList<Task>();
-		for (Task taskInCache : tasksCache) {
+		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
+		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
+		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		for (Task taskInCache : tasksCache.values()) {
 			if (taskInCache instanceof DeadlineTask) {
 				if (!((DeadlineTask) taskInCache).getDeadline().isBefore(day)) {
-					deadlineTasks.add(taskInCache);
+					deadlineTasks.add((DeadlineTask) taskInCache);
 				}
 			} else if (taskInCache instanceof TimedTask) {
 				if (!(((TimedTask) taskInCache).getEnd().isBefore(day) && ((TimedTask) taskInCache)
 						.getStart().isAfter(day))) {
-					timedTasks.add(taskInCache);
+					timedTasks.add((TimedTask) taskInCache);
 				}
 			} else if (taskInCache instanceof FloatingTask) {
-				floatingTasks.add(taskInCache);
+				floatingTasks.add((FloatingTask) taskInCache);
 			}
 		}
-		ArrayList<Task> filteredTasks = new ArrayList<Task>();
-		filteredTasks.addAll(deadlineTasks);
-		filteredTasks.addAll(timedTasks);
-		filteredTasks.addAll(floatingTasks);
-		return filteredTasks;
+		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
 	}
 
 	/**
@@ -225,23 +195,19 @@ public class DbHandler {
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveAll() {
-		List<Task> deadlineTasks = new ArrayList<Task>();
-		List<Task> timedTasks = new ArrayList<Task>();
-		List<Task> floatingTasks = new ArrayList<Task>();
-		for (Task taskInCache : tasksCache) {
+		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
+		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
+		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		for (Task taskInCache : tasksCache.values()) {
 			if (taskInCache instanceof DeadlineTask) {
-				deadlineTasks.add(taskInCache);
+				deadlineTasks.add((DeadlineTask) taskInCache);
 			} else if (taskInCache instanceof TimedTask) {
-				timedTasks.add(taskInCache);
+				timedTasks.add((TimedTask) taskInCache);
 			} else if (taskInCache instanceof FloatingTask) {
-				floatingTasks.add(taskInCache);
+				floatingTasks.add((FloatingTask) taskInCache);
 			}
 		}
-		ArrayList<Task> filteredTasks = new ArrayList<Task>();
-		filteredTasks.addAll(deadlineTasks);
-		filteredTasks.addAll(timedTasks);
-		filteredTasks.addAll(floatingTasks);
-		return filteredTasks;
+		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
 	}
 
 	/**
@@ -252,22 +218,33 @@ public class DbHandler {
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveContaining(String searchCriteria) {
-		List<Task> deadlineTasks = new ArrayList<Task>();
-		List<Task> timedTasks = new ArrayList<Task>();
-		List<Task> floatingTasks = new ArrayList<Task>();
-		for (Task taskInCache : tasksCache) {
+		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
+		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
+		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		for (Task taskInCache : tasksCache.values()) {
 			if (taskInCache.getTitle().contains(searchCriteria)
 					|| taskInCache.getDescription().contains(searchCriteria)) {
 				if (taskInCache instanceof DeadlineTask) {
-					deadlineTasks.add(taskInCache);
+					deadlineTasks.add((DeadlineTask) taskInCache);
 				} else if (taskInCache instanceof TimedTask) {
-					timedTasks.add(taskInCache);
+					timedTasks.add((TimedTask) taskInCache);
 				} else if (taskInCache instanceof FloatingTask) {
-					floatingTasks.add(taskInCache);
+					floatingTasks.add((FloatingTask) taskInCache);
 				}
 			}
 		}
+		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
+
+	}
+
+	private ArrayList<Task> combineTasksForViewing(
+			List<DeadlineTask> deadlineTasks, List<TimedTask> timedTasks,
+			List<FloatingTask> floatingTasks) {
 		ArrayList<Task> filteredTasks = new ArrayList<Task>();
+
+		Collections.sort(deadlineTasks, DeadlineTask.COMPARE_BY_DATE);
+		Collections.sort(timedTasks, TimedTask.COMPARE_BY_DATE);
+
 		filteredTasks.addAll(deadlineTasks);
 		filteredTasks.addAll(timedTasks);
 		filteredTasks.addAll(floatingTasks);
@@ -276,7 +253,7 @@ public class DbHandler {
 
 	public boolean isAvailable(DateTime start, DateTime end) {
 		boolean isAvailable = true;
-		for (Task taskInCache : tasksCache) {
+		for (Task taskInCache : tasksCache.values()) {
 			if (taskInCache instanceof TimedTask) {
 				TimedTask timedTask = (TimedTask) taskInCache;
 				if (timedTask.isBusy()
@@ -292,7 +269,7 @@ public class DbHandler {
 
 	public Task retrieveBusyTask(DateTime start, DateTime end) {
 		Task busyTask = null;
-		for (Task taskInCache : tasksCache) {
+		for (Task taskInCache : tasksCache.values()) {
 			if (taskInCache instanceof TimedTask) {
 				TimedTask timedTask = (TimedTask) taskInCache;
 				if (timedTask.isBusy()
