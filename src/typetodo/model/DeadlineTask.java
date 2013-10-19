@@ -32,6 +32,15 @@ public class DeadlineTask extends Task {
 				this.getDescription(), this.getDeadline());
 	}
 
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("TITLE: " + this.getTitle() + " ");
+		sb.append("DESCRIPTION: " + this.getDescription() + " ");
+		sb.append("DEADLINE: " + this.getDeadline());
+
+		return sb.toString();
+	}
+
 	public static final Comparator<DeadlineTask> COMPARE_BY_DATE = new Comparator<DeadlineTask>() {
 		@Override
 		public int compare(DeadlineTask task1, DeadlineTask task2) {
