@@ -1,6 +1,5 @@
 package typetodo.logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,17 +10,13 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import typetodo.model.FieldName;
-import typetodo.model.View;
 import typetodo.model.Task.Status;
 
 /** @author Wang Qi */
 public class CommandParser {
-	public final Schedule schedule;
 	private final static String MESSAGE_TYPE_ERROR = "Error: wrong command type.";
 	private final static String MESSAGE_ERROR_COMMAND = "Error: wrong command key.";
 	private final static String MESSAGE_INVALID_COMMAND = "Error: the command is invalid.";
-	private final static View VIEW_INVALID = new View(MESSAGE_INVALID_COMMAND,
-			null);
 	private final static String catalog = "Here is catalog of standard inputs: \n"
 			+ "ADD: add <name> desc <description>\n"
 			+ "     add <name> desc <description> <deadline in h:mm d-MMM yyyy format>\n"
@@ -35,182 +30,63 @@ public class CommandParser {
 			+ "SEARCH: search <keyword>\n"
 			+ "MARK COMPLETED: done <index>\n"
 			+ "HOME: home\n" + "UNDO: undo\n" + "HELP: help\n" + "EXIT: exit";
-	private final static View VIEW_CATALOG = new View(catalog, null);
-
-	// initialize
-	public CommandParser(Schedule schedule) {
-		this.schedule = schedule;
-	}
-
-	public enum COMMAND {
-		ADD, DELETE, DISPLAY, UPDATE, SEARCH, DONE, HOME, UNDO, HELP, INVALID, SYNC, EXIT
-	}
-
-	public void executeCommand(String userInput) throws IllegalArgumentException {
-		//To determine which command to execute:
-		String commandString = getFirstWord(userInput);
-		COMMAND command = getCommand(commandString);
-		
-		String contentString = getContent(userInput);
-		String[] contentArray = partitionString(contentString);
-
-		switch (command) {
-
-		case ADD:
-			String name = contentArray[0];
-
-			if (dateOccurrence(contentArray) == 0) {
-				schedule.addTask(name, contentArray[1]);
-			}
-
-			else if (dateOccurrence(contentArray) == 1) {
-				String description = contentArray[1];
-				DateTime deadline = convertToDate(contentArray[2]);
-				schedule.addTask(name, description, deadline);
-			}
-
-			else if (dateOccurrence(contentArray) == 2) {
-				String description = contentArray[1];
-				DateTime start = convertToDate(contentArray[2]);
-				DateTime end = convertToDate(contentArray[3]);
-				
-				Boolean isBusy = false;
-				try {
-					if (contentArray[4] == "busy") {
-						isBusy = true;
-					} else {
-						isBusy = false;
-					}
-				} catch (ArrayIndexOutOfBoundsException e) {
-					//move on
-				}
-				
-				schedule.addTask(name, description, start, end, isBusy);
-			} else {
-				//TODO: invalid new view
-			}
-			break;
-
-		case DELETE :
-			if (isNumeric(contentArray[0])) {
-				schedule.deleteTask(Integer.parseInt(contentString));
-			} else {
-				schedule.deleteTask(contentString);
-			}
-			break;
-			
-		case DISPLAY :
-			if (isDate(contentString)) {
-				DateTime date = convertToDate(contentString);
-				schedule.setViewMode(date);
-			} else if (isStatus(contentString)) {
-				Status status = convertToStatus(contentString);
-				schedule.setViewMode(status);
-			} else {
-				schedule.setViewMode(contentString);
-			}
-			break;
-
-		case UPDATE:
-			int index = Integer.parseInt(contentArray[0]);
-			FieldName fieldName = convertToFieldName(contentArray[1]);
-			String field_name = fieldName.toString();
-			String newValue = contentArray[2];
-
-			if (field_name.equals("TITLE") || field_name.equals("DESCRIPTION")) {
-				schedule.editTask(index, fieldName, newValue);
-			} else if (field_name.equals("START") || field_name.equals("END")
-					|| field_name.equals("DEADLINE")) {
-				DateTime date = convertToDate(newValue);
-				schedule.editTask(index, fieldName, date);
-			} else if (field_name.equals("BUSYFIELD")) {
-				boolean isBusy = convertToBoolean(newValue);
-				schedule.editTask(index, fieldName, isBusy);
-			} else {
-				//TODO: invalid view
-			}
-			break;
-
-		case SEARCH :
-			schedule.search(contentString);
-			break;
-
-		case DONE :
-			schedule.markTaskAsCompleted(Integer.parseInt(contentString));
-			break;
-
-		case HOME :
-			schedule.setViewMode(new DateTime());
-			break;
-
-		case UNDO :
-			schedule.undoLastOperation();
-			break;
-
-		case HELP:
-			//TODO: view catalog
-			break;
-			
-		case INVALID :
-			//TODO: view invalid
-			break;
-			
-		case EXIT :
-			System.exit(0);
-			break;
-		
-		case SYNC :
-			schedule.sync();
-			break;
-
-		default:
-			throw new Error(MESSAGE_TYPE_ERROR);
-		}
+	private CommandType command;
+	private ArrayList<DateTime> dates;
+	private String title;
+	private String description;
+	private boolean isBusy;
+	private FieldName fieldName;
+	private String newValue;
+	private int index;
+	private String keyWord;
+	private ScheduleController sc;
+	public CommandParser(ScheduleController sc) {
+		this.sc = sc;
 	}
 
 	/**
 	 * parse users' command lines to the programme, according to different
 	 * command types.
 	 */
-	private static COMMAND getCommand(String command) {
+	private CommandType getCommand(String command) {
 		String commandLowerCase = command.toLowerCase();
 		if (commandLowerCase == null) {
 			throw new Error(MESSAGE_ERROR_COMMAND);
 		} else if (addSynonym.contains(commandLowerCase)) {
-			return COMMAND.ADD;
+			return CommandType.ADD;
 		} else if (deleteSynonym.contains(commandLowerCase)) {
-			return COMMAND.DELETE;
+			return CommandType.DELETE;
 		} else if (doneSynonym.contains(commandLowerCase)) {
-			return COMMAND.DONE;
+			return CommandType.DONE;
 		} else if (displaySynonym.contains(commandLowerCase)) {
-			return COMMAND.DISPLAY;
+			return CommandType.DISPLAY;
 		} else if (updateSynonym.contains(commandLowerCase)) {
-			return COMMAND.UPDATE;
+			return CommandType.UPDATE;
 		} else if (helpSynonym.contains(commandLowerCase)) {
-			return COMMAND.HELP;
+			return CommandType.HELP;
 		} else if (homeSynonym.contains(commandLowerCase)) {
-			return COMMAND.HOME;
+			return CommandType.HOME;
 		} else if (searchSynonym.contains(commandLowerCase)) {
-			return COMMAND.SEARCH;
+			return CommandType.SEARCH;
 		} else if (undoSynonym.contains(commandLowerCase)) {
-			return COMMAND.UNDO;
+			return CommandType.UNDO;
 		} else if (exitSynonym.contains(commandLowerCase)) {
-			return COMMAND.EXIT;
+			return CommandType.EXIT;
 		} else if (commandLowerCase.equals("sync")) {
-			return COMMAND.SYNC;
+			return CommandType.SYNC;
 		}
 		else {
-			return COMMAND.INVALID;
+			return CommandType.INVALID;
 		}
 	}
 
 	/** return the first word (before whitespace) of a sentence. */
-	private static String getFirstWord(String userInput) {
+	private String getFirstWord(String userInput) {
 		return userInput.trim().split("\\s+")[0];
 	}
 
 	/** return substring of a sentence that removed the first word. */
-	private static String getContent(String userInput) {
+	private String getContent(String userInput) {
 		String[] temp = userInput.split(" ", 2);
 
 		if (temp.length < 2) {
@@ -221,15 +97,10 @@ public class CommandParser {
 	}
 
 	/** return string array that each element is a word from a text. */
-	private static String[] partitionString(String bodyOfUserInput) {
+	private void partitionString(String bodyOfUserInput) {
+		
 		StringBuilder sb;
-		
-		if (bodyOfUserInput == null) {
-			return null;
-		}
 
-		ArrayList<String> listOfFields = new ArrayList<String>();
-		
 		String[] temp = bodyOfUserInput.split(" ");
 		
 		int indexOfLastDate = temp.length;
@@ -260,7 +131,7 @@ public class CommandParser {
 		}
 		
 		if (hasDesc) {
-			//extract name
+			//extract title
 			sb = new StringBuilder();
 			for (int index = 0; index < indexOfDesc; ++index) {
 				sb.append(temp[index]);
@@ -270,7 +141,7 @@ public class CommandParser {
 				}
 			}
 			
-			listOfFields.add(sb.toString());
+			this.setTitle(sb.toString());
 			sb = new StringBuilder();
 			
 			//extract description
@@ -281,7 +152,7 @@ public class CommandParser {
 				}
 			}
 			
-			listOfFields.add(sb.toString());
+			this.setDescription(sb.toString());
 			sb = new StringBuilder();
 		}
 		else  {
@@ -307,11 +178,16 @@ public class CommandParser {
 					}
 				}
 				
-				listOfFields.add(sb.toString());
+				if (isNumeric(sb.toString())) {
+					this.index = Integer.parseInt(sb.toString());
+				}
+				else {
+					this.keyWord = sb.toString();
+				}
 				sb = new StringBuilder();
 				
 				// add field name to array list:
-				listOfFields.add(temp[indexOfFieldName]);
+				this.fieldName = convertToFieldName(temp[indexOfFieldName]);
 				
 				// extract new value
 				for (int index = indexOfFieldName+1; index < indexOfLastDate; ++index) {
@@ -321,36 +197,41 @@ public class CommandParser {
 					}
 				}
 				if (!sb.toString().equals("")) {
-					listOfFields.add(sb.toString());
+					this.newValue = sb.toString();
 				}
 				
 				sb = new StringBuilder();
 			}
-			else {
+			else {// delete with index
 				for (int index = 0; index < indexOfLastDate; ++index) {
-				listOfFields.add(temp[index]);
+					try {
+						this.index = Integer.parseInt(temp[index]);
+					} catch (Exception e) {
+						this.keyWord = temp[index];
+					}
 				}
 			}
 		}
 		
 		//insert dates into the back of arraylist
 		while (!dates.isEmpty()) {
-			listOfFields.add(dates.pop());
+			this.dates.add(convertToDate(dates.pop()));
 		}
 		
 		//lastly check if the busy flag is raised, if yes, insert 'busy' to back of arraylist
 		if (temp[temp.length-1].equals("busy")) {
-			listOfFields.add("busy");
+			this.isBusy = true;
 		}
-		
-		return listOfFields.toArray(new String[listOfFields.size()]);
+		else {
+			this.isBusy = false;
+		}
 	}
 
 	/**
 	 * return boolean value of whether a string can be parsed into an integer
 	 * value.
 	 */
-	private static boolean isNumeric(String intString) {
+	private boolean isNumeric(String intString) {
 		try {
 			Integer.parseInt(intString);
 		} catch (NumberFormatException e) {
@@ -362,7 +243,7 @@ public class CommandParser {
 	/**
 	 * return boolean value of whether a string can be parsed into a date value.
 	 */
-	private static boolean isDate(String dateString) {
+	private boolean isDate(String dateString) {
 		try {
 			DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
 			fmt.parseDateTime(dateString);
@@ -372,20 +253,8 @@ public class CommandParser {
 		return true;
 	}
 
-	/** return number of occurrence of Date in an array. */
-	private static int dateOccurrence(String[] array) {
-		int count = 0;
-		for (String element : array) {
-			//System.out.println(element);
-			if (isDate(element)) {
-				count++;
-			}
-		}
-		return count;
-	}
-
 	/** convert from string to date, and return date */
-	private static DateTime convertToDate(String dateString) throws IllegalArgumentException {
+	private DateTime convertToDate(String dateString) throws IllegalArgumentException {
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
 		DateTime date = fmt.parseDateTime(dateString);
 		return date;
@@ -416,7 +285,7 @@ public class CommandParser {
 	}
 
 	/** convert from string to FieldName and return FieldName. */
-	private static FieldName convertToFieldName(String fnString) {
+	private FieldName convertToFieldName(String fnString) {
 		if (fnString.equals("NAME")) {
 			return FieldName.TITLE;
 		} else if (fnString.equals("DESCRIPTION")) {
@@ -432,7 +301,7 @@ public class CommandParser {
 		}
 	}
 
-	private static boolean convertToBoolean(String booleanString) {
+	private boolean convertToBoolean(String booleanString) {
 		if (booleanString.equals("busy")) {
 			return true;
 		} else {
@@ -440,6 +309,205 @@ public class CommandParser {
 		}
 	}
 
+	/**
+	 * @return the command
+	 */
+	public CommandType getCommand() {
+		return command;
+	}
+
+	public ArrayList<DateTime> getDates() {
+		return dates;
+	}
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * @return the isBusy
+	 */
+	public boolean isBusy() {
+		return isBusy;
+	}
+
+	/**
+	 * @return the fieldName
+	 */
+	public FieldName getFieldName() {
+		return fieldName;
+	}
+
+	/**
+	 * @return the newValue
+	 */
+	public String getNewValue() {
+		return newValue;
+	}
+
+	/**
+	 * @return the index
+	 */
+	public int getIndex() {
+		return index;
+	}
+
+	/**
+	 * @return the keyWord
+	 */
+	public String getKeyWord() {
+		return keyWord;
+	}
+
+	public Command parse(String userInput) throws IllegalArgumentException {
+		String commandString = getFirstWord(userInput);
+		this.command = getCommand(commandString);
+		
+		this.dates = new ArrayList<DateTime>();
+		
+		String contentString = getContent(userInput);
+		
+		if (contentString != null) {
+			this.partitionString(contentString);
+		}
+		
+		Command command = null;
+
+		switch (this.getCommand()) {
+
+		case ADD:
+			String title = this.getTitle();
+			String description = this.getDescription();
+			ArrayList<DateTime> dates = this.getDates();
+
+			if (dates == null || dates.isEmpty()) {
+				command = new AddTaskCommand(sc, title, description);
+			}
+			else if (dates.size() == 1) {
+				DateTime deadline = dates.get(0);
+				command = new AddTaskCommand(sc, title, description, deadline);
+			}
+			else if (dates.size() == 2) {
+				DateTime start = dates.get(0);
+				DateTime end = dates.get(1);
+
+				Boolean isBusy = this.isBusy();
+
+				command = new AddTaskCommand(sc, title, description, start, end, isBusy);
+			} else {
+				//TODO: invalid new view
+			}
+			break;
+
+		case DELETE :
+			String keyWord = this.getKeyWord();
+			if (keyWord == null) {
+				int index = this.getIndex();
+				command = new DeleteTaskCommand(sc, index);
+			} else {
+				command = new DeleteTaskCommand(sc, keyWord);
+			}
+			break;
+
+		case DISPLAY :
+			/*
+			if (isDate(contentString)) {
+				DateTime date = convertToDate(contentString);
+				schedule.setViewMode(date);
+			} else if (isStatus(contentString)) {
+				Status status = convertToStatus(contentString);
+				schedule.setViewMode(status);
+			} else {
+				schedule.setViewMode(contentString);
+			}
+			 */
+			break;
+
+		case UPDATE:
+			int index = this.getIndex();
+			FieldName fieldName = this.getFieldName();
+			String field_name = fieldName.toString();
+
+			if (field_name.equals("TITLE") || field_name.equals("DESCRIPTION")) {
+				String newValue = this.getNewValue();
+				command = new EditTaskCommand(sc, index, fieldName, newValue);
+			} else if (field_name.equals("START") || field_name.equals("END")
+					|| field_name.equals("DEADLINE")) {
+				DateTime newValue = this.getDates().get(0);
+				command = new EditTaskCommand(sc, index, fieldName, newValue);
+			} else if (field_name.equals("BUSYFIELD")) {
+				boolean newValue = this.isBusy();
+				command = new EditTaskCommand(sc, index, fieldName, newValue);
+			} else {
+				//TODO: invalid view
+			}
+			break;
+
+		case SEARCH :
+			String keyword = this.getKeyWord();
+			command = new SearchCommand(sc, keyword);
+			break;
+
+		case DONE :
+			//TODO
+			break;
+
+		case HOME :
+			//TODO
+			break;
+
+		case UNDO :
+			command = new UndoCommand(sc);
+			break;
+
+		case HELP:
+			//TODO: view catalog
+			break;
+
+		case INVALID :
+			//TODO: view invalid
+			break;
+
+		case EXIT :
+			System.exit(0);
+			break;
+
+		case SYNC :
+			//TODO:
+			break;
+
+		default:
+			//TODO: 
+			throw new Error();
+		}
+
+		return command;
+	}
+	
 	/** hard coded library of possible various user command inputs. */
 	private static List<String> addSynonym = Arrays.asList("add", "ad", "a",
 			"+", "insert", "i");

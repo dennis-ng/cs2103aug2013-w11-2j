@@ -27,4 +27,13 @@ public class DeadlineTask extends Task{
 	public Task makeCopy() {
 		return new DeadlineTask(this.getTaskId(), this.getTitle(), this.getDescription(), this.getDeadline());
 	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("TITLE: " + this.getTitle() + " ");
+		sb.append("DESCRIPTION: " + this.getDescription() +" ");
+		sb.append("DEADLINE: " + this.getDeadline());
+		
+		return sb.toString();
+	}
 }

@@ -50,4 +50,13 @@ public class TimedTask extends Task {
 		return new TimedTask(this.getTaskId(), this.getTitle(), this.getDescription(), this.getStart(),
 				this.getEnd(), this.isBusy());
 	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("TITLE: " + this.getTitle() + " ");
+		sb.append("DESCRIPTION: " + this.getDescription() +" ");
+		sb.append("PERIOD: " + this.getStart() + " TO " + this.getEnd());
+		
+		return sb.toString();
+	}
 }
