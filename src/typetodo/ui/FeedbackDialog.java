@@ -90,6 +90,14 @@ public class FeedbackDialog extends JDialog {
 		initialize();
 	}
 
+	public JLabel getFeedbackLabel() {
+		return lblFeedback;
+	}
+
+	public JTextArea getOutputBox() {
+		return txtListOutput;
+	}
+
 	/**
 	 * 
 	 */
@@ -108,7 +116,7 @@ public class FeedbackDialog extends JDialog {
 						getHeight() + 10, 20, 20));
 			}
 		};
-		lblFeedback = new JLabel("Welcome to TypeToDo");
+		lblFeedback = new JLabel("Fail to initialise feedback");
 		lblFeedback.setForeground(Color.WHITE);
 		feedbackPanel.add(lblFeedback);
 

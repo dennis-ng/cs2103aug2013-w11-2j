@@ -7,17 +7,29 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import typetodo.logic.ScheduleController;
+import typetodo.model.Task;
 
 /**
  * @author DennZ
  * 
  */
-public class TypeToDoGui extends JFrame {
+public class TypeToDoGui extends JFrame implements View {
 
 	private static TypeToDoGui mainGui;
+	private static String cmd = null;
+	private static JLabel lblFeedback;
+	private static JTextArea txtListOutput;
+	private static FeedbackDialog feedbackDialog;
+	private static ScheduleController sc;
 
 	private TypeToDoGui() {
 
@@ -39,8 +51,9 @@ public class TypeToDoGui extends JFrame {
 
 	/**
 	 * @param args
+	 * @throws IOException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		final JTextField txtCmd;
 		TypeToDoGui cmdFrame = new TypeToDoGui();
 
@@ -53,7 +66,7 @@ public class TypeToDoGui extends JFrame {
 		// This will center the JFrame in the middle of the screen
 		cmdFrame.setLocationRelativeTo(null);
 
-		FeedbackDialog feedbackDialog = new FeedbackDialog(cmdFrame);
+		feedbackDialog = new FeedbackDialog(cmdFrame);
 		feedbackDialog.setLocationRelativeTo(cmdFrame);
 		feedbackDialog.setLocation(feedbackDialog.getX(), cmdFrame.getY()
 				+ cmdFrame.getHeight());
@@ -69,14 +82,55 @@ public class TypeToDoGui extends JFrame {
 		wma.addComponentToMove(feedbackDialog);
 
 		txtCmd = cmdPanel.getTxtCmd();
-		String cmd = "";
 		txtCmd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JTextField source = (JTextField) e.getSource();
-				// cmd = source.getText();
+				sc.listenForCommands(source.getText());
 				source.setText("");
 			}
 		});
+		lblFeedback = feedbackDialog.getFeedbackLabel();
+		txtListOutput = feedbackDialog.getOutputBox();
+
+		sc = new ScheduleController(cmdFrame);
+	}
+
+	public static void setCmd(String input) {
+		cmd = input;
+		System.out.println(cmd + "first");
+	}
+
+	@Override
+	public String getUserInput() {
+		return null;
+	}
+
+	@Override
+	public int getIndex() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void displayFeedBack(String feedBack) {
+		lblFeedback.setText(feedBack);
+	}
+
+	@Override
+	public void displayErrorMessage(String errorMessage) {
+		lblFeedback.setText(errorMessage);
+	}
+
+	@Override
+	public void displayTasks(ArrayList<Task> tasks) {
+		String output = "";
+		int index = 1;
+		for (Task task : tasks) {
+			output += index + ". " + task + "\n";
+			index++;
+		}
+		txtListOutput.setText(output);
+		feedbackDialog.pack();
 	}
 }
