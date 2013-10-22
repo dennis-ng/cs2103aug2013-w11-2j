@@ -36,7 +36,10 @@ public class DbHandlerTest {
 					deadline);
 			db = DbHandler.getInstance();
 			assertEquals("Add task", 1, db.addTask(floatingTask));
-			assertEquals("Add task twice", 2, db.addTask(floatingTask2));
+			assertEquals("Add second task", 2, db.addTask(floatingTask2));
+			// White box testing: deadlineTask with taskId 1 is used to replace the
+			// same task with taskId 1. The algorithm behind the update method is
+			// known.
 			assertEquals("Update task", true, db.updateTask(deadlineTask));
 			assertEquals("Delete", true, (db.deleteTask(1)));
 			assertEquals("Delete", true, (db.deleteTask(2)));
