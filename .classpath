@@ -59,5 +59,11 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/cs2103aug2013-w11-2j/lib/calendar/google-api-services-tasks-v1-rev22-1.17.0-rc-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/prettytime-nlp-3.1.0.Final.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/cs2103aug2013-w11-2j/lib/prettytime-nlp-3.1.0.Final-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/prettytime-1.0.8.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
