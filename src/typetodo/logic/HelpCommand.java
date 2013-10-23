@@ -1,12 +1,14 @@
 package typetodo.logic;
 
-public class UndoCommand implements Command{
+public class HelpCommand implements Command{
 	Scheduler sc;
-	public UndoCommand(Scheduler sc) {
+	
+	public HelpCommand(Scheduler sc) {
 		this.sc = sc;
 	}
 	
+	@Override
 	public void execute() throws Exception {
-		sc.undo();
+		sc.help();
 	}
 }

@@ -134,6 +134,7 @@ public class DbHandler {
 	public boolean deleteTask(int taskIdToDelete) {
 		if (tasksCache.containsKey(taskIdToDelete)) {
 			tasksCache.remove(taskIdToDelete);
+			this.writeChangesToFile();
 			return true;
 		} else {
 			return false;
@@ -154,6 +155,7 @@ public class DbHandler {
 			throw new Exception("The task did not contain a taskId");
 		}
 		if (tasksCache.put(taskIdToUpdate, taskToUpdate) != null) {
+			this.writeChangesToFile();
 			return true;
 		}
 		return false;
