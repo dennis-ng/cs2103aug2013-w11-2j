@@ -139,5 +139,5 @@ public class TypeToDoGui extends JFrame implements View {
 		txtListOutput.setText(helpMessage);
 		feedbackDialog.pack();
 	}
-	
+
 }

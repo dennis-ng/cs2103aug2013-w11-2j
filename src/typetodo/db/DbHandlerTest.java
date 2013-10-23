@@ -41,8 +41,36 @@ public class DbHandlerTest {
 			// same task with taskId 1. The algorithm behind the update method is
 			// known.
 			assertEquals("Update task", true, db.updateTask(deadlineTask));
-			assertEquals("Delete", true, (db.deleteTask(1)));
+			// Test deleting over 2 when last taskId is 2
+			assertEquals("Delete a task with taskID larger than the last taskId",
+					false, (db.deleteTask(3)));
+			// Test deleting over 2 when last taskId is 2
+			assertEquals("Delete a task with taskID larger than the last taskId",
+					false, (db.deleteTask(4)));
+			// Test deleting over 2 when last taskId is 2
+			assertEquals("Delete a task with taskID larger than the last taskId",
+					false, (db.deleteTask(5)));
+			// Test deleting below 2 when last taskId is 1
+			assertEquals("Delete negative number of tasks", false, (db.deleteTask(0)));
+			// Test deleting below 2 when last taskId is 1
+			assertEquals("Delete negative number of tasks", false,
+					(db.deleteTask(-1)));
+			// Test deleting below 2 when last taskId is 1
+			assertEquals("Delete negative number of tasks", false,
+					(db.deleteTask(-2)));
 			assertEquals("Delete", true, (db.deleteTask(2)));
+
+			// Test deleting over 1 when last taskId is 1
+			assertEquals("Delete a task with taskID larger than the last taskId",
+					false, (db.deleteTask(2)));
+			// Test deleting over 1 when last taskId is 1
+			assertEquals("Delete a task with taskID larger than the last taskId",
+					false, (db.deleteTask(3)));
+			// Test deleting over 1 when last taskId is 1
+			assertEquals("Delete a task with taskID larger than the last taskId",
+					false, (db.deleteTask(4)));
+
+			assertEquals("Delete", true, (db.deleteTask(1)));
 			assertEquals("Undo deleted task", 1, (db.addTask(deadlineTask)));
 			assertEquals("Retrieve", deadline, ((DeadlineTask) db.retrieveList(date)
 					.get(0)).getDeadline());
