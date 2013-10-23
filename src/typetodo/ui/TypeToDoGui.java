@@ -136,6 +136,7 @@ public class TypeToDoGui extends JFrame implements View {
 
 	@Override
 	public void displayHelp(String helpMessage) {
+		System.out.println(helpMessage);
 		txtListOutput.setText(helpMessage);
 		feedbackDialog.pack();
 	}

@@ -113,7 +113,7 @@ public class Scheduler {
 			}
 		} catch (Exception e) {
 			// TODO;
-			//e.printStackTrace();
+			e.printStackTrace();
 			view.displayErrorMessage("Invalid input format, type \"help\" for a list of possible inputs");
 		}
 		this.refreshView();
