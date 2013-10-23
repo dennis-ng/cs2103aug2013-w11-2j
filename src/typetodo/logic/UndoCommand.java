@@ -1,8 +1,8 @@
 package typetodo.logic;
 
 public class UndoCommand implements Command{
-	ScheduleController sc;
-	public UndoCommand(ScheduleController sc) {
+	Scheduler sc;
+	public UndoCommand(Scheduler sc) {
 		this.sc = sc;
 	}
 	

@@ -3,17 +3,17 @@ package typetodo.logic;
 import typetodo.model.Task;
 
 public class DeleteTaskCommand implements Command, Undoable{
-	ScheduleController sc;
+	Scheduler sc;
 	Task taskToBeDeleted;
 	String keyword;
 	Integer index;
 	
-	public DeleteTaskCommand(ScheduleController sc, String keyword){
+	public DeleteTaskCommand(Scheduler sc, String keyword){
 		this.sc = sc;
 		this.keyword = keyword;
 	}
 	
-	public DeleteTaskCommand(ScheduleController sc, int index) {
+	public DeleteTaskCommand(Scheduler sc, int index) {
 		this.sc = sc;
 		this.index = index;
 	}

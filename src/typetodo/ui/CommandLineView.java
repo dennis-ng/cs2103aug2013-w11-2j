@@ -35,4 +35,9 @@ public class CommandLineView implements View{
 			index++;
 		}
 	}
+	@Override
+	public void displayHelp(String helpMessage) {
+		System.out.println(helpMessage);
+	}
+	
 }

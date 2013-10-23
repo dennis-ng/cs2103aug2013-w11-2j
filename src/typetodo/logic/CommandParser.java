@@ -17,19 +17,7 @@ public class CommandParser {
 	private final static String MESSAGE_TYPE_ERROR = "Error: wrong command type.";
 	private final static String MESSAGE_ERROR_COMMAND = "Error: wrong command key.";
 	private final static String MESSAGE_INVALID_COMMAND = "Error: the command is invalid.";
-	private final static String catalog = "Here is catalog of standard inputs: \n"
-			+ "ADD: add <name> desc <description>\n"
-			+ "     add <name> desc <description> <deadline in h:mm d-MMM yyyy format>\n"
-			+ "     add <name> desc <description> <start date> <end date> <isBusy>(type 'busy' if busy)\n"
-			+ "DELETE: delete <name>\n"
-			+ "        delete <index shown in list>\n"
-			+ "DISPLAY: view <date>\n"
-			+ "         view <keyword>\n"
-			+ "         view <status>(COMPLETED, DISCARDED, INCOMPLETE)\n"
-			+ "UPDATE: edit <index> <field name> <new value>\n"
-			+ "SEARCH: search <keyword>\n"
-			+ "MARK COMPLETED: done <index>\n"
-			+ "HOME: home\n" + "UNDO: undo\n" + "HELP: help\n" + "EXIT: exit";
+
 	private CommandType command;
 	private ArrayList<DateTime> dates;
 	private String title;
@@ -39,8 +27,8 @@ public class CommandParser {
 	private String newValue;
 	private int index;
 	private String keyWord;
-	private ScheduleController sc;
-	public CommandParser(ScheduleController sc) {
+	private Scheduler sc;
+	public CommandParser(Scheduler sc) {
 		this.sc = sc;
 	}
 
@@ -286,7 +274,7 @@ public class CommandParser {
 
 	/** convert from string to FieldName and return FieldName. */
 	private FieldName convertToFieldName(String fnString) {
-		if (fnString.equals("NAME")) {
+		if (fnString.equals("NAME") || fnString.equals("TITLE")) {
 			return FieldName.TITLE;
 		} else if (fnString.equals("DESCRIPTION")) {
 			return FieldName.DESCRIPTION;
@@ -477,7 +465,7 @@ public class CommandParser {
 			break;
 
 		case HOME :
-			//TODO
+			command = new HomeCommand(sc);
 			break;
 
 		case UNDO :
@@ -485,7 +473,7 @@ public class CommandParser {
 			break;
 
 		case HELP:
-			//TODO: view catalog
+			command = new HelpCommand(sc);
 			break;
 
 		case INVALID :
@@ -493,7 +481,7 @@ public class CommandParser {
 			break;
 
 		case EXIT :
-			System.exit(0);
+			command = new ExitCommand(sc);
 			break;
 
 		case SYNC :
