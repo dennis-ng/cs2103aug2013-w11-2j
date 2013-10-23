@@ -1,10 +1,10 @@
 package typetodo.logic;
 
 public class SearchCommand implements Command{
-	ScheduleController sc;
+	Scheduler sc;
 	String keyword;
 	
-	public SearchCommand(ScheduleController sc, String keyword) {
+	public SearchCommand(Scheduler sc, String keyword) {
 		this.sc = sc;
 		this.keyword = keyword;
 	}

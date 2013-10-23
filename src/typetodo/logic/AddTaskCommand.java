@@ -8,21 +8,21 @@ import typetodo.model.Task;
 import typetodo.model.TimedTask;
 
 public class AddTaskCommand implements Command, Undoable {
-	ScheduleController sc;
+	Scheduler sc;
 	int taskId;
 	Task taskToBeAdded;
 	
-	public AddTaskCommand(ScheduleController sc, String title, String description) {
+	public AddTaskCommand(Scheduler sc, String title, String description) {
 		this.sc = sc;
 		this.taskToBeAdded = new FloatingTask(title, description);
 	}
 	
-	public AddTaskCommand(ScheduleController sc, String title, String description, DateTime deadline) {	
+	public AddTaskCommand(Scheduler sc, String title, String description, DateTime deadline) {	
 		this.sc = sc;
 		this.taskToBeAdded = new DeadlineTask(title, description, deadline);
 	}
 	
-	public AddTaskCommand(ScheduleController sc, String title, String description, DateTime start, DateTime end, boolean isBusy) {
+	public AddTaskCommand(Scheduler sc, String title, String description, DateTime start, DateTime end, boolean isBusy) {
 		this.sc = sc;
 		this.taskToBeAdded = new TimedTask(title, description, start, end, isBusy);
 	}

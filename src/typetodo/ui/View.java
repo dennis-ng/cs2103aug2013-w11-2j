@@ -14,4 +14,6 @@ public interface View {
 	public void displayErrorMessage(String errorMessage);
 	
 	public void displayTasks(ArrayList<Task> tasks);
+	
+	public void displayHelp(String helpMessage);
 }
