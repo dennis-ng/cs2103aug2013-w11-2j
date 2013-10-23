@@ -43,5 +43,16 @@
       "dateCreated": "2013-10-23T10:37:49.894+08:00",
       "dateModified": "2013-10-23T10:37:49.894+08:00"
     }
+  },
+  "6": {
+    "type": "FloatingTask",
+    "properties": {
+      "TaskId": 6,
+      "title": "floating",
+      "description": "hi",
+      "status": "INCOMPLETE",
+      "dateCreated": "2013-10-23T11:04:55.704+08:00",
+      "dateModified": "2013-10-23T11:04:55.704+08:00"
+    }
   }
 }
