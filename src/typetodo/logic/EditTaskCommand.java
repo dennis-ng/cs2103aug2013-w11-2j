@@ -9,7 +9,6 @@ public class EditTaskCommand implements Command, Undoable{
 	private static final String MESSAGE_EDITED = "Edit successful";
 	private Schedule sc;
 	private Task taskBeforeEdit;
-	private String keyword;
 	private int index;
 	private FieldName fieldName;
 	private String newString;

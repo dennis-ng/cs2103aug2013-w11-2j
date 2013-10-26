@@ -9,65 +9,23 @@ import typetodo.db.DbHandler;
 import typetodo.model.DeadlineTask;
 import typetodo.model.FieldName;
 import typetodo.model.Task;
-import typetodo.model.Task.Status;
 import typetodo.model.TimedTask;
 
 public class Schedule {
 	private ArrayList<Task> currentListOfTasks;
-	
-	public ArrayList<Task> getCurrentListOfTasks() {
-		this.refreshView();
-		return currentListOfTasks;
-	}
-
 	private DbHandler db;
-
-	private static enum Mode {
-		DATE, KEYWORD, STATUS;
-	}
-	
-	private static class ViewMode {
-		private static Mode mode;
-		private static DateTime date;
-		private static String keyword;
-		private static Status status;
-
-		private static Mode getMode() {
-			return mode;
-		}
-
-		private static void setMode(Mode mode) {
-			ViewMode.mode = mode;
-		}
-
-		private static DateTime getDate() {
-			return date;
-		}
-
-		private static void setDate(DateTime date) {
-			ViewMode.date = date;
-		}
-
-		private static String getKeyword() {
-			return keyword;
-		}
-
-		private static void setKeyword(String keyword) {
-			ViewMode.keyword = keyword;
-		}
-
-		private static Status getStatus() {
-			return status;
-		}
-	}
+	private Object keyItem;
 
 	public Schedule() throws IOException {
 		db = DbHandler.getInstance(); // model
-
-		ViewMode.setDate(new DateTime());
-		ViewMode.setMode(Mode.DATE);
+		keyItem = new DateTime();
 	}
 
+	public ArrayList<Task> getCurrentListOfTasks() {
+		this.refreshList();
+		return currentListOfTasks;
+	}
+	
 	public int addTask(Task task) throws Exception {
 		int taskId = db.addTask(task);
 		
@@ -197,40 +155,29 @@ public class Schedule {
 	}
 
 	public void search(String keyword) {
-		this.setViewMode(keyword);
-	}
-
-	private void setViewMode(String keyword) {
-		ViewMode.setMode(Mode.KEYWORD);
-		ViewMode.setKeyword(keyword);
-	}
-
-	private void setViewMode(DateTime dateTime) {
-		ViewMode.setMode(Mode.DATE);
-		ViewMode.setDate(dateTime);
-	}
-
+		this.setKeyItem(keyword);
+	}	
+	
 	public void viewTasksofToday() {
-		this.setViewMode(new DateTime());
+		this.setKeyItem(new DateTime());
 	}
 
 	public void help() {
 	}
 
-	private void refreshView() {
-		switch (ViewMode.getMode()) {
-		case DATE :
-			currentListOfTasks = db.retrieveList(ViewMode.getDate());
-			break;
-
-		case KEYWORD :
-			currentListOfTasks = db.retrieveContaining(ViewMode.getKeyword());
-			break;
-
-		case STATUS :
-			currentListOfTasks = db.retrieveContaining(ViewMode.getStatus()
-					.toString());
-			break;
+	private void refreshList() {
+		if (keyItem instanceof String) {
+			this.currentListOfTasks = db.retrieveContaining((String) keyItem);
+		} else if (keyItem instanceof DateTime) {
+			this.currentListOfTasks = db.retrieveList((DateTime) keyItem);
 		}
+	}
+	
+	private void setKeyItem(DateTime dateTime) {
+		keyItem = dateTime;
+	}
+
+	private void setKeyItem(String keyword) {
+		keyItem = keyword;
 	}
 }
