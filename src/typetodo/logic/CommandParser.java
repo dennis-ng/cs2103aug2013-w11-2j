@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import org.joda.time.DateTime;
@@ -12,13 +13,21 @@ import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 import typetodo.model.FieldName;
 
 public class CommandParser {
-	private Scheduler scheduler;
+	private Schedule scheduler;
+	private ScheduleController sc;
 	
-	public CommandParser(Scheduler sc) {
-		this.scheduler = sc;
+	public CommandParser(ScheduleController sc, Schedule schedule) {
+		this.sc = sc;
+		this.scheduler = schedule;
 	}
 	
-	private CommandType getCommand(String userInput) {
+	/**
+	 * Extracts and returns the command from the user input.
+	 * @param userInput A String containing the raw user input
+	 * @return the command
+	 * @throws InvalidCommandException
+	 */
+	private CommandType getCommand(String userInput) throws InvalidCommandException {
 		Scanner scanner = new Scanner(userInput);
 		String command = scanner.next().toLowerCase(); //Extract the first string
 		scanner.close();
@@ -41,58 +50,115 @@ public class CommandParser {
 				return commandType;
 			}
 		}
-		return CommandType.INVALID;
+		throw new InvalidCommandException("Invalid command");
 	}
 
-	private String getTitle(String userInput) throws Exception {
+	/**
+	 * Extracts and returns the title from the user input.
+	 * @param userInput A String containing the raw user input
+	 * @return the title
+	 * @throws InvalidFormatException if user input does not have ';'
+	 * @throws MissingFieldException if user input does not contain a title
+	 */
+	private String getTitle(String userInput) throws InvalidFormatException, MissingFieldException {
+		if (userInput.indexOf(';') == -1) {
+			throw new InvalidFormatException("Missing ';'");
+		}
+
 		Scanner scanner = new Scanner(userInput);
-		scanner.next(); //throws away the user's command
-		scanner.useDelimiter(";");
-		String title = scanner.next().substring(1);
+		scanner.next(); //discard user command;
+		scanner.useDelimiter(";"); //title of task must always end with a ;
+		String title = scanner.next().trim(); //extract title and remove all leading/trailing spaces
 		scanner.close();
 		if (title.equals(null)) {
-			throw new Exception("Title of task is missing");
+			throw new MissingFieldException("Title of task is missing");
 		}
 		return title;
 	}
-
-	private String getDescription(String userInput) {
+	
+	/**
+	 * Extracts and returns the description from the user input.
+	 * @param userInput A String containing the raw user input
+	 * @return the description
+	 * @throws InvalidFormatException if restricted char ';' is found in the description
+	 */
+	private String getDescription(String userInput) throws InvalidFormatException {
 		int indexOfDescription = userInput.indexOf('+');
-		if (indexOfDescription == -1) {
+		if (indexOfDescription == -1) { //if user input does not contain a description
 			return "";
 		}
-
+		
+		if (indexOfDescription == (userInput.length()-1)) { //if description is blank
+			return ""; 
+		}
+		
 		//Description will always be at the end of the userinput
-		return userInput.substring(++indexOfDescription); 
+		String description = userInput.substring(++indexOfDescription);
+		if (description.indexOf(';') == -1) {
+			throw new InvalidFormatException("';' is a reserved character and should not be found in the description");
+		}
+		return description;
 	}
 
-	//might throw InputMismatchException 
+	/**
+	 * Extracts and returns the index from the user input.
+	 * @param userInput A String containing the raw user input
+	 * @return the index
+	 */
 	private int getIndex(String userInput) {
 		Scanner scanner = new Scanner(userInput);
-		scanner.next();
-		int index = scanner.nextInt();
+		scanner.next(); //discard the command
+		int index = scanner.nextInt(); //next expected field should be the index
 		scanner.close();
 
 		return index;
 	}
 
-	private FieldName getFieldName(String userInput) {
+	/**
+	 * Extracts and returns the FieldName from the user input.
+	 * @param userInput Raw user input
+	 * @return the Field Name
+	 * @throws InvalidFieldNameException if field name is invalid
+	 * @throws MissingFieldException if field name is missing 
+	 */
+	private FieldName getFieldName(String userInput) throws InvalidFieldNameException, MissingFieldException {
 		FieldName fieldName;
 		Scanner scanner = new Scanner(userInput);
-		scanner.next(); //throw away command
-		scanner.nextInt(); //throw away index
-		fieldName = this.convertToFieldName(scanner.next());
+		scanner.next(); //discard the command
+		scanner.nextInt(); //discard the index
+		try {
+			fieldName = this.convertToFieldName(scanner.next());
+		} catch (NoSuchElementException e) {
+			scanner.close();
+			throw new MissingFieldException("Field Name is missing");
+		}
 		scanner.close();
 		return fieldName;
 	}
 	
-	private Object getValue(String userInput) throws Exception {
+	/**
+	 * Extracts and returns the new value from the user input. It can be an instance of either a String,
+	 * DateTime or Boolean, depending on the field that is to be updated.
+	 * @param userInput Raw user input
+	 * @return the new value
+	 * @throws MissingFieldException if new value is missing
+	 * @throws InvalidFieldNameException if field name is invalid
+	 */
+	private Object getNewValue(String userInput) throws MissingFieldException, InvalidFieldNameException {
 		Scanner scanner = new Scanner(userInput);
 		scanner.next(); //throw away command
 		scanner.nextInt(); //throw away index
 		scanner.next(); //throw away fieldName
-		String newValue = scanner.nextLine();
+		
+		String newValue;
+		try {
+			newValue = scanner.nextLine();
+		} catch (NoSuchElementException e) {
+			scanner.close();
+			throw new MissingFieldException("New value is missing");
+		}
 		scanner.close();
+		
 		switch (this.getFieldName(userInput)) {
 			case TITLE :
 			case DESCRIPTION :
@@ -101,12 +167,12 @@ public class CommandParser {
 			case END :
 			case DEADLINE :
 				return new DateTime(this.getDates(newValue).get(0));
-			case BUSYFIELD:
+			case BUSYFIELD :
 				return (this.getIsBusy(userInput));
 			default:
-				throw new Exception("INVALID INPUT");
+				//TODO: assert?
 		}
-		
+		return null;
 	}
 	
 	private boolean getIsBusy(String userInput) {
@@ -122,7 +188,7 @@ public class CommandParser {
 		scanner.next(); //throw away command
 		keyword = scanner.nextLine();//get keyword
 		scanner.close();
-		return keyword;
+		return keyword.trim();
 	}
 
 	private ArrayList<DateTime> getDates(String userInput) {
@@ -133,13 +199,13 @@ public class CommandParser {
 			scanner.useDelimiter(";");
 			scanner.next();
 			scanner.useDelimiter("\\+");
-			dateField = scanner.next().substring(1);
+			dateField = scanner.next().substring(1).trim();
 			System.out.println(dateField);
 		}
 		else {
 			scanner.next();//throw away index
 			scanner.next();//throw away fieldName
-			dateField = scanner.nextLine();
+			dateField = scanner.nextLine().trim();
 			System.out.println(dateField);
 		}
 		scanner.close();
@@ -167,11 +233,12 @@ public class CommandParser {
 		}
 	}
 
-	/** convert from string to FieldName and return FieldName. */
-	private FieldName convertToFieldName(String fnString) {
+	/** convert from string to FieldName and return FieldName. 
+	 * @throws InvalidFieldNameException */
+	private FieldName convertToFieldName(String fnString) throws InvalidFieldNameException {
 		HashMap<FieldName, List<String>> fieldNameSynonyms = new HashMap<FieldName, List<String>>();
 		fieldNameSynonyms.put(FieldName.TITLE, Arrays.asList("NAME", "TITLE"));
-		fieldNameSynonyms.put(FieldName.DESCRIPTION, Arrays.asList("DESCRIPTION"));
+		fieldNameSynonyms.put(FieldName.DESCRIPTION, Arrays.asList("DESCRIPTION", "DESC"));
 		fieldNameSynonyms.put(FieldName.START, Arrays.asList("START"));
 		fieldNameSynonyms.put(FieldName.END, Arrays.asList("END"));
 		fieldNameSynonyms.put(FieldName.DEADLINE, Arrays.asList("DEADLINE"));
@@ -182,7 +249,7 @@ public class CommandParser {
 				return fieldName;
 			}
 		}
-		return null;
+		throw new InvalidFieldNameException("\"" + fnString + "\" is not a valid Field Name");
 	}
 
 	public Command parse(String userInput) throws Exception {
@@ -196,12 +263,10 @@ public class CommandParser {
 
 			if (dates.isEmpty()) {
 				command = new AddTaskCommand(scheduler, title, description);
-			}
-			else if (dates.size() == 1) {
+			} else if (dates.size() == 1) {
 				DateTime deadline = dates.get(0);
 				command = new AddTaskCommand(scheduler, title, description, deadline);
-			}
-			else if (dates.size() == 2) {
+			} else if (dates.size() == 2) {
 				DateTime start = dates.get(0);
 				DateTime end = dates.get(1);
 
@@ -244,7 +309,7 @@ public class CommandParser {
 		case UPDATE:
 			int index = this.getIndex(userInput);
 			FieldName fieldName = this.getFieldName(userInput);
-			Object newValue = this.getValue(userInput);
+			Object newValue = this.getNewValue(userInput);
 			if (newValue instanceof String) {
 				command = new EditTaskCommand(scheduler, index, fieldName, (String) newValue);
 			} else if (newValue instanceof DateTime) {
@@ -270,7 +335,7 @@ public class CommandParser {
 			break;
 
 		case UNDO :
-			command = new UndoCommand(scheduler);
+			command = new UndoCommand(sc);
 			break;
 
 		case HELP:
@@ -282,7 +347,7 @@ public class CommandParser {
 			break;
 
 		case EXIT :
-			command = new ExitCommand(scheduler);
+			command = new ExitCommand();
 			break;
 
 		case SYNC :

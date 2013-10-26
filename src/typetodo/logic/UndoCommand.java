@@ -1,12 +1,16 @@
 package typetodo.logic;
 
 public class UndoCommand implements Command{
-	Scheduler sc;
-	public UndoCommand(Scheduler sc) {
+	private static final String MESSAGE_UNDO = "Undo is successful";
+	private ScheduleController sc;
+	
+	public UndoCommand(ScheduleController sc) {
 		this.sc = sc;
 	}
 	
-	public void execute() throws Exception {
+	public String execute() throws Exception {
 		sc.undo();
+		String feedback = MESSAGE_UNDO;
+		return feedback;
 	}
 }

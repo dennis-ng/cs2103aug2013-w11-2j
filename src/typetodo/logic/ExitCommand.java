@@ -1,12 +1,9 @@
 package typetodo.logic;
 
-public class ExitCommand implements Command{
-	private Scheduler sc;
-	public ExitCommand(Scheduler sc) {
-		this.sc = sc;
-	}
+public class ExitCommand implements Command{	
 	@Override
-	public void execute() throws Exception {
-		sc.exit();
+	public String execute() throws Exception {
+		System.exit(0);
+		return null;
 	}
 }

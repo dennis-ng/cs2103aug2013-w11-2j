@@ -15,7 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import typetodo.logic.Scheduler;
+import typetodo.logic.Schedule;
+import typetodo.logic.ScheduleController;
 import typetodo.model.Task;
 
 /**
@@ -29,7 +30,7 @@ public class TypeToDoGui extends JFrame implements View {
 	private static JLabel lblFeedback;
 	private static JTextArea txtListOutput;
 	private static FeedbackDialog feedbackDialog;
-	private static Scheduler sc;
+	private static ScheduleController sc;
 
 	private TypeToDoGui() {
 
@@ -86,14 +87,14 @@ public class TypeToDoGui extends JFrame implements View {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JTextField source = (JTextField) e.getSource();
-				sc.listenForCommands(source.getText());
+				sc.inputCommand(source.getText());
 				source.setText("");
 			}
 		});
 		lblFeedback = feedbackDialog.getFeedbackLabel();
 		txtListOutput = feedbackDialog.getOutputBox();
 
-		sc = new Scheduler(cmdFrame);
+		sc = new ScheduleController(cmdFrame, new Schedule());
 	}
 
 	public static void setCmd(String input) {
