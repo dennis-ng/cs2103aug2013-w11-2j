@@ -8,27 +8,32 @@ import typetodo.model.Task;
 import typetodo.model.TimedTask;
 
 public class AddTaskCommand implements Command, Undoable {
-	Scheduler sc;
+	private static final String MESSAGE_ADDED = "\"%s\" has been added to your schedule";
+	Schedule sc;
 	int taskId;
 	Task taskToBeAdded;
 	
-	public AddTaskCommand(Scheduler sc, String title, String description) {
+	public AddTaskCommand(Schedule sc, String title, String description) {
 		this.sc = sc;
 		this.taskToBeAdded = new FloatingTask(title, description);
 	}
 	
-	public AddTaskCommand(Scheduler sc, String title, String description, DateTime deadline) {	
+	public AddTaskCommand(Schedule sc, String title, String description, DateTime deadline) {	
 		this.sc = sc;
 		this.taskToBeAdded = new DeadlineTask(title, description, deadline);
 	}
 	
-	public AddTaskCommand(Scheduler sc, String title, String description, DateTime start, DateTime end, boolean isBusy) {
+	public AddTaskCommand(Schedule sc, String title, String description, DateTime start, DateTime end, boolean isBusy) {
 		this.sc = sc;
 		this.taskToBeAdded = new TimedTask(title, description, start, end, isBusy);
 	}
 	
-	public void execute() throws Exception {
+	public String execute() throws Exception {
 		taskId = sc.addTask(taskToBeAdded);
+		
+		String feedback;
+		feedback = String.format(MESSAGE_ADDED, taskToBeAdded.getTitle());
+		return feedback;
 	}
 	
 	public void undo() throws Exception{

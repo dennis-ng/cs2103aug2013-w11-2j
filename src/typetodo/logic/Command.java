@@ -1,5 +1,5 @@
 package typetodo.logic;
 
 public interface Command {
-	public void execute() throws Exception;
+	public String execute() throws Exception;
 }
