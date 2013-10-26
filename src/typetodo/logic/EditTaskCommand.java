@@ -6,37 +6,38 @@ import typetodo.model.FieldName;
 import typetodo.model.Task;
 
 public class EditTaskCommand implements Command, Undoable{
-	Scheduler sc;
-	Task taskBeforeEdit;
-	String keyword;
-	int index;
-	FieldName fieldName;
-	String newString;
-	DateTime newDateTime;
-	Boolean newBoolean;
+	private static final String MESSAGE_EDITED = "Edit successful";
+	private Schedule sc;
+	private Task taskBeforeEdit;
+	private String keyword;
+	private int index;
+	private FieldName fieldName;
+	private String newString;
+	private DateTime newDateTime;
+	private Boolean newBoolean;
 	
-	public EditTaskCommand(Scheduler sc, int index, FieldName fieldName, String newValue) {
+	public EditTaskCommand(Schedule sc, int index, FieldName fieldName, String newValue) {
 		this.sc = sc;
 		this.index = index;
 		this.fieldName = fieldName;
 		this.newString = newValue;
 	}
 	
-	public EditTaskCommand(Scheduler sc, int index, FieldName fieldName, DateTime newDate) {
+	public EditTaskCommand(Schedule sc, int index, FieldName fieldName, DateTime newDate) {
 		this.sc = sc;
 		this.index = index;
 		this.fieldName = fieldName;
 		this.newDateTime = newDate;
 	}
 	
-	public EditTaskCommand(Scheduler sc, int index, FieldName fieldName, boolean newBoolean) {
+	public EditTaskCommand(Schedule sc, int index, FieldName fieldName, boolean newBoolean) {
 		this.sc = sc;
 		this.index = index;
 		this.fieldName = fieldName;
 		this.newBoolean = newBoolean;
 	}
 	
-	public void execute() throws Exception {
+	public String execute() throws Exception {
 		if (newString != null) {
 			this.taskBeforeEdit = sc.editTask(index, fieldName, newString);
 		}
@@ -46,6 +47,9 @@ public class EditTaskCommand implements Command, Undoable{
 		else if(newBoolean != null) {
 			this.taskBeforeEdit = sc.editTask(index, fieldName, newBoolean);
 		}
+		
+		String feedback = String.format(MESSAGE_EDITED);
+		return feedback;
 	}
 	
 	public void undo() throws Exception {
