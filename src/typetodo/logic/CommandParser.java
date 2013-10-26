@@ -304,8 +304,7 @@ public class CommandParser {
 			}
 			 */
 			break;
-
-		
+	
 		case UPDATE:
 			int index = this.getIndex(userInput);
 			FieldName fieldName = this.getFieldName(userInput);
