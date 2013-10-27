@@ -10,7 +10,11 @@ import typetodo.model.DeadlineTask;
 import typetodo.model.FieldName;
 import typetodo.model.Task;
 import typetodo.model.TimedTask;
-
+/**
+ * 
+ * @author Shiyu
+ *
+ */
 public class Schedule {
 	private ArrayList<Task> currentListOfTasks;
 	private DbHandler db;
@@ -21,11 +25,21 @@ public class Schedule {
 		keyItem = new DateTime();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public ArrayList<Task> getCurrentListOfTasks() {
 		this.refreshList();
 		return currentListOfTasks;
 	}
 	
+	/**
+	 * 
+	 * @param task
+	 * @return
+	 * @throws Exception
+	 */
 	public int addTask(Task task) throws Exception {
 		int taskId = db.addTask(task);
 		

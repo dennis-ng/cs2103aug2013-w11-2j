@@ -5,6 +5,7 @@ import java.util.Stack;
 import typetodo.ui.View;
 
 public class ScheduleController {
+	private static final String MESSAGE_WELCOME = "Welcome to TypeToDo!";
 	private View view;
 	private Stack<Command> historyOfCommands;
 	private CommandParser commandParser;
@@ -17,13 +18,13 @@ public class ScheduleController {
 		this.schedule = schedule;
 		
 		view.displayTasks(schedule.getCurrentListOfTasks());
-		view.displayFeedBack("Welcome to TypeTodo");
+		view.displayFeedBack(MESSAGE_WELCOME);
 	}
 	
-	public void inputCommand(String input) {
+	public void parseAndExecute(String userInput) {
 		Command command;
 		try {
-			command = commandParser.parse(input);
+			command = commandParser.parse(userInput);
 			String feedback = command.execute();
 			view.displayFeedBack(feedback);
 			
