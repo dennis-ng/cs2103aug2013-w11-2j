@@ -91,8 +91,9 @@ public class FeedbackDialog extends JDialog {
 		initialize();
 	}
 
-	public JTextArea getFeedbackLabel() {
-		return txtFeedback;
+	public void setFeedbackText(String text) {
+		txtFeedback.setText(text);
+		this.pack();
 	}
 
 	public JTextArea getOutputBox() {
