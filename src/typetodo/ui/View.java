@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import typetodo.model.Task;
 
 public interface View {
-	public String getUserInput();
 
 	public void displayFeedBack(String feedBack);
 

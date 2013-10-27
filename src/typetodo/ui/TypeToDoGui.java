@@ -26,14 +26,11 @@ public class TypeToDoGui extends JFrame implements View {
 
 	private static TypeToDoGui mainGui;
 	private static String cmd = null;
-	private static JTextArea txtFeedback;
 	private static JTextArea txtListOutput;
 	private static FeedbackDialog feedbackDialog;
 	private static ScheduleController sc;
 
 	private TypeToDoGui() {
-
-		// FeedbackDialog feedbackDialog = new FeedbackDialog(this);
 
 		this.setUndecorated(true);
 		this.setLayout(new BorderLayout());
@@ -47,6 +44,40 @@ public class TypeToDoGui extends JFrame implements View {
 			mainGui = new TypeToDoGui();
 		}
 		return mainGui;
+	}
+
+	public static void setCmd(String input) {
+		cmd = input;
+		System.out.println(cmd + "first");
+	}
+
+	@Override
+	public void displayFeedBack(String feedBack) {
+		feedbackDialog.setFeedbackText(feedBack);
+	}
+
+	@Override
+	public void displayErrorMessage(String errorMessage) {
+		feedbackDialog.setFeedbackText(errorMessage);
+	}
+
+	@Override
+	public void displayTasks(ArrayList<Task> tasks) {
+		String output = "";
+		int index = 1;
+		for (Task task : tasks) {
+			output += index + ". " + task + "\n";
+			index++;
+		}
+		txtListOutput.setText(output);
+		feedbackDialog.pack();
+	}
+
+	@Override
+	public void displayHelp(String helpMessage) {
+		System.out.println(helpMessage);
+		txtListOutput.setText(helpMessage);
+		feedbackDialog.pack();
 	}
 
 	/**
@@ -90,49 +121,8 @@ public class TypeToDoGui extends JFrame implements View {
 				source.setText("");
 			}
 		});
-		txtFeedback = feedbackDialog.getFeedbackLabel();
-		txtListOutput = feedbackDialog.getOutputBox();
 
+		txtListOutput = feedbackDialog.getOutputBox();
 		sc = new ScheduleController(cmdFrame, new Schedule());
 	}
-
-	public static void setCmd(String input) {
-		cmd = input;
-		System.out.println(cmd + "first");
-	}
-
-	@Override
-	public String getUserInput() {
-		return null;
-	}
-
-	@Override
-	public void displayFeedBack(String feedBack) {
-		txtFeedback.setText(feedBack);
-	}
-
-	@Override
-	public void displayErrorMessage(String errorMessage) {
-		txtFeedback.setText(errorMessage);
-	}
-
-	@Override
-	public void displayTasks(ArrayList<Task> tasks) {
-		String output = "";
-		int index = 1;
-		for (Task task : tasks) {
-			output += index + ". " + task + "\n";
-			index++;
-		}
-		txtListOutput.setText(output);
-		feedbackDialog.pack();
-	}
-
-	@Override
-	public void displayHelp(String helpMessage) {
-		System.out.println(helpMessage);
-		txtListOutput.setText(helpMessage);
-		feedbackDialog.pack();
-	}
-
 }
