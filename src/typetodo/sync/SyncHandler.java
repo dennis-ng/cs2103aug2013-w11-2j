@@ -20,7 +20,7 @@ public class SyncHandler {
 		db = DbHandler.getInstance();
 		gcal = new GCalHandler();
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
-		lastSyncDate = fmt.parseDateTime("17:00 10-OCT 2013"); // for testing
+		lastSyncDate = fmt.parseDateTime("17:00 26-OCT 2013"); // for testing
 	}
 
 	public void syncToGoogleCalendar() {
@@ -29,15 +29,14 @@ public class SyncHandler {
 			Task task = tasks.get(index);
 			try {
 				if (!gcal.hasTask(task)) { // if task is not in google calendar
-					System.out.println(task.getTitle() + " is already in google system");
+					System.out.println(task.getTitle() + " is not in google system");
 
 					// Case 1a: task had not be sync before
 					if (task.getDateModified().isAfter(lastSyncDate)) {
 						gcal.addTaskToGCal(task);
 						try {
-							System.out.println("MY ID IS " + task.getGoogleId());
 							if (db.updateTask(task)) {
-								System.out.println("UDPATED WHAT");
+								System.out.println("GoogleId has been added to \"" + task.getTitle() + "\"");
 							}
 
 						} catch (Exception e) {
@@ -67,9 +66,8 @@ public class SyncHandler {
 						taskToBeUpdated.setTaskId(task.getTaskId());
 						taskToBeUpdated.setGoogleId(task.getGoogleId());
 						taskToBeUpdated.setDateCreated(task.getDateCreated());
-						taskToBeUpdated.setDateModified(new DateTime()); // set modded day
+						taskToBeUpdated.updateDateModified(); // set modded day
 																															// to today.
-
 						try {
 							db.updateTask(taskToBeUpdated);
 							System.out.println("\"" + taskToBeUpdated.getTitle()
