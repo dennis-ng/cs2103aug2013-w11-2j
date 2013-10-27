@@ -11,10 +11,12 @@ import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import typetodo.model.FieldName;
+import typetodo.sync.SyncHandler;
 
 public class CommandParser {
 	private Schedule scheduler;
 	private ScheduleController sc;
+	private SyncHandler sync;
 	
 	public CommandParser(ScheduleController sc, Schedule schedule) {
 		this.sc = sc;
@@ -44,6 +46,7 @@ public class CommandParser {
 		commandSynonyms.put(CommandType.SEARCH, Arrays.asList("search", "find"));
 		commandSynonyms.put(CommandType.UNDO, Arrays.asList("undo"));
 		commandSynonyms.put(CommandType.EXIT, Arrays.asList("exit", "terminate"));
+		commandSynonyms.put(CommandType.SYNC, Arrays.asList("sync"));
 
 		for (CommandType commandType : commandSynonyms.keySet()) {
 			if (commandSynonyms.get(commandType).contains(command)) {
@@ -94,7 +97,7 @@ public class CommandParser {
 		
 		//Description will always be at the end of the userinput
 		String description = userInput.substring(++indexOfDescription);
-		if (description.indexOf(';') == -1) {
+		if (description.indexOf(';') != -1) {
 			throw new InvalidFormatException("';' is a reserved character and should not be found in the description");
 		}
 		return description;
@@ -344,7 +347,10 @@ public class CommandParser {
 			break;
 
 		case SYNC :
-			//TODO:
+			if (sync == null) {
+				sync = new SyncHandler();
+			}
+			command = new CommandSync(sync);
 			break;
 
 		default:
