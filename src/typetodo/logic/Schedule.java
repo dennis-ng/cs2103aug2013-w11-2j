@@ -9,6 +9,7 @@ import typetodo.db.DbHandler;
 import typetodo.model.DeadlineTask;
 import typetodo.model.FieldName;
 import typetodo.model.Task;
+import typetodo.model.Task.Status;
 import typetodo.model.TimedTask;
 /**
  * 
@@ -96,7 +97,13 @@ public class Schedule {
 
 	public Task editTask(int index, FieldName fieldName, String newString)
 			throws Exception {
-		Task taskToBeEdited = currentListOfTasks.get(index - 1);
+		Task taskToBeEdited = null;
+		try {
+			taskToBeEdited = currentListOfTasks.get(index - 1);
+		}
+		catch (IndexOutOfBoundsException e) {
+			throw new IndexOutOfBoundsException("Given index is not in range");
+		}
 		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 
 		switch (fieldName) {
@@ -110,7 +117,7 @@ public class Schedule {
 			// TODO: throw exception
 		}
 
-		taskToBeEdited.setDateModified(new DateTime());
+		taskToBeEdited.updateDateModified();
 		db.updateTask(taskToBeEdited);
 
 		return taskBeforeEdit;
@@ -118,7 +125,12 @@ public class Schedule {
 
 	public Task editTask(int index, FieldName fieldName, DateTime newDateTime)
 			throws Exception {
-		Task taskToBeEdited = currentListOfTasks.get(index - 1);
+		Task taskToBeEdited = null;
+		try {
+			taskToBeEdited = currentListOfTasks.get(index - 1);
+		} catch (IndexOutOfBoundsException e) {
+			throw new IndexOutOfBoundsException("Given index is not in range");
+		}
 		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 
 		switch (fieldName) {
@@ -147,7 +159,7 @@ public class Schedule {
 			// TODO: throw exception
 		}
 
-		taskToBeEdited.setDateModified(new DateTime());
+		taskToBeEdited.updateDateModified();
 		db.updateTask(taskToBeEdited);
 
 		return taskBeforeEdit;
@@ -155,19 +167,39 @@ public class Schedule {
 
 	public Task editTask(int index, FieldName fieldName, boolean newBoolean)
 			throws Exception {
-		Task taskToBeEdited = currentListOfTasks.get(index - 1);
+		Task taskToBeEdited = null;
+		try {
+			taskToBeEdited = currentListOfTasks.get(index - 1);
+		} catch (IndexOutOfBoundsException e) {
+			throw new IndexOutOfBoundsException("Given index is not in range");
+		}
 		Task taskBeforeEdit = taskToBeEdited.makeCopy();
 
 		if (taskToBeEdited instanceof TimedTask) {
 			((TimedTask) taskToBeEdited).setBusy(newBoolean);
 		}
 
-		taskToBeEdited.setDateModified(new DateTime());
+		taskToBeEdited.updateDateModified();
 		db.updateTask(taskToBeEdited);
 
 		return taskBeforeEdit;
 	}
 
+	public Task updateTaskStatus(int index, Status status) 
+			throws Exception {
+		Task taskToBeMarked = null;
+		try {
+			taskToBeMarked = currentListOfTasks.get(index - 1);
+		} catch (IndexOutOfBoundsException e) {
+			throw new IndexOutOfBoundsException("Given index is not in range");
+		}
+		
+		taskToBeMarked.setStatus(status);
+		db.updateTask(taskToBeMarked);
+		
+		return taskToBeMarked;
+	}
+	
 	public void search(String keyword) {
 		this.setKeyItem(keyword);
 	}	
