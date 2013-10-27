@@ -17,7 +17,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -29,8 +28,10 @@ public class FeedbackDialog extends JDialog {
 
 	private JPanel feedbackPanel;
 	private JPanel taskListPanel;
-	private JLabel lblFeedback;
+	private JTextArea txtFeedback;
 	private JTextArea txtListOutput;
+	private static ComponentAdapter DIALOG_RESIZE_ACTION;
+	public final static Color dialogColor = new Color(230, 230, 230);
 
 	public FeedbackDialog() {
 		super();
@@ -90,8 +91,8 @@ public class FeedbackDialog extends JDialog {
 		initialize();
 	}
 
-	public JLabel getFeedbackLabel() {
-		return lblFeedback;
+	public JTextArea getFeedbackLabel() {
+		return txtFeedback;
 	}
 
 	public JTextArea getOutputBox() {
@@ -116,32 +117,42 @@ public class FeedbackDialog extends JDialog {
 						getHeight() + 10, 20, 20));
 			}
 		};
-		lblFeedback = new JLabel("Fail to initialise feedback");
-		lblFeedback.setForeground(Color.WHITE);
-		feedbackPanel.add(lblFeedback);
-
-		taskListPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		txtListOutput = new JTextArea("Add some words");
-		txtListOutput.addComponentListener(new ComponentAdapter() {
+		DIALOG_RESIZE_ACTION = new ComponentAdapter() {
 			// Resize the dialog as the textarea increase in size
 			@Override
 			public void componentResized(ComponentEvent e) {
 				FeedbackDialog.this.pack();
 			}
-		});
+		};
+		txtFeedback = new JTextArea();
+		txtFeedback.setForeground(Color.WHITE);
+		txtFeedback.setBackground(Color.DARK_GRAY);
+		txtFeedback.setLineWrap(true);
+		txtFeedback.setWrapStyleWord(true);
+		txtFeedback.setSize(this.getMinimumSize());
+		txtFeedback.setMinimumSize(new Dimension(txtFeedback.getWidth(), 0));
+		txtFeedback.setMaximumSize(new Dimension(txtFeedback.getWidth(), 20));
+		txtFeedback.setEditable(false);
+		txtFeedback.addComponentListener(DIALOG_RESIZE_ACTION);
+		feedbackPanel.add(txtFeedback);
+
+		taskListPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		txtListOutput = new JTextArea();
+		txtListOutput.addComponentListener(DIALOG_RESIZE_ACTION);
 		txtListOutput.setLineWrap(true);
 		txtListOutput.setWrapStyleWord(true);
-		txtListOutput.setBackground(new Color(230, 230, 230));
+		txtListOutput.setBackground(dialogColor);
 		txtListOutput.setEditable(false);
 		txtListOutput.setSize(this.getMinimumSize());
 		txtListOutput.setMinimumSize(new Dimension(txtListOutput.getWidth(), 0));
 		txtListOutput.setMaximumSize(new Dimension(txtListOutput.getWidth(), 20));
 		taskListPanel.add(txtListOutput);
 
-		this.setOpacity(0.75f);
+		this.setBackground(dialogColor);
 		this.setLayout(new BorderLayout());
 		this.add(feedbackPanel, BorderLayout.NORTH);
 		this.add(taskListPanel, BorderLayout.CENTER);
 		this.pack();
 	}
+
 }

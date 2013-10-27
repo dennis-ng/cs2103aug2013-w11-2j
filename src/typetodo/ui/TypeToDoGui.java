@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -27,7 +26,7 @@ public class TypeToDoGui extends JFrame implements View {
 
 	private static TypeToDoGui mainGui;
 	private static String cmd = null;
-	private static JLabel lblFeedback;
+	private static JTextArea txtFeedback;
 	private static JTextArea txtListOutput;
 	private static FeedbackDialog feedbackDialog;
 	private static ScheduleController sc;
@@ -91,7 +90,7 @@ public class TypeToDoGui extends JFrame implements View {
 				source.setText("");
 			}
 		});
-		lblFeedback = feedbackDialog.getFeedbackLabel();
+		txtFeedback = feedbackDialog.getFeedbackLabel();
 		txtListOutput = feedbackDialog.getOutputBox();
 
 		sc = new ScheduleController(cmdFrame, new Schedule());
@@ -108,19 +107,13 @@ public class TypeToDoGui extends JFrame implements View {
 	}
 
 	@Override
-	public int getIndex() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public void displayFeedBack(String feedBack) {
-		lblFeedback.setText(feedBack);
+		txtFeedback.setText(feedBack);
 	}
 
 	@Override
 	public void displayErrorMessage(String errorMessage) {
-		lblFeedback.setText(errorMessage);
+		txtFeedback.setText(errorMessage);
 	}
 
 	@Override
