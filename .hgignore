@@ -2,5 +2,4 @@ syntax: glob
 .DS_Store
 bin
 TypeToDo\.txt
-.TypeToDo.txt
-.*.txt
+.*.TypeToDo.txt
