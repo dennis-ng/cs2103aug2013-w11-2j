@@ -54,9 +54,14 @@ public class Converter {
 		
 		String name = task.getTitle();
 		String description = task.getDescription();
+		String googleId = task.getGoogleId();
 		
 		googleTask.setTitle(name);
 		googleTask.setNotes(description);
+		
+		if(googleId != null) {
+			googleTask.setId(googleId);
+		}
 			
 		return googleTask;
 	}

@@ -48,7 +48,6 @@ public class GCalHandler {
 		else if(task instanceof DeadlineTask) {
 			Event event = Converter.deadlineTaskToGoogleEvent((DeadlineTask) task);
 			Event result = calendarClient.events().insert(calendarId, event).execute();
-			System.out.println("Results id " + result.getId());
 			task.setGoogleId(result.getId()); //append GCal's id to task
 		}
 		else if(task instanceof FloatingTask) {
@@ -73,44 +72,39 @@ public class GCalHandler {
 		}
 		return null;
 	}
-	
+
 	public boolean hasTask(Task task) {
-		if (task instanceof TimedTask || task instanceof DeadlineTask) {
-			if (task.getGoogleId() != null) {
-				try {
-					if(task.getGoogleId() != null) {
-						Event event = calendarClient.events().get(calendarId, task.getGoogleId()).execute();
-						if ((!event.equals(null)) && (!event.getStatus().equals("cancelled"))){
-							System.out.println(calendarId + " " + task.getGoogleId());
-							return true;
-						}
-						else {
-							System.out.println(calendarId + " " + task.getGoogleId());
-							System.out.println(event.getStatus());
-							System.out.println("failed");
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+		if (task.getGoogleId() == null) {
+			return false;
 		}
-		else {
+
+		if (task instanceof TimedTask || task instanceof DeadlineTask) { //check google calendar
 			try {
-				if(task.getGoogleId() != null) {
-					if (!tasksClient.tasks().get(taskListId, task.getGoogleId()).execute().equals(null)) {
-						return true;
-					}
+				Event event = calendarClient.events().get(calendarId, task.getGoogleId()).execute();
+
+				if ((!event.equals(null)) && (!event.getStatus().equals("cancelled"))){
+					return true;
+				} else {
+					return false;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else if (task instanceof FloatingTask) { //Check google task
+			try {
+				if (!tasksClient.tasks().get(taskListId, task.getGoogleId()).execute().equals(null)) {
+					return true;
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		
 		return false;
 	}
 
-	
+
 	/**
 	 * Returns a task to update if task mod date is before google event/task updated mod
 	 * @param task
@@ -118,50 +112,54 @@ public class GCalHandler {
 	 */
 	public Task getUpdate(Task task) {
 		Event googleEvent;
-		if (task.getGoogleId() != null) {
-			try {
-				if (task instanceof TimedTask || task instanceof DeadlineTask) {
-					if (calendarClient.events().get(calendarId, task.getGoogleId()) != null){
-						googleEvent = calendarClient.events().get(calendarId, task.getGoogleId()).execute();
-						DateTime gcEventModifiedDate = Converter.toJodaDateTime(googleEvent.getUpdated());
-						DateTime taskModifiedDate = task.getDateModified();
-						
-						if (gcEventModifiedDate.isAfter(taskModifiedDate)) {
-							return Converter.googleEventToTask(googleEvent);
-						}
-						else if (gcEventModifiedDate.isBefore(taskModifiedDate)) {
-							this.updateTaskInGCal(task);
-							return null;
-						}
-					}
-				}
-				else if (task instanceof FloatingTask) {
-					com.google.api.services.tasks.model.Task googleTask;
-					googleTask = tasksClient.tasks().get(taskListId, task.getGoogleId()).execute();
-					if (!googleTask.equals(null)) {
-						DateTime gcTaskModifiedDate = Converter.toJodaDateTime(googleTask.getUpdated());
-						DateTime taskModifiedDate = task.getDateModified();
-						
-						if (gcTaskModifiedDate.isAfter(taskModifiedDate)) {
-							return Converter.googleTaskToTask(googleTask);
-						}
-						else if (gcTaskModifiedDate.isBefore(taskModifiedDate)) {
-							this.updateTaskInGCal(task);
-							return null;
-						}
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
+		if (task.getGoogleId() == null) {
+			return null;
 		}
+
+		try {
+			if (task instanceof TimedTask || task instanceof DeadlineTask) {
+				if (calendarClient.events().get(calendarId, task.getGoogleId()) != null){
+					googleEvent = calendarClient.events().get(calendarId, task.getGoogleId()).execute();
+					DateTime gcEventModifiedDate = Converter.toJodaDateTime(googleEvent.getUpdated());
+					DateTime taskModifiedDate = task.getDateModified();
+
+					if (gcEventModifiedDate.isAfter(taskModifiedDate)) {
+						return Converter.googleEventToTask(googleEvent);
+					}
+					else if (gcEventModifiedDate.isBefore(taskModifiedDate)) {
+						this.updateTaskInGCal(task);
+						return null;
+					}
+				}
+			}
+			else if (task instanceof FloatingTask) {
+				com.google.api.services.tasks.model.Task googleTask;
+				googleTask = tasksClient.tasks().get(taskListId, task.getGoogleId()).execute();
+				if (!googleTask.equals(null)) {
+					DateTime gcTaskModifiedDate = Converter.toJodaDateTime(googleTask.getUpdated());
+					DateTime taskModifiedDate = task.getDateModified();
+
+					if (gcTaskModifiedDate.isAfter(taskModifiedDate)) {
+						return Converter.googleTaskToTask(googleTask);
+					}
+					else if (gcTaskModifiedDate.isBefore(taskModifiedDate)) {
+						this.updateTaskInGCal(task);
+						return null;
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
 		return null;
 	}
 	
 	public void updateTaskInGCal(Task task) {
 		Event event;
 		String googleId = task.getGoogleId();
+		
 		if (task instanceof TimedTask) {
 			event = Converter.timedTaskToEvent((TimedTask) task);
 			try {
@@ -183,7 +181,6 @@ public class GCalHandler {
 		else if (task instanceof FloatingTask) {
 			com.google.api.services.tasks.model.Task googleTask = 
 					Converter.floatingTaskToGoogleTask((FloatingTask) task);
-			
 			try {
 				tasksClient.tasks().update(taskListId, googleId, googleTask).execute();
 			} catch (IOException e) {
@@ -218,11 +215,10 @@ public class GCalHandler {
 				if (entry.getSummary().equals("TypeToDo")) {
 					return entry.getId();
 				}
-				
 			}
 			
 		} catch (Exception e) {
-			//handle
+			//TODO:
 		}
 		
 		return null;

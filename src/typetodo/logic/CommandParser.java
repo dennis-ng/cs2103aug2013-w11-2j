@@ -11,10 +11,12 @@ import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import typetodo.model.FieldName;
+import typetodo.sync.SyncHandler;
 
 public class CommandParser {
 	private Schedule scheduler;
 	private ScheduleController sc;
+	private SyncHandler sync;
 
 	public CommandParser(ScheduleController sc, Schedule schedule) {
 		this.sc = sc;
@@ -54,7 +56,7 @@ public class CommandParser {
 				.put(CommandType.SEARCH, Arrays.asList("search", "find"));
 		commandSynonyms.put(CommandType.UNDO, Arrays.asList("undo"));
 		commandSynonyms.put(CommandType.EXIT,
-				Arrays.asList("exit", "terminate"));
+		commandSynonyms.put(CommandType.SYNC, Arrays.asList("sync"));
 
 		for (CommandType commandType : commandSynonyms.keySet()) {
 			if (commandSynonyms.get(commandType).contains(command)) {
@@ -249,6 +251,10 @@ public class CommandParser {
 		} else {
 			scanner.next();// throw away index
 			scanner.next();// throw away fieldName
+		}
+		else {
+			scanner.next();//throw away index
+			scanner.next();//throw away fieldName
 			dateField = scanner.nextLine().trim();
 			System.out.println(dateField);
 		}
@@ -343,6 +349,24 @@ public class CommandParser {
 			 * if (isStatus(contentString)) { Status status =
 			 * convertToStatus(contentString); schedule.setViewMode(status); }
 			 * else { schedule.setViewMode(contentString); }
+			if (isDate(contentString)) {
+				DateTime date = convertToDate(contentString);
+				schedule.setViewMode(date);
+			} else if (isStatus(contentString)) {
+				Status status = convertToStatus(contentString);
+				schedule.setViewMode(status);
+			} else {
+				schedule.setViewMode(contentString);
+			}
+			if (isDate(contentString)) {
+				DateTime date = convertToDate(contentString);
+				schedule.setViewMode(date);
+			} else if (isStatus(contentString)) {
+				Status status = convertToStatus(contentString);
+				schedule.setViewMode(status);
+			} else {
+				schedule.setViewMode(contentString);
+			}
 			 */
 			break;
 
@@ -394,7 +418,10 @@ public class CommandParser {
 			break;
 
 		case SYNC:
-			// TODO:
+			if (sync == null) {
+				sync = new SyncHandler();
+			}
+			command = new CommandSync(sync);
 			break;
 
 		default:
