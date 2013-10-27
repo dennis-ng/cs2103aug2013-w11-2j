@@ -51,12 +51,11 @@ public class CommandParser {
 		commandSynonyms.put(CommandType.HOME, Arrays.asList("home", "today"));
 		commandSynonyms.put(CommandType.UPDATE,
 				Arrays.asList("update", "edit", "change"));
-		;
 		commandSynonyms
 				.put(CommandType.SEARCH, Arrays.asList("search", "find"));
 		commandSynonyms.put(CommandType.UNDO, Arrays.asList("undo"));
 		commandSynonyms.put(CommandType.EXIT,
-		commandSynonyms.put(CommandType.SYNC, Arrays.asList("sync"));
+				commandSynonyms.put(CommandType.SYNC, Arrays.asList("sync")));
 
 		for (CommandType commandType : commandSynonyms.keySet()) {
 			if (commandSynonyms.get(commandType).contains(command)) {
@@ -248,13 +247,11 @@ public class CommandParser {
 			scanner.useDelimiter("\\+");
 			dateField = scanner.next().substring(1).trim();
 			System.out.println(dateField);
-		} else {
+		}
+
+		else {
 			scanner.next();// throw away index
 			scanner.next();// throw away fieldName
-		}
-		else {
-			scanner.next();//throw away index
-			scanner.next();//throw away fieldName
 			dateField = scanner.nextLine().trim();
 			System.out.println(dateField);
 		}
@@ -348,25 +345,17 @@ public class CommandParser {
 			 * convertToDate(contentString); schedule.setViewMode(date); } else
 			 * if (isStatus(contentString)) { Status status =
 			 * convertToStatus(contentString); schedule.setViewMode(status); }
+			 * else { schedule.setViewMode(contentString); } if
+			 * (isDate(contentString)) { DateTime date =
+			 * convertToDate(contentString); schedule.setViewMode(date); } else
+			 * if (isStatus(contentString)) { Status status =
+			 * convertToStatus(contentString); schedule.setViewMode(status); }
+			 * else { schedule.setViewMode(contentString); } if
+			 * (isDate(contentString)) { DateTime date =
+			 * convertToDate(contentString); schedule.setViewMode(date); } else
+			 * if (isStatus(contentString)) { Status status =
+			 * convertToStatus(contentString); schedule.setViewMode(status); }
 			 * else { schedule.setViewMode(contentString); }
-			if (isDate(contentString)) {
-				DateTime date = convertToDate(contentString);
-				schedule.setViewMode(date);
-			} else if (isStatus(contentString)) {
-				Status status = convertToStatus(contentString);
-				schedule.setViewMode(status);
-			} else {
-				schedule.setViewMode(contentString);
-			}
-			if (isDate(contentString)) {
-				DateTime date = convertToDate(contentString);
-				schedule.setViewMode(date);
-			} else if (isStatus(contentString)) {
-				Status status = convertToStatus(contentString);
-				schedule.setViewMode(status);
-			} else {
-				schedule.setViewMode(contentString);
-			}
 			 */
 			break;
 
