@@ -166,8 +166,10 @@ public class CommandParser {
 			case START :
 			case END :
 			case DEADLINE :
+				//TODO: date format might be wrong or date might be missing, exception has to be thrown
 				return new DateTime(this.getDates(newValue).get(0));
 			case BUSYFIELD :
+				//TODO: same as the above^
 				return (this.getIsBusy(userInput));
 			default:
 				//TODO: assert?
@@ -219,20 +221,6 @@ public class CommandParser {
 		return jodaDates;
 	}
 
-
-	/**
-	 * return boolean value of whether a string can be parsed to a status value.
-	 */
-	private static boolean isStatus(String statusString) {
-		if (statusString.equals("COMPLETED")
-				|| statusString.equals("INCOMPLETE")
-				|| statusString.equals("DISCARDED"))
-			return true;
-		else {
-			return false;
-		}
-	}
-
 	/** convert from string to FieldName and return FieldName. 
 	 * @throws InvalidFieldNameException */
 	private FieldName convertToFieldName(String fnString) throws InvalidFieldNameException {
@@ -252,6 +240,12 @@ public class CommandParser {
 		throw new InvalidFieldNameException("\"" + fnString + "\" is not a valid Field Name");
 	}
 
+	/**
+	 * 
+	 * @param userInput
+	 * @return
+	 * @throws Exception
+	 */
 	public Command parse(String userInput) throws Exception {
 		Command command = null;
 		switch (this.getCommand(userInput)) {
@@ -262,17 +256,17 @@ public class CommandParser {
 				ArrayList<DateTime> dates = this.getDates(userInput);
 
 			if (dates.isEmpty()) {
-				command = new AddTaskCommand(scheduler, title, description);
+				command = new CommandAddTask(scheduler, title, description);
 			} else if (dates.size() == 1) {
 				DateTime deadline = dates.get(0);
-				command = new AddTaskCommand(scheduler, title, description, deadline);
+				command = new CommandAddTask(scheduler, title, description, deadline);
 			} else if (dates.size() == 2) {
 				DateTime start = dates.get(0);
 				DateTime end = dates.get(1);
 
 				//Boolean isBusy = this.isBusy();
 
-				command = new AddTaskCommand(scheduler, title, description, start, end, false);
+				command = new CommandAddTask(scheduler, title, description, start, end, false);
 			} else {
 				//TODO: invalid new view
 			}
@@ -281,13 +275,13 @@ public class CommandParser {
 		case DELETE :
 			try {
 				int index = this.getIndex(userInput);
-				command = new DeleteTaskCommand(scheduler, index);
+				command = new CommandDeleteTask(scheduler, index);
 			} catch (Exception e) {
 				String keyword = this.getKeyword(userInput);
 				if (keyword == null) {
 					throw new Exception("INVALID FORMAT");
 				}
-				command = new DeleteTaskCommand(scheduler, keyword);
+				command = new CommandDeleteTask(scheduler, keyword);
 			}
 			break;
 
@@ -310,11 +304,11 @@ public class CommandParser {
 			FieldName fieldName = this.getFieldName(userInput);
 			Object newValue = this.getNewValue(userInput);
 			if (newValue instanceof String) {
-				command = new EditTaskCommand(scheduler, index, fieldName, (String) newValue);
+				command = new CommandEditTask(scheduler, index, fieldName, (String) newValue);
 			} else if (newValue instanceof DateTime) {
-				command = new EditTaskCommand(scheduler, index, fieldName, (DateTime) newValue);
+				command = new CommandEditTask(scheduler, index, fieldName, (DateTime) newValue);
 			} else if (newValue instanceof Boolean) {
-				command = new EditTaskCommand(scheduler, index, fieldName,(Boolean) newValue);
+				command = new CommandEditTask(scheduler, index, fieldName,(Boolean) newValue);
 			} else {
 				//TODO: invalid view
 			}
@@ -322,7 +316,7 @@ public class CommandParser {
 
 		case SEARCH :
 			String keyword = this.getKeyword(userInput);
-			command = new SearchCommand(scheduler, keyword);
+			command = new CommandSearch(scheduler, keyword);
 			break;
 
 		case DONE :
@@ -330,15 +324,15 @@ public class CommandParser {
 			break;
 
 		case HOME :
-			command = new HomeCommand(scheduler);
+			command = new CommandHome(scheduler);
 			break;
 
 		case UNDO :
-			command = new UndoCommand(sc);
+			command = new CommandUndo(sc);
 			break;
 
 		case HELP:
-			command = new HelpCommand(scheduler);
+			command = new CommandHelp(scheduler);
 			break;
 
 		case INVALID :
@@ -346,7 +340,7 @@ public class CommandParser {
 			break;
 
 		case EXIT :
-			command = new ExitCommand();
+			command = new CommandExit();
 			break;
 
 		case SYNC :

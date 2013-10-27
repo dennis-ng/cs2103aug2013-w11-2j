@@ -87,7 +87,7 @@ public class TypeToDoGui extends JFrame implements View {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JTextField source = (JTextField) e.getSource();
-				sc.inputCommand(source.getText());
+				sc.parseAndExecute(source.getText());
 				source.setText("");
 			}
 		});
