@@ -15,8 +15,7 @@ public class CommandSync implements Command{
 	@Override
 	public String execute() throws Exception {
 		// TODO Auto-generated method stub
-		sh.syncToGoogleCalendar();
-		
+		sh.twoWaySync();
 		return MESSAGE_SYNC;
 	}
 	
