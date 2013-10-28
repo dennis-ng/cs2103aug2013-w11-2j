@@ -25,6 +25,7 @@ import typetodo.model.TimedTask;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 public class DbController {
@@ -40,7 +41,7 @@ public class DbController {
 	private static DbController mainDbHandler;
 	private final Gson gson;
 
-	private DbController() throws IOException {
+	private DbController() throws IOException, JsonSyntaxException {
 		savedFile = new File(FILENAME);
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
@@ -62,7 +63,11 @@ public class DbController {
 		return mainDbHandler;
 	}
 
-	private void loadFile() {
+	/**
+	 * @throws JsonSyntaxException
+	 *           when contents of the file to load is incorrect
+	 */
+	private void loadFile() throws JsonSyntaxException {
 		StringBuilder fileToTextBuffer = new StringBuilder();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(savedFile));
@@ -77,7 +82,10 @@ public class DbController {
 		if (!fileToTextBuffer.toString().isEmpty()) {
 			Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
 			}.getType();
+			// The following statement throws JsonSyntaxException when contents of the
+			// file to load is incorrect
 			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
+
 		}
 	}
 
