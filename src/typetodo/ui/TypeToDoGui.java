@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import typetodo.logic.Schedule;
@@ -26,7 +25,6 @@ public class TypeToDoGui extends JFrame implements View {
 
 	private static TypeToDoGui mainGui;
 	private static String cmd = null;
-	private static JTextArea txtListOutput;
 	private static FeedbackDialog feedbackDialog;
 	private static ScheduleController sc;
 
@@ -69,15 +67,13 @@ public class TypeToDoGui extends JFrame implements View {
 			output += index + ". " + task + "\n";
 			index++;
 		}
-		txtListOutput.setText(output);
-		feedbackDialog.pack();
+		feedbackDialog.setTableOfTasks(output);
 	}
 
 	@Override
 	public void displayHelp(String helpMessage) {
 		System.out.println(helpMessage);
-		txtListOutput.setText(helpMessage);
-		feedbackDialog.pack();
+		feedbackDialog.setTableOfTasks(helpMessage);
 	}
 
 	/**
@@ -122,7 +118,6 @@ public class TypeToDoGui extends JFrame implements View {
 			}
 		});
 
-		txtListOutput = feedbackDialog.getOutputBox();
 		sc = new ScheduleController(cmdFrame, new Schedule());
 	}
 }

@@ -92,12 +92,13 @@ public class FeedbackDialog extends JDialog {
 	}
 
 	public void setFeedbackText(String text) {
-		txtFeedback.setText(text);
+		this.txtFeedback.setText(text);
 		this.pack();
 	}
 
-	public JTextArea getOutputBox() {
-		return txtListOutput;
+	public void setTableOfTasks(String text) {
+		this.txtListOutput.setText(text);
+		this.pack();
 	}
 
 	/**
@@ -147,6 +148,7 @@ public class FeedbackDialog extends JDialog {
 		txtListOutput.setSize(this.getMinimumSize());
 		txtListOutput.setMinimumSize(new Dimension(txtListOutput.getWidth(), 0));
 		txtListOutput.setMaximumSize(new Dimension(txtListOutput.getWidth(), 20));
+		taskListPanel.setBackground(dialogColor);
 		taskListPanel.add(txtListOutput);
 
 		this.setBackground(dialogColor);
