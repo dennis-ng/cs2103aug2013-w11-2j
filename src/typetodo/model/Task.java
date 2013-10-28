@@ -86,6 +86,10 @@ public abstract class Task implements Comparable<Task> {
 		return dateModified;
 	}
 
+	public void setDateModified(DateTime dateModified) {
+		this.dateModified = dateModified;
+	}
+	
 	/**
 	 * @param dateModified
 	 *          the dateModified to set
