@@ -86,7 +86,9 @@ public class Converter {
 		
 		String name = event.getSummary();
 		String description = event.getDescription();
+		String googleId = event.getId();
 		
+		org.joda.time.DateTime dateModified = toJodaDateTime(event.getUpdated());
 		org.joda.time.DateTime start = toJodaDateTime(event.getStart().getDateTime());
 		org.joda.time.DateTime end = toJodaDateTime(event.getEnd().getDateTime());
 		
@@ -107,6 +109,9 @@ public class Converter {
 			task = new TimedTask(name, description, start, end, isBusy);
 		}
 		
+		task.setGoogleId(googleId);
+		task.setDateModified(dateModified);
+		
 		return task;
 	}
 	
@@ -115,8 +120,13 @@ public class Converter {
 		
 		String name = googleTask.getTitle();
 		String description = googleTask.getNotes();
+		String googleId = googleTask.getId();
+		
+		org.joda.time.DateTime dateModified = toJodaDateTime(googleTask.getUpdated());
 		
 		task = new FloatingTask(name, description);
+		task.setGoogleId(googleId);
+		task.setDateModified(dateModified);
 		
 		return task;
 	}
