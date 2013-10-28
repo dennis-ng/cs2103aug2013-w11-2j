@@ -27,7 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-public class DbHandler {
+public class DbController {
 
 	// Constants
 	private static final String FILENAME = "TypeToDo.txt";
@@ -37,10 +37,10 @@ public class DbHandler {
 	private TreeMap<Integer, Task> tasksCache;
 
 	// Controllers and external libraries
-	private static DbHandler mainDbHandler;
+	private static DbController mainDbHandler;
 	private final Gson gson;
 
-	private DbHandler() throws IOException {
+	private DbController() throws IOException {
 		savedFile = new File(FILENAME);
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
@@ -55,9 +55,9 @@ public class DbHandler {
 		this.loadFile();
 	}
 
-	public static DbHandler getInstance() throws IOException {
+	public static DbController getInstance() throws IOException {
 		if (mainDbHandler == null) {
-			mainDbHandler = new DbHandler();
+			mainDbHandler = new DbController();
 		}
 		return mainDbHandler;
 	}

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 
-import typetodo.db.DbHandler;
+import typetodo.db.DbController;
 import typetodo.model.DeadlineTask;
 import typetodo.model.FieldName;
 import typetodo.model.Task;
@@ -18,11 +18,11 @@ import typetodo.model.TimedTask;
  */
 public class Schedule {
 	private ArrayList<Task> currentListOfTasks;
-	private DbHandler db;
+	private DbController db;
 	private Object keyItem;
 
 	public Schedule() throws IOException {
-		db = DbHandler.getInstance(); // model
+		db = DbController.getInstance(); // model
 		keyItem = new DateTime();
 	}
 

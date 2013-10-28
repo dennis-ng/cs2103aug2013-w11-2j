@@ -19,11 +19,11 @@ import typetodo.model.FloatingTask;
  * @author DennZ
  * 
  */
-public class DbHandlerTest {
+public class DbControllerTest {
 
 	@Test
 	public void test() {
-		DbHandler db;
+		DbController db;
 		try {
 			FloatingTask floatingTask = new FloatingTask("floatingTask1", "Desc");
 			FloatingTask floatingTask2 = new FloatingTask("floatingTask2", "Desc");
@@ -34,7 +34,7 @@ public class DbHandlerTest {
 
 			DeadlineTask deadlineTask = new DeadlineTask(1, "deadlineTask", "Desc",
 					deadline);
-			db = DbHandler.getInstance();
+			db = DbController.getInstance();
 			assertEquals("Add task", 1, db.addTask(floatingTask));
 			assertEquals("Add second task", 2, db.addTask(floatingTask2));
 			// White box testing: deadlineTask with taskId 1 is used to replace the

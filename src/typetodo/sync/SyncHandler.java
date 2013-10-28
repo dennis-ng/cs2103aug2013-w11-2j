@@ -7,17 +7,17 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import typetodo.db.DbHandler;
+import typetodo.db.DbController;
 import typetodo.model.Task;
 
 public class SyncHandler {
 	public DateTime lastSyncDate;
 
 	private final GCalHandler gcal;
-	private final DbHandler db;
+	private final DbController db;
 
 	public SyncHandler() throws IOException {
-		db = DbHandler.getInstance();
+		db = DbController.getInstance();
 		gcal = new GCalHandler();
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
 		lastSyncDate = fmt.parseDateTime("17:00 26-OCT 2013"); // for testing
