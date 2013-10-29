@@ -47,6 +47,10 @@ public class Schedule {
 			if(db.isAvailable(((TimedTask) task).getStart(), ((TimedTask) task).getEnd())) {
 				taskId = db.addTask(task);
 			}
+			else {
+				//TODO:
+				throw new Exception("Task cannot be added as current time frame is busy");
+			}
 		} else {
 			taskId = db.addTask(task);
 		}
@@ -232,6 +236,10 @@ public class Schedule {
 		this.setKeyItem(keyword);
 	}	
 	
+	public void viewAllTasks() {
+		this.keyItem = null;
+	}
+	
 	public void viewTasksofToday() {
 		this.setKeyItem(new DateTime());
 	}
@@ -244,11 +252,14 @@ public class Schedule {
 	}
 
 	private void refreshList() {
+		if (keyItem == null) {
+			this.currentListOfTasks = db.retrieveAll();
+		}
 		if (keyItem instanceof String) {
 			this.currentListOfTasks = db.retrieveContaining((String) keyItem);
 		} else if (keyItem instanceof DateTime) {
 			this.currentListOfTasks = db.retrieveList((DateTime) keyItem);
-		}
+		} 
 	}
 	
 	private void setKeyItem(DateTime dateTime) {
