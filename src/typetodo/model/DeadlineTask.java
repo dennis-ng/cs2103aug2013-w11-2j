@@ -34,9 +34,14 @@ public class DeadlineTask extends Task {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("TITLE: " + this.getTitle() + " ");
-		sb.append("DESCRIPTION: " + this.getDescription() + " ");
-		sb.append("DEADLINE: " + this.getDeadline());
+		sb.append(this.getTitle() + " ");
+
+		sb.append("on " + this.getDeadline().toString("EEE, dd MMM yyyy HH:mm"));
+
+		if (!this.getDescription().equals("")) {
+			sb.append("\n");
+			sb.append("    Notes: " + this.getDescription().trim());
+		}
 
 		return sb.toString();
 	}

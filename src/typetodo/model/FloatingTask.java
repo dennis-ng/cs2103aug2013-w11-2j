@@ -17,8 +17,12 @@ public class FloatingTask extends Task {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("TITLE: " + this.getTitle() + " ");
-		sb.append("DESCRIPTION: " + this.getDescription());
+		sb.append(this.getTitle() + " ");
+	
+		if (!this.getDescription().equals("")) {
+			sb.append("\n");
+			sb.append("    Notes: " + this.getDescription().trim());
+		}
 		
 		return sb.toString();
 	}
