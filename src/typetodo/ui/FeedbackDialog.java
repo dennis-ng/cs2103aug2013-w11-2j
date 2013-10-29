@@ -18,6 +18,7 @@ import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 /**
@@ -30,6 +31,7 @@ public class FeedbackDialog extends JDialog {
 	private JPanel taskListPanel;
 	private JTextArea txtFeedback;
 	private JTextArea txtListOutput;
+	private JScrollPane scrollableDisplay;
 	private static ComponentAdapter DIALOG_RESIZE_ACTION;
 	public final static Color dialogColor = new Color(230, 230, 230);
 
@@ -98,6 +100,11 @@ public class FeedbackDialog extends JDialog {
 
 	public void setTableOfTasks(String text) {
 		this.txtListOutput.setText(text);
+		if (this.txtListOutput.getLineCount() > 10) {
+			txtListOutput.setRows(10);
+		} else {
+			txtListOutput.setRows(txtListOutput.getLineCount());
+		}
 		this.pack();
 	}
 
@@ -149,7 +156,11 @@ public class FeedbackDialog extends JDialog {
 		txtListOutput.setMinimumSize(new Dimension(txtListOutput.getWidth(), 0));
 		txtListOutput.setMaximumSize(new Dimension(txtListOutput.getWidth(), 20));
 		taskListPanel.setBackground(dialogColor);
-		taskListPanel.add(txtListOutput);
+
+		scrollableDisplay = new JScrollPane(txtListOutput);
+		scrollableDisplay.setBorder(null);
+		taskListPanel.add(scrollableDisplay);
+		// taskListPanel.add(txtListOutput);
 
 		this.setBackground(dialogColor);
 		this.setLayout(new BorderLayout());
