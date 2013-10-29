@@ -228,10 +228,19 @@ public class DbController {
 					deadlineTasks.add((DeadlineTask) taskInCache);
 				}
 			} else if (taskInCache instanceof TimedTask) {
-				if ((!((TimedTask) taskInCache).getEnd().toLocalDate()
-						.isBefore(startDay.toLocalDate()) && !((TimedTask) taskInCache)
-						.getStart().toLocalDate().isAfter(endDay.toLocalDate()))) {
-					timedTasks.add((TimedTask) taskInCache);
+				TimedTask timedTask = (TimedTask) taskInCache;
+				// Get the localdate only so that we can compare without time
+				LocalDate taskStart = timedTask.getStart().toLocalDate();
+				LocalDate taskEnd = timedTask.getEnd().toLocalDate();
+				LocalDate rangeStart = startDay.toLocalDate();
+				LocalDate rangeEnd = endDay.toLocalDate();
+
+				if (!(taskStart.isAfter(rangeEnd) || taskStart.isBefore(rangeStart))) {
+					timedTasks.add(timedTask);
+				} else if (!(taskEnd.isAfter(rangeEnd) || taskEnd.isBefore(rangeStart))) {
+					timedTasks.add(timedTask);
+				} else if (taskStart.isBefore(rangeStart) && taskEnd.isAfter(rangeEnd)) {
+					timedTasks.add(timedTask);
 				}
 			} else if (taskInCache instanceof FloatingTask) {
 				floatingTasks.add((FloatingTask) taskInCache);
