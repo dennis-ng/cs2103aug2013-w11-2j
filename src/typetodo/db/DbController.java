@@ -186,7 +186,7 @@ public class DbController {
 					deadlineTasks.add((DeadlineTask) taskInCache);
 				}
 			} else if (taskInCache instanceof TimedTask) {
-				if (!(((TimedTask) taskInCache).getEnd().isBefore(day) && ((TimedTask) taskInCache)
+				if ((!((TimedTask) taskInCache).getEnd().isBefore(day) && !((TimedTask) taskInCache)
 						.getStart().isAfter(day))) {
 					timedTasks.add((TimedTask) taskInCache);
 				}

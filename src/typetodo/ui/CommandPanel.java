@@ -4,7 +4,9 @@
 package typetodo.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -67,12 +69,12 @@ public class CommandPanel extends JPanel {
 	}
 
 	private void initialize() {
-		lblTitle = new JLabel("TypeToDo");
+		lblTitle = new JLabel(" TypeToDo ");
 		lblMinimize = new JLabel("-");
 		lblMinimize.setToolTipText("Minimize");
 		lblClose = new JLabel("X");
 		lblClose.setToolTipText("Close");
-		txtCmd = new JTextField(25);
+		txtCmd = new JTextField(30);
 		txtCmd.setToolTipText("Enter a command");
 
 		this.add(lblTitle);
@@ -95,6 +97,13 @@ public class CommandPanel extends JPanel {
 
 		g2d.setPaint(new Color(230, 230, 230));
 		g2d.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20));
+	}
+
+	@Override
+	public Component add(Component comp) {
+		comp.setFont(new Font(Font.SANS_SERIF, Font.PLAIN,
+				comp.getFont().getSize() + 5));
+		return super.add(comp);
 	}
 
 	protected void setFrameToMinimize(final Frame parent) {
