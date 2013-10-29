@@ -67,7 +67,7 @@ public class TypeToDoGui extends JFrame implements View {
 			output += index + ". " + task + "\n";
 			index++;
 		}
-		feedbackDialog.setTableOfTasks(output);
+		feedbackDialog.setTableOfTasks(output.trim());
 	}
 
 	@Override
