@@ -1,7 +1,7 @@
 package typetodo.logic;
 
 public class CommandHome implements Command {
-	private static final String MESSAGE_HOME = "";
+	private static final String MESSAGE_HOME = "Displaying Today's Tasks";
 	private Schedule sc;
 	
 	public CommandHome(Schedule sc) {

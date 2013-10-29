@@ -14,25 +14,26 @@ import typetodo.model.FieldName;
 import typetodo.sync.SyncHandler;
 
 public class CommandParser {
-	private final Schedule scheduler;
-	private final ScheduleController sc;
+	private Schedule schedule;
+	private ScheduleController sc;
 	private SyncHandler sync;
 
 	public CommandParser(ScheduleController sc, Schedule schedule) {
 		this.sc = sc;
-		this.scheduler = schedule;
+		this.schedule = schedule;
 	}
 
 	/**
 	 * Extracts and returns the command from the user input.
 	 * 
 	 * @param userInput
-	 *          A String containing the raw user input
+	 *            A String containing the raw user input
 	 * @return the command
 	 * @throws InvalidCommandException
 	 */
 	private CommandType getCommand(String userInput)
 			throws InvalidCommandException {
+
 		Scanner scanner = new Scanner(userInput);
 		String command = scanner.next().toLowerCase(); // Extract the first
 		// string
@@ -41,16 +42,12 @@ public class CommandParser {
 		HashMap<CommandType, List<String>> commandSynonyms = new HashMap<CommandType, List<String>>();
 		/** hard coded library of possible various user command inputs. */
 		commandSynonyms.put(CommandType.ADD, Arrays.asList("add", "insert"));
-		commandSynonyms.put(CommandType.DELETE,
-				Arrays.asList("delete", "del", "de", "-", "remove"));
-		commandSynonyms.put(CommandType.DONE,
-				Arrays.asList("done", "finished", "finish", "completed", "complete"));
-		commandSynonyms.put(CommandType.DISPLAY,
-				Arrays.asList("display", "view", "show", "see", "list"));
+		commandSynonyms.put(CommandType.DELETE,Arrays.asList("delete", "del", "de", "-", "remove"));
+		commandSynonyms.put(CommandType.DONE, Arrays.asList("done", "finished","finish", "completed", "complete"));
+		commandSynonyms.put(CommandType.DISPLAY, Arrays.asList("display", "view", "show", "see", "list"));
 		commandSynonyms.put(CommandType.HELP, Arrays.asList("help"));
 		commandSynonyms.put(CommandType.HOME, Arrays.asList("home", "today"));
-		commandSynonyms.put(CommandType.UPDATE,
-				Arrays.asList("update", "edit", "change"));
+		commandSynonyms.put(CommandType.UPDATE, Arrays.asList("update", "edit", "change"));
 		commandSynonyms.put(CommandType.SEARCH, Arrays.asList("search", "find"));
 		commandSynonyms.put(CommandType.UNDO, Arrays.asList("undo"));
 		commandSynonyms.put(CommandType.EXIT, Arrays.asList("exit"));
@@ -68,12 +65,12 @@ public class CommandParser {
 	 * Extracts and returns the title from the user input.
 	 * 
 	 * @param userInput
-	 *          A String containing the raw user input
+	 *            A String containing the raw user input
 	 * @return the title
 	 * @throws InvalidFormatException
-	 *           if user input does not have ';'
+	 *             if user input does not have ';'
 	 * @throws MissingFieldException
-	 *           if user input does not contain a title
+	 *             if user input does not contain a title
 	 */
 	private String getTitle(String userInput) throws InvalidFormatException,
 			MissingFieldException {
@@ -85,7 +82,7 @@ public class CommandParser {
 		scanner.next(); // discard user command;
 		scanner.useDelimiter(";"); // title of task must always end with a ;
 		String title = scanner.next().trim(); // extract title and remove all
-		// leading/trailing spaces
+												// leading/trailing spaces
 		scanner.close();
 		if (title.equals("")) {
 			throw new MissingFieldException("Title of task is missing");
@@ -94,27 +91,28 @@ public class CommandParser {
 					"'+' is a reserved character and should not be found in the title");
 		}
 
-		return title;
+		return title.trim();
 	}
 
 	/**
 	 * Extracts and returns the description from the user input.
 	 * 
 	 * @param userInput
-	 *          A String containing the raw user input
+	 *            A String containing the raw user input
 	 * @return the description
 	 * @throws InvalidFormatException
-	 *           if restricted char ';' is found in the description
+	 *             if restricted char ';' is found in the description
 	 */
-	private String getDescription(String userInput) throws InvalidFormatException {
+	private String getDescription(String userInput)
+			throws InvalidFormatException {
 		int indexOfDescription = userInput.indexOf('+');
 		if (indexOfDescription == -1) { // if user input does not contain a
-			// description
+										// description
 			return "";
 		}
 
 		if (indexOfDescription == (userInput.length() - 1)) { // if description
-			// is blank
+																// is blank
 			return "";
 		}
 
@@ -124,21 +122,21 @@ public class CommandParser {
 			throw new InvalidFormatException(
 					"';' is a reserved character and should not be found in the description");
 		}
-		return description;
+		return description.trim();
 	}
 
 	/**
 	 * Extracts and returns the index from the user input.
 	 * 
 	 * @param userInput
-	 *          A String containing the raw user input
+	 *            A String containing the raw user input
 	 * @return the index
 	 */
 	private int getIndex(String userInput) {
 		Scanner scanner = new Scanner(userInput);
 		scanner.next(); // discard the command
 		int index = scanner.nextInt(); // next expected field should be the
-		// index
+										// index
 		scanner.close();
 
 		return index;
@@ -148,12 +146,12 @@ public class CommandParser {
 	 * Extracts and returns the FieldName from the user input.
 	 * 
 	 * @param userInput
-	 *          Raw user input
+	 *            Raw user input
 	 * @return the Field Name
 	 * @throws InvalidFieldNameException
-	 *           if field name is invalid
+	 *             if field name is invalid
 	 * @throws MissingFieldException
-	 *           if field name is missing
+	 *             if field name is missing
 	 */
 	private FieldName getFieldName(String userInput)
 			throws InvalidFieldNameException, MissingFieldException {
@@ -177,15 +175,11 @@ public class CommandParser {
 	 * that is to be updated.
 	 * 
 	 * @param userInput
-	 *          Raw user input
+	 *            Raw user input
 	 * @return the new value
-	 * @throws MissingFieldException
-	 *           if new value is missing
-	 * @throws InvalidFieldNameException
-	 *           if field name is invalid
+	 * @throws Exception 
 	 */
-	private Object getNewValue(String userInput) throws MissingFieldException,
-			InvalidFieldNameException {
+	private Object getNewValue(String userInput) throws Exception {
 		Scanner scanner = new Scanner(userInput);
 		scanner.next(); // throw away command
 		scanner.nextInt(); // throw away index
@@ -201,20 +195,20 @@ public class CommandParser {
 		scanner.close();
 
 		switch (this.getFieldName(userInput)) {
-			case TITLE:
-			case DESCRIPTION:
-				return newValue;
-			case START:
-			case END:
-			case DEADLINE:
-				// TODO: date format might be wrong or date might be missing,
-				// exception has to be thrown
-				return new DateTime(this.getDates(newValue).get(0));
-			case BUSYFIELD:
-				// TODO: same as the above^
-				return (this.getIsBusy(userInput));
-			default:
-				// TODO: assert?
+		case TITLE:
+		case DESCRIPTION:
+			return newValue;
+		case START:
+		case END:
+		case DEADLINE:
+			// TODO: date format might be wrong or date might be missing,
+			// exception has to be thrown
+			return new DateTime(this.getDates(newValue).get(0));
+		case BUSYFIELD:
+			// TODO: same as the above^
+			return (this.getIsBusy(userInput));
+		default:
+			// TODO: assert?
 		}
 		return null;
 	}
@@ -235,7 +229,7 @@ public class CommandParser {
 		return keyword.trim();
 	}
 
-	private ArrayList<DateTime> getDates(String userInput) {
+	private ArrayList<DateTime> getDates (String userInput) throws Exception {
 		String dateField;
 		Scanner scanner = new Scanner(userInput);
 		scanner.next();// throw away command
@@ -245,16 +239,21 @@ public class CommandParser {
 			scanner.useDelimiter("\\+");
 			dateField = scanner.next().substring(1).trim();
 			System.out.println(dateField);
+		} else if(this.getCommand(userInput).equals(CommandType.DISPLAY)) {
+			dateField = scanner.nextLine().trim();
+			System.out.println(dateField);
+			//TODO:
 		}
-
 		else {
 			scanner.next();// throw away index
 			scanner.next();// throw away fieldName
 			dateField = scanner.nextLine().trim();
 			System.out.println(dateField);
 		}
+		
 		scanner.close();
-		List<java.util.Date> javaDates = new PrettyTimeParser().parse(dateField);
+		List<java.util.Date> javaDates = new PrettyTimeParser()
+				.parse(dateField);
 		ArrayList<DateTime> jodaDates = new ArrayList<DateTime>();
 
 		while (!javaDates.isEmpty()) {
@@ -299,119 +298,106 @@ public class CommandParser {
 		Command command = null;
 		switch (this.getCommand(userInput)) {
 
-			case ADD:
-				String title = this.getTitle(userInput);
-				String description = this.getDescription(userInput);
-				ArrayList<DateTime> dates = this.getDates(userInput);
+		case ADD:
+			String title = this.getTitle(userInput);
+			String description = this.getDescription(userInput);
+			ArrayList<DateTime> dates = this.getDates(userInput);
 
-				if (dates.isEmpty()) {
-					command = new CommandAddTask(scheduler, title, description);
-				} else if (dates.size() == 1) {
-					DateTime deadline = dates.get(0);
-					command = new CommandAddTask(scheduler, title, description, deadline);
-				} else if (dates.size() == 2) {
-					DateTime start = dates.get(0);
-					DateTime end = dates.get(1);
+			if (dates.isEmpty()) {
+				command = new CommandAddTask(schedule, title, description);
+			} else if (dates.size() == 1) {
+				DateTime deadline = dates.get(0);
+				command = new CommandAddTask(schedule, title, description,
+						deadline);
+			} else if (dates.size() == 2) {
+				DateTime start = dates.get(0);
+				DateTime end = dates.get(1);
 
-					// Boolean isBusy = this.isBusy();
+				// Boolean isBusy = this.isBusy();
 
-					command = new CommandAddTask(scheduler, title, description, start,
-							end, false);
-				} else {
-					// TODO: invalid new view
-				}
-				break;
+				command = new CommandAddTask(schedule, title, description,
+						start, end, false);
+			} else {
+				// TODO: invalid new view
+			}
+			break;
 
-			case DELETE:
-				try {
-					int index = this.getIndex(userInput);
-					command = new CommandDeleteTask(scheduler, index);
-				} catch (Exception e) {
-					String keyword = this.getKeyword(userInput);
-					if (keyword == null) {
-						throw new Exception("INVALID FORMAT");
-					}
-					command = new CommandDeleteTask(scheduler, keyword);
-				}
-				break;
-
-			case DISPLAY:
-				/*
-				 * if (isDate(contentString)) { DateTime date =
-				 * convertToDate(contentString); schedule.setViewMode(date); } else if
-				 * (isStatus(contentString)) { Status status =
-				 * convertToStatus(contentString); schedule.setViewMode(status); } else
-				 * { schedule.setViewMode(contentString); } if (isDate(contentString)) {
-				 * DateTime date = convertToDate(contentString);
-				 * schedule.setViewMode(date); } else if (isStatus(contentString)) {
-				 * Status status = convertToStatus(contentString);
-				 * schedule.setViewMode(status); } else {
-				 * schedule.setViewMode(contentString); } if (isDate(contentString)) {
-				 * DateTime date = convertToDate(contentString);
-				 * schedule.setViewMode(date); } else if (isStatus(contentString)) {
-				 * Status status = convertToStatus(contentString);
-				 * schedule.setViewMode(status); } else {
-				 * schedule.setViewMode(contentString); }
-				 */
-				break;
-
-			case UPDATE:
+		case DELETE:
+			try {
 				int index = this.getIndex(userInput);
-				FieldName fieldName = this.getFieldName(userInput);
-				Object newValue = this.getNewValue(userInput);
-				if (newValue instanceof String) {
-					command = new CommandEditTask(scheduler, index, fieldName,
-							(String) newValue);
-				} else if (newValue instanceof DateTime) {
-					command = new CommandEditTask(scheduler, index, fieldName,
-							(DateTime) newValue);
-				} else if (newValue instanceof Boolean) {
-					command = new CommandEditTask(scheduler, index, fieldName,
-							(Boolean) newValue);
-				} else {
-					// TODO: invalid view
-				}
-				break;
-
-			case SEARCH:
+				command = new CommandDeleteTask(schedule, index);
+			} catch (Exception e) {
 				String keyword = this.getKeyword(userInput);
-				command = new CommandSearch(scheduler, keyword);
-				break;
-
-			case DONE:
-				// TODO
-				break;
-
-			case HOME:
-				command = new CommandHome(scheduler);
-				break;
-
-			case UNDO:
-				command = new CommandUndo(sc);
-				break;
-
-			case HELP:
-				command = new CommandHelp(scheduler);
-				break;
-
-			case INVALID:
-				// TODO: view invalid
-				break;
-
-			case EXIT:
-				command = new CommandExit();
-				break;
-
-			case SYNC:
-				if (sync == null) {
-					sync = new SyncHandler();
+				if (keyword == null) {
+					throw new Exception("INVALID FORMAT");
 				}
-				command = new CommandSync(sync);
-				break;
+				command = new CommandDeleteTask(schedule, keyword);
+			}
+			break;
 
-			default:
-				// TODO:
-				throw new Error();
+		case UPDATE:
+			int index = this.getIndex(userInput);
+			FieldName fieldName = this.getFieldName(userInput);
+			Object newValue = this.getNewValue(userInput);
+			if (newValue instanceof String) {
+				command = new CommandEditTask(schedule, index, fieldName,
+						(String) newValue);
+			} else if (newValue instanceof DateTime) {
+				command = new CommandEditTask(schedule, index, fieldName,
+						(DateTime) newValue);
+			} else if (newValue instanceof Boolean) {
+				command = new CommandEditTask(schedule, index, fieldName,
+						(Boolean) newValue);
+			} else {
+				// TODO: invalid view
+			}
+			break;
+
+		case SEARCH:
+			String keyword = this.getKeyword(userInput);
+			command = new CommandSearch(schedule, keyword);
+			break;
+
+		case DISPLAY:
+			DateTime dateTime = this.getDates(userInput).get(0);
+			System.out.println("hello");
+			command = new CommandView(schedule, dateTime);
+			break;
+			
+		case DONE:
+			// TODO
+			break;
+
+		case HOME:
+			command = new CommandHome(schedule);
+			break;
+
+		case UNDO:
+			command = new CommandUndo(sc);
+			break;
+
+		case HELP:
+			command = new CommandHelp(schedule);
+			break;
+
+		case INVALID:
+			// TODO: view invalid
+			break;
+
+		case EXIT:
+			command = new CommandExit();
+			break;
+
+		case SYNC:
+			if (sync == null) {
+				sync = new SyncHandler();
+			}
+			command = new CommandSync(sync);
+			break;
+
+		default:
+			// TODO:
+			throw new Error();
 		}
 
 		return command;
