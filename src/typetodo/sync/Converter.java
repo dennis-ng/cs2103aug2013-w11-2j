@@ -68,9 +68,11 @@ public class Converter {
 	
 	public static Event deadlineTaskToGoogleEvent(DeadlineTask task) {
 		Event googleEvent = new Event();
+		String name = "";
+		String description = "";
 		
-		String name = task.getTitle();
-		String description = task.getDescription();
+		name = task.getTitle();
+		description = task.getDescription();
 		DateTime deadline = toGoogleDateTime(((DeadlineTask) task).getDeadline());
 		
 		googleEvent.setSummary(name);
@@ -83,16 +85,24 @@ public class Converter {
 	
 	public static Task googleEventToTask(Event event) {
 		Task task = null;
+		String name = "";
+		String description = "";
+		String googleId = "";
 		
-		String name = event.getSummary();
-		String description = event.getDescription();
-		String googleId = event.getId();
+		name = event.getSummary();
+		description = event.getDescription();
+		googleId = event.getId();
 		
 		org.joda.time.DateTime dateModified = toJodaDateTime(event.getUpdated());
 		org.joda.time.DateTime start = toJodaDateTime(event.getStart().getDateTime());
 		org.joda.time.DateTime end = toJodaDateTime(event.getEnd().getDateTime());
 		
 		boolean isBusy = false;
+		
+		if (description ==  null) {
+			description = "";
+		}
+		
 		if (event.getTransparency() != null) {
 			if (event.getTransparency().equals("opaque")) {
 				isBusy = true;
@@ -117,10 +127,17 @@ public class Converter {
 	
 	public static Task googleTaskToTask(com.google.api.services.tasks.model.Task googleTask) {
 		Task task = null;
+		String name = "";
+		String description = "";
+		String googleId = "";
 		
-		String name = googleTask.getTitle();
-		String description = googleTask.getNotes();
-		String googleId = googleTask.getId();
+		name = googleTask.getTitle();
+		description = googleTask.getNotes();
+		googleId = googleTask.getId();
+		
+		if (description == null) {
+			description = "";
+		}
 		
 		org.joda.time.DateTime dateModified = toJodaDateTime(googleTask.getUpdated());
 		

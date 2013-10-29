@@ -57,10 +57,24 @@ public class TimedTask extends Task {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("TITLE: " + this.getTitle() + " ");
-		sb.append("DESCRIPTION: " + this.getDescription() + " ");
-		sb.append("PERIOD: " + this.getStart() + " TO " + this.getEnd());
-
+		sb.append(this.getTitle() + " ");
+		if (this.getStart().toLocalDate().isEqual(this.getEnd().toLocalDate())) {
+			sb.append("from " + this.getStart().toString("HH:mm"));
+			sb.append(" - ");
+			sb.append(this.getEnd().toString("HH:mm"));
+			sb.append(" on ");
+			sb.append(this.getStart().toString("EEE, dd MMM yyyy"));
+			sb.append(" ");
+		} else {
+			sb.append("from " + this.getStart().toString("EEE, dd MMM yyyy HH:mm"));
+			sb.append(" - ");
+			sb.append(this.getEnd().toString("EEE, dd MMM yyyy HH:mm"));
+		}
+		if (!this.getDescription().equals("")) {
+			sb.append("\n");
+			sb.append("    Notes: " + this.getDescription().trim());
+		}
+		
 		return sb.toString();
 	}
 

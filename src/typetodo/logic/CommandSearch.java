@@ -10,7 +10,7 @@ public class CommandSearch implements Command{
 		this.keyword = keyword;
 	}
 	public String execute() throws Exception {
-		String feedback = MESSAGE_SEARCH;
+		String feedback = String.format(MESSAGE_SEARCH, keyword);
 		sc.search(keyword);
 		return feedback;
 	}
