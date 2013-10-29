@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import typetodo.model.DeadlineTask;
 import typetodo.model.FloatingTask;
@@ -171,26 +172,33 @@ public class DbController {
 
 	/**
 	 * 
-	 * @param day
+	 * @param datetime
 	 * @return An arraylist of all the tasks on this day. null will be returned if
 	 *         nothing is found.
 	 * @throws Exception
 	 */
-	public ArrayList<Task> retrieveList(DateTime day) {
+	public ArrayList<Task> retrieveList(DateTime datetime) {
 		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
 		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
 		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		for (Task taskInCache : tasksCache.values()) {
 			if (taskInCache instanceof DeadlineTask) {
-				if (!((DeadlineTask) taskInCache).getDeadline().isBefore(day)) {
+				if (!((DeadlineTask) taskInCache).getDeadline().isBefore(datetime)) {
 					deadlineTasks.add((DeadlineTask) taskInCache);
 				}
 			} else if (taskInCache instanceof TimedTask) {
-				if ((!((TimedTask) taskInCache).getEnd().toLocalDate()
-						.isBefore(day.toLocalDate()) && !((TimedTask) taskInCache)
-						.getStart().toLocalDate().isAfter(day.toLocalDate()))) {
-					if (!((TimedTask) taskInCache).getEnd().isBefore(day)) {
-						timedTasks.add((TimedTask) taskInCache);
+				TimedTask timedTask = (TimedTask) taskInCache;
+				// Get the localdate only so that we can compare without time
+				LocalDate taskStart = timedTask.getStart().toLocalDate();
+				LocalDate taskEnd = timedTask.getEnd().toLocalDate();
+				LocalDate dateToCheck = datetime.toLocalDate();
+
+				if (!(dateToCheck.isAfter(taskEnd) || dateToCheck.isBefore(taskStart))) {
+					// Note: isAfter() and isBefore() are not inclusive, wrapping with a !
+					// makes them include the day
+					if (timedTask.getEnd().isAfter(datetime)) {
+						// Exclude the day's tasks that have already ended
+						timedTasks.add(timedTask);
 					}
 				}
 			} else if (taskInCache instanceof FloatingTask) {
@@ -202,7 +210,38 @@ public class DbController {
 
 	/**
 	 * 
-	 * @param day
+	 * @param
+	 * @return An arraylist of all the tasks on this day. null will be returned if
+	 *         nothing is found.
+	 * @throws Exception
+	 */
+	public ArrayList<Task> retrieveByRange(DateTime startDay, DateTime endDay) {
+		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
+		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
+		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		for (Task taskInCache : tasksCache.values()) {
+			if (taskInCache instanceof DeadlineTask) {
+				if (!((DeadlineTask) taskInCache).getDeadline().toLocalDate()
+						.isBefore(startDay.toLocalDate())
+						&& !((DeadlineTask) taskInCache).getDeadline().toLocalDate()
+								.isAfter(endDay.toLocalDate())) {
+					deadlineTasks.add((DeadlineTask) taskInCache);
+				}
+			} else if (taskInCache instanceof TimedTask) {
+				if ((!((TimedTask) taskInCache).getEnd().toLocalDate()
+						.isBefore(startDay.toLocalDate()) && !((TimedTask) taskInCache)
+						.getStart().toLocalDate().isAfter(endDay.toLocalDate()))) {
+					timedTasks.add((TimedTask) taskInCache);
+				}
+			} else if (taskInCache instanceof FloatingTask) {
+				floatingTasks.add((FloatingTask) taskInCache);
+			}
+		}
+		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
+	}
+
+	/**
+	 * 
 	 * @return An arraylist of all the tasks in the system. null will be returned
 	 *         if nothing is found.
 	 * @throws Exception
