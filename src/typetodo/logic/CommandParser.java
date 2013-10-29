@@ -214,7 +214,7 @@ public class CommandParser {
 	}
 
 	private boolean getIsBusy(String userInput) {
-		if (userInput.contains("BUSY")) {
+		if (userInput.indexOf("BUSY") != -1) {
 			return true;
 		}
 		return false;
@@ -359,11 +359,23 @@ public class CommandParser {
 			break;
 
 		case DISPLAY:
-			DateTime dateTime = this.getDates(userInput).get(0);
-			System.out.println("hello");
+			Scanner scanner = new Scanner(userInput);
+			scanner.next();
+			if (scanner.next().equals("all")) {
+				command = new CommandView(schedule);
+				break;
+			}
+			scanner.close();
+
+			DateTime dateTime;
+			try {
+				dateTime = this.getDates(userInput).get(0);
+			} catch (IndexOutOfBoundsException e) {
+				throw new InvalidFormatException("Invalid view mode");
+			}
 			command = new CommandView(schedule, dateTime);
 			break;
-			
+
 		case DONE:
 			// TODO
 			break;
