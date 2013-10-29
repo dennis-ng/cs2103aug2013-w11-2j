@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 import typetodo.sync.SyncHandler;
 
 public class CommandSync implements Command{
-	private static final String MESSAGE_SYNC = "Sync as of " + new DateTime();
+	private static final String MESSAGE_SYNC = "Sync as of " + new DateTime().toString("EEE, dd MMM yyyy HH:mm");
 	private SyncHandler sh;
 	
 	public CommandSync (SyncHandler sh) {
