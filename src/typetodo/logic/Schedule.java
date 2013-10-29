@@ -22,7 +22,7 @@ public class Schedule {
 	private Object keyItem;
 
 	public Schedule() throws IOException {
-		db = DbController.getInstance(); // model
+		db = DbController.getInstance();
 		keyItem = new DateTime();
 	}
 
@@ -36,17 +36,29 @@ public class Schedule {
 	}
 	
 	/**
-	 * 
-	 * @param task
-	 * @return
-	 * @throws Exception
+	 * Adds a task into the Schedule.
+	 * @param task Task to be added
+	 * @return Returns the ID of the added task
+	 * @throws Exception 
 	 */
 	public int addTask(Task task) throws Exception {
-		int taskId = db.addTask(task);
+		int taskId = -1;
+		if (task instanceof TimedTask) {
+			if(db.isAvailable(((TimedTask) task).getStart(), ((TimedTask) task).getEnd())) {
+				taskId = db.addTask(task);
+			}
+		} else {
+			taskId = db.addTask(task);
+		}
 		
 		return taskId;
 	}
 
+	/**
+	 * Deletes a task from the schedule.
+	 * @param index Index of the task that is to be deleted
+	 * @return Returns the deleted task
+	 */
 	public Task deleteTaskByIndex(int index) {
 		Task taskToBeDeleted = null;
 		
@@ -61,6 +73,12 @@ public class Schedule {
 		return taskToBeDeleted;
 	}
 
+	/**
+	 * 
+	 * @param keyword
+	 * @return
+	 * @throws Exception
+	 */
 	public Task deleteTaskByKeyword(String keyword) throws Exception {
 		Task taskToBeDeleted = null;
 
@@ -87,10 +105,19 @@ public class Schedule {
 		return taskToBeDeleted;
 	}
 
+	/**
+	 * 
+	 * @param taskId
+	 */
 	public void deleteTaskById(int taskId) {
 		db.deleteTask(taskId);
 	}
 
+	/**
+	 * 
+	 * @param task
+	 * @throws Exception
+	 */
 	public void editTask(Task task) throws Exception {
 		db.updateTask(task);
 	}
@@ -194,10 +221,11 @@ public class Schedule {
 			throw new IndexOutOfBoundsException("Given index is not in range");
 		}
 		
+		Task taskBeforeMarking = taskToBeMarked.makeCopy();
 		taskToBeMarked.setStatus(status);
 		db.updateTask(taskToBeMarked);
 		
-		return taskToBeMarked;
+		return taskBeforeMarking;
 	}
 	
 	public void search(String keyword) {
@@ -206,6 +234,10 @@ public class Schedule {
 	
 	public void viewTasksofToday() {
 		this.setKeyItem(new DateTime());
+	}
+	
+	public void viewTasksByDate(DateTime dateTime) {
+		setKeyItem(dateTime);
 	}
 
 	public void help() {
