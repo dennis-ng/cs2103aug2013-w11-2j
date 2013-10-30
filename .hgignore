@@ -3,3 +3,4 @@ syntax: glob
 bin
 TypeToDo\.txt
 .*.TypeToDo.txt
+savedfiles
