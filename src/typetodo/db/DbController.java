@@ -319,8 +319,10 @@ public class DbController {
 		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
 		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache.getTitle().contains(searchCriteria)
-					|| taskInCache.getDescription().contains(searchCriteria)) {
+			if (taskInCache.getTitle().toUpperCase()
+					.contains(searchCriteria.toUpperCase())
+					|| taskInCache.getDescription().toUpperCase()
+							.contains(searchCriteria.toUpperCase())) {
 				if (taskInCache instanceof DeadlineTask) {
 					deadlineTasks.add((DeadlineTask) taskInCache);
 				} else if (taskInCache instanceof TimedTask) {
