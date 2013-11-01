@@ -57,7 +57,7 @@ public class ViewHelper {
 			printDateHeading(date, sb);
 			
 			for (Task task : tasksSortedByDate.get(date)) {
-				if (isNewlyCreated(task)) {
+				if (isNewlyCreated(task) || isRecentlyModified(task)) {
 					highlightTask(task, sb);
 				} else if (task.getStatus().equals(Status.COMPLETED)) {
 					strikeOutTask(task, sb);
@@ -74,7 +74,7 @@ public class ViewHelper {
 		}
 
 		for (Task task : floatingTask) {
-			if (isNewlyCreated(task)) {
+			if (isNewlyCreated(task) || isRecentlyModified(task)) {
 				highlightTask(task, sb);
 			} else if (task.getStatus().equals(Status.COMPLETED)) {
 				strikeOutTask(task, sb);
@@ -93,7 +93,14 @@ public class ViewHelper {
 
 		return Seconds.secondsBetween(dateCreated, currentDateTime).isLessThan(Seconds.parseSeconds("PT5S"));
 	}
-	
+
+	private static boolean isRecentlyModified(Task task) {
+		DateTime dateModified = task.getDateModified();
+		DateTime currentDateTime = new DateTime();
+
+		return Seconds.secondsBetween(dateModified, currentDateTime).isLessThan(Seconds.parseSeconds("PT5S"));
+	}
+
 	private static void highlightTask(Task task, StringBuilder sb) {
 		sb.append("<span style=\"background-color: #FFFF00\">");
 		sb.append("<marker>");
