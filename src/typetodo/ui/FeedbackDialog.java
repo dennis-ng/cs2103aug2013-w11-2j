@@ -124,6 +124,7 @@ public class FeedbackDialog extends JDialog {
 
 	public int getIndexToScrollTo(String htmlText, String textWithOutHtmlTags) {
 		int indexOfMarker = htmlText.indexOf("<marker>");
+	
 		if (indexOfMarker != -1) {
 			String test = htmlText.substring(htmlText.indexOf("<marker>") + 8, htmlText.length());
 			Scanner sc = new Scanner(test);
@@ -133,8 +134,8 @@ public class FeedbackDialog extends JDialog {
 			
 			return textWithOutHtmlTags.indexOf(idOfTask);
 		}
-
-		return textWithOutHtmlTags.indexOf("0");
+		
+		return 0;
 	}
 	
 	/**
