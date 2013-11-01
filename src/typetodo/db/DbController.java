@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -32,10 +33,13 @@ import com.google.gson.reflect.TypeToken;
 public class DbController {
 
 	// Constants
-	private static final String FILENAME = "TypeToDo.txt";
-	private final File savedFile;
+	private static final String DIRECTORY_NAME = "savedfiles";
+	private static final String FILENAME_TASK = "tasks.txt";
+	private static final String FILENAME_PROPERTIES = "properties.txt";
 
 	// Variables
+	private HashMap<String, File> allFiles;
+	private final HashMap<String, Object> properties;
 	private TreeMap<Integer, Task> tasksCache;
 
 	// Controllers and external libraries
@@ -43,7 +47,6 @@ public class DbController {
 	private final Gson gson;
 
 	private DbController() throws IOException, JsonSyntaxException {
-		savedFile = new File(FILENAME);
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
 		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
@@ -51,10 +54,11 @@ public class DbController {
 		gson = gsonBuilder.setPrettyPrinting().create();
 		// Create a comparator to sort by type of tasks and end datetime
 		tasksCache = new TreeMap<Integer, Task>();
-		if (!savedFile.exists()) {
-			savedFile.createNewFile();
+		properties = new HashMap<String, Object>();
+		initializeFiles();
+		for (String fileName : allFiles.keySet()) {
+			this.loadFile(fileName);
 		}
-		this.loadFile();
 	}
 
 	public static DbController getInstance() throws IOException {
@@ -64,14 +68,30 @@ public class DbController {
 		return mainDbHandler;
 	}
 
+	private void initializeFiles() throws IOException {
+		allFiles = new HashMap<String, File>(3);
+		final File subdirectory = new File(DIRECTORY_NAME);
+		File FILE_TASKS = new File(subdirectory, FILENAME_TASK);
+		File FILE_PROPERTIES = new File(subdirectory, FILENAME_PROPERTIES);
+		allFiles.put(FILENAME_TASK, FILE_TASKS);
+		allFiles.put(FILENAME_PROPERTIES, FILE_PROPERTIES);
+		if (!subdirectory.exists()) {
+			subdirectory.mkdir();
+			for (File file : allFiles.values()) {
+				file.createNewFile();
+			}
+		}
+	}
+
 	/**
 	 * @throws JsonSyntaxException
 	 *           when contents of the file to load is incorrect
 	 */
-	private void loadFile() throws JsonSyntaxException {
+	private void loadFile(String fileName) throws JsonSyntaxException {
 		StringBuilder fileToTextBuffer = new StringBuilder();
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(savedFile));
+			File fileToLoad = allFiles.get(fileName);
+			BufferedReader reader = new BufferedReader(new FileReader(fileToLoad));
 			String nextLine;
 			while ((nextLine = reader.readLine()) != null) {
 				fileToTextBuffer.append(nextLine);
@@ -81,22 +101,38 @@ public class DbController {
 			e.printStackTrace();
 		}
 		if (!fileToTextBuffer.toString().isEmpty()) {
-			Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
-			}.getType();
-			// The following statement throws JsonSyntaxException when contents of the
-			// file to load is incorrect
-			tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
+			if (fileName.equals(FILENAME_TASK)) {
+				Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
+				}.getType();
+				// The following statement throws JsonSyntaxException when contents of
+				// the file to load is incorrect
+				tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
+			} else if (fileName.equals(FILENAME_PROPERTIES)) {
+				Type collectionType = new TypeToken<HashMap<String, Object>>() {
+				}.getType();
+				// The following statement throws JsonSyntaxException when contents of
+				// the file to load is incorrect
+				tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
 
+			}
 		}
 	}
 
-	private void writeChangesToFile() {
+	private void writeChangesToFile(String fileName) {
 		BufferedWriter writer;
 		try {
-			writer = new BufferedWriter(new FileWriter(savedFile));
-			Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
-			}.getType();
-			writer.write(gson.toJson(tasksCache, collectionType));
+			File fileToWrite = allFiles.get(fileName);
+			writer = new BufferedWriter(new FileWriter(fileToWrite));
+			if (fileName.equals(FILENAME_TASK)) {
+				Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
+				}.getType();
+				writer.write(gson.toJson(tasksCache, collectionType));
+			} else if (fileName.equals(FILENAME_PROPERTIES)) {
+				Type collectionType = new TypeToken<HashMap<String, Object>>() {
+				}.getType();
+				writer.write(gson.toJson(properties, collectionType));
+
+			}
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -118,7 +154,7 @@ public class DbController {
 				throw new Exception("Task with the same id already exist.");
 			}
 			tasksCache.put(newTask.getTaskId(), newTask);
-			this.writeChangesToFile();
+			this.writeChangesToFile(FILENAME_TASK);
 			return newTask.getTaskId();
 		}
 
@@ -131,7 +167,7 @@ public class DbController {
 		}
 		newTask.setTaskId(newTaskIdGenerated);
 		tasksCache.put(newTaskIdGenerated, newTask);
-		this.writeChangesToFile();
+		this.writeChangesToFile(FILENAME_TASK);
 		return newTaskIdGenerated;
 	}
 
@@ -143,7 +179,7 @@ public class DbController {
 	public boolean deleteTask(int taskIdToDelete) {
 		if (tasksCache.containsKey(taskIdToDelete)) {
 			tasksCache.remove(taskIdToDelete);
-			this.writeChangesToFile();
+			this.writeChangesToFile(FILENAME_TASK);
 			return true;
 		} else {
 			return false;
@@ -164,7 +200,7 @@ public class DbController {
 			throw new Exception("The task did not contain a taskId");
 		}
 		if (tasksCache.put(taskIdToUpdate, taskToUpdate) != null) {
-			this.writeChangesToFile();
+			this.writeChangesToFile(FILENAME_TASK);
 			return true;
 		}
 		return false;
@@ -283,8 +319,10 @@ public class DbController {
 		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
 		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
 		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache.getTitle().contains(searchCriteria)
-					|| taskInCache.getDescription().contains(searchCriteria)) {
+			if (taskInCache.getTitle().toUpperCase()
+					.contains(searchCriteria.toUpperCase())
+					|| taskInCache.getDescription().toUpperCase()
+							.contains(searchCriteria.toUpperCase())) {
 				if (taskInCache instanceof DeadlineTask) {
 					deadlineTasks.add((DeadlineTask) taskInCache);
 				} else if (taskInCache instanceof TimedTask) {
