@@ -116,12 +116,21 @@ public class CommandParser {
 			return "";
 		}
 
-		// Description will always be at the end of the userinput
-		String description = userInput.substring(++indexOfDescription);
+		String description = "";
+		int indexOfBusy = userInput.lastIndexOf("BUSY");
+		
+		if (indexOfBusy == -1) {
+			// Description will always be at the end of the userinput
+			description = userInput.substring(++indexOfDescription);
+		} else {
+			description = userInput.substring(++indexOfDescription, indexOfBusy);
+		}
+		
 		if (description.indexOf(';') != -1) {
 			throw new InvalidFormatException(
 					"';' is a reserved character and should not be found in the description");
 		}
+		
 		return description.trim();
 	}
 
@@ -187,7 +196,7 @@ public class CommandParser {
 
 		String newValue;
 		try {
-			newValue = scanner.nextLine();
+			newValue = scanner.nextLine().trim();
 		} catch (NoSuchElementException e) {
 			scanner.close();
 			throw new MissingFieldException("New value is missing");
@@ -203,7 +212,7 @@ public class CommandParser {
 		case DEADLINE:
 			// TODO: date format might be wrong or date might be missing,
 			// exception has to be thrown
-			return new DateTime(this.getDates(newValue).get(0));
+			return new DateTime(this.getDates(userInput).get(0));
 		case BUSYFIELD:
 			// TODO: same as the above^
 			return (this.getIsBusy(userInput));
@@ -287,6 +296,18 @@ public class CommandParser {
 		throw new InvalidFieldNameException("\"" + fnString
 				+ "\" is not a valid Field Name");
 	}
+	
+	private boolean isViewAll(String userInput) {
+		Scanner scanner = new Scanner(userInput);
+		scanner.next(); //discard user command
+		if (scanner.next().equals("all")) {
+			scanner.close();
+			return true;
+		}
+		scanner.close();
+		
+		return false;
+	}
 
 	/**
 	 * 
@@ -359,13 +380,10 @@ public class CommandParser {
 			break;
 
 		case DISPLAY:
-			Scanner scanner = new Scanner(userInput);
-			scanner.next();
-			if (scanner.next().equals("all")) {
+			if (this.isViewAll(userInput)) {
 				command = new CommandView(schedule);
 				break;
 			}
-			scanner.close();
 
 			DateTime dateTime;
 			try {
@@ -377,7 +395,8 @@ public class CommandParser {
 			break;
 
 		case DONE:
-			// TODO
+			int indexOfCompletedTask = this.getIndex(userInput);
+			command = new CommandCompleted(schedule, indexOfCompletedTask);
 			break;
 
 		case HOME:
