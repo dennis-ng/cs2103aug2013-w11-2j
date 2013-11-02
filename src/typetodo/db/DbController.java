@@ -382,4 +382,12 @@ public class DbController {
 		return busyTask;
 	}
 
+	public Object getProperty(String propertyName) {
+		return properties.get(propertyName);
+	}
+
+	public void setProperty(String propertyName, Object property) {
+		properties.put(propertyName, property);
+		this.writeChangesToFile(FILENAME_PROPERTIES);
+	}
 }
