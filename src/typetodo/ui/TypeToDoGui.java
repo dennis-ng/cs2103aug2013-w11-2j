@@ -8,14 +8,12 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import typetodo.logic.Schedule;
 import typetodo.logic.ScheduleController;
-import typetodo.model.Task;
 
 /**
  * @author DennZ
@@ -83,7 +81,6 @@ public class TypeToDoGui extends JFrame implements View {
 		cmdPanel.setFrameToClose(cmdFrame);
 		cmdFrame.add(cmdPanel);
 		cmdFrame.pack();
-		cmdFrame.setVisible(true);
 		// This will center the JFrame in the middle of the screen
 		cmdFrame.setLocationRelativeTo(null);
 
@@ -111,6 +108,8 @@ public class TypeToDoGui extends JFrame implements View {
 				source.setText("");
 			}
 		});
+		cmdFrame.setVisible(true);
+		txtCmd.requestFocusInWindow();
 
 		sc = new ScheduleController(cmdFrame, new Schedule());
 	}
