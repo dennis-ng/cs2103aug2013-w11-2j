@@ -57,23 +57,29 @@ public class TimedTask extends Task {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("<font face=\"century gothic\">");
+		sb.append("<b>");
 		sb.append(this.getTitle() + " ");
-		if (this.getStart().toLocalDate().isEqual(this.getEnd().toLocalDate())) {
-			sb.append("from " + this.getStart().toString("HH:mm"));
-			sb.append(" - ");
-			sb.append(this.getEnd().toString("HH:mm"));
-			sb.append(" on ");
-			sb.append(this.getStart().toString("EEE, dd MMM yyyy"));
-			sb.append(" ");
-		} else {
-			sb.append("from " + this.getStart().toString("EEE, dd MMM yyyy HH:mm"));
-			sb.append(" - ");
-			sb.append(this.getEnd().toString("EEE, dd MMM yyyy HH:mm"));
-		}
+		sb.append("</b>");
+		
+		sb.append("from ");
+		sb.append("<font face=\"century gothic\" color=\"red\">");
+		sb.append("<b>");
+		sb.append(this.getStart().toString("HH:mm"));
+		sb.append(" to ");
+		sb.append(this.getEnd().toString("HH:mm"));
+		sb.append("</b>");
+		sb.append("</font>");
+		
 		if (!this.getDescription().equals("")) {
 			sb.append("\n");
-			sb.append("    Notes: " + this.getDescription().trim());
+			sb.append("<br>");
+			sb.append("<i>");
+			sb.append(" - " + this.getDescription().trim());
+			sb.append("</i>");
 		}
+		sb.append("</font>");
+		sb.append("<br>");
 		
 		return sb.toString();
 	}
