@@ -40,6 +40,7 @@ public class GCalHandler {
 	 */
 	public void addTask(Task taskToBeAdded) throws IOException {
 		if (taskToBeAdded instanceof TimedTask) {
+			System.out.println(taskToBeAdded);
 			Event event = Converter.timedTaskToEvent((TimedTask) taskToBeAdded);
 			Event result = gCalendarClient.events().insert(gCalendarId, event).execute();
 			taskToBeAdded.setGoogleId(result.getId()); //append GCal's id to task
