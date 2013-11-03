@@ -17,7 +17,8 @@ public class ScheduleController {
 		this.historyOfCommands = new Stack<Command>();
 		this.schedule = schedule;
 		
-		view.displayTasks(schedule.getCurrentListOfTasks());
+		String htmlDisplayContent = ViewHelper.generateHTMLDisplayContent(schedule.getCurrentListOfTasks());
+		view.displayTasks(htmlDisplayContent);
 		view.displayFeedBack(MESSAGE_WELCOME);
 	}
 	
@@ -38,7 +39,9 @@ public class ScheduleController {
 			view.displayErrorMessage(e.getMessage());
 		}
 		
-		view.displayTasks(schedule.getCurrentListOfTasks());
+		String htmlDisplayContent = ViewHelper.generateHTMLDisplayContent(schedule.getCurrentListOfTasks());
+		view.displayTasks(htmlDisplayContent);
+		//view.displayTasks(schedule.getCurrentListOfTasks());
 	}
 	
 	public void undo() throws Exception {

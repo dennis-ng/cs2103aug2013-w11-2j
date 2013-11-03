@@ -28,13 +28,10 @@ public class CommandLineView implements View{
 		System.out.println(errorMessage);
 	}
 	
-	public void displayTasks(ArrayList<Task> tasks) {
-		int index = 1;
-		for(Task task : tasks) {
-			System.out.println(index + ". " + task);
-			index++;
-		}
+	public void displayTasks(String tasks) {
+
 	}
+	
 	@Override
 	public void displayHelp(String helpMessage) {
 		System.out.println(helpMessage);

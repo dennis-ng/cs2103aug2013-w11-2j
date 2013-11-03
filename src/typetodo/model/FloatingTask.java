@@ -17,12 +17,20 @@ public class FloatingTask extends Task {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("<font face=\"century gothic\">");
+		sb.append("<b>");
 		sb.append(this.getTitle() + " ");
-	
+		sb.append("</b>");
+		
 		if (!this.getDescription().equals("")) {
 			sb.append("\n");
-			sb.append("    Notes: " + this.getDescription().trim());
+			sb.append("<br>");
+			sb.append("<i>");
+			sb.append(" - " + this.getDescription().trim());
+			sb.append("</i>");
 		}
+		sb.append("</font>");
+		sb.append("<br>");
 		
 		return sb.toString();
 	}

@@ -34,15 +34,28 @@ public class DeadlineTask extends Task {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("<font face=\"century gothic\">");
+		sb.append("<b>");
 		sb.append(this.getTitle() + " ");
-
-		sb.append("on " + this.getDeadline().toString("EEE, dd MMM yyyy HH:mm"));
-
+		sb.append("</b>");
+		
+		sb.append("due at ");
+		sb.append("<font face=\"century gothic\" color=\"red\">");
+		sb.append("<b>");
+		sb.append(this.getDeadline().toString("HH:mm"));
+		sb.append("</b>");
+		sb.append("</font>");
+		
 		if (!this.getDescription().equals("")) {
 			sb.append("\n");
-			sb.append("    Notes: " + this.getDescription().trim());
+			sb.append("<br>");
+			sb.append("<i>");
+			sb.append(" - " + this.getDescription().trim());
+			sb.append("</i>");
 		}
-
+		sb.append("</font>");
+		sb.append("<br>");
+		
 		return sb.toString();
 	}
 
