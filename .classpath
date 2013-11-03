@@ -65,5 +65,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/prettytime-1.0.8.Final.jar"/>
+	<classpathentry kind="lib" path="lib/JNativeHook/jar/JNativeHook.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

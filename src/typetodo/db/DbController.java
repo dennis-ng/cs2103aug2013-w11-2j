@@ -382,10 +382,21 @@ public class DbController {
 		return busyTask;
 	}
 
+	/**
+	 * @param propertyName
+	 *          is the name of the property that was saved.
+	 * @return Returns null when the property doesn't exist.
+	 */
 	public Object getProperty(String propertyName) {
 		return properties.get(propertyName);
 	}
 
+	/**
+	 * @param propertyName
+	 *          The name of the property you want to save.
+	 * @param property
+	 *          Can be any objects that you want to save as a property.
+	 */
 	public void setProperty(String propertyName, Object property) {
 		properties.put(propertyName, property);
 		this.writeChangesToFile(FILENAME_PROPERTIES);
