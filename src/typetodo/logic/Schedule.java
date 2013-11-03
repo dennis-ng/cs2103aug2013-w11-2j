@@ -23,7 +23,7 @@ public class Schedule {
 
 	public Schedule() throws IOException {
 		db = DbController.getInstance();
-		keyItem = new DateTime();
+		this.viewTasksofToday();
 	}
 
 	/**
@@ -65,9 +65,10 @@ public class Schedule {
 	 */
 	public Task deleteTaskByIndex(int index) {
 		Task taskToBeDeleted = null;
-		
+	
 		try {
-			taskToBeDeleted = this.currentListOfTasks.get(index - 1);
+			//taskToBeDeleted = this.currentListOfTasks.get(index - 1);
+			taskToBeDeleted = this.getTaskByIdFromCurrentListOfTasks(index);
 		} catch (IndexOutOfBoundsException e) {
 			throw new IndexOutOfBoundsException("Given index is not in range");
 		}
@@ -158,7 +159,8 @@ public class Schedule {
 			throws Exception {
 		Task taskToBeEdited = null;
 		try {
-			taskToBeEdited = currentListOfTasks.get(index - 1);
+			//taskToBeEdited = currentListOfTasks.get(index - 1);
+			taskToBeEdited = this.getTaskByIdFromCurrentListOfTasks(index);
 		} catch (IndexOutOfBoundsException e) {
 			throw new IndexOutOfBoundsException("Given index is not in range");
 		}
@@ -200,7 +202,8 @@ public class Schedule {
 			throws Exception {
 		Task taskToBeEdited = null;
 		try {
-			taskToBeEdited = currentListOfTasks.get(index - 1);
+			//taskToBeEdited = currentListOfTasks.get(index - 1);
+			taskToBeEdited = this.getTaskByIdFromCurrentListOfTasks(index);
 		} catch (IndexOutOfBoundsException e) {
 			throw new IndexOutOfBoundsException("Given index is not in range");
 		}
@@ -220,7 +223,8 @@ public class Schedule {
 			throws Exception {
 		Task taskToBeMarked = null;
 		try {
-			taskToBeMarked = currentListOfTasks.get(index - 1);
+			//taskToBeMarked = currentListOfTasks.get(index - 1);
+			taskToBeMarked = this.getTaskByIdFromCurrentListOfTasks(index);
 		} catch (IndexOutOfBoundsException e) {
 			throw new IndexOutOfBoundsException("Given index is not in range");
 		}
@@ -268,5 +272,15 @@ public class Schedule {
 
 	private void setKeyItem(String keyword) {
 		keyItem = keyword;
+	}
+	
+	private Task getTaskByIdFromCurrentListOfTasks(int id) {
+		for (Task task : this.currentListOfTasks) {
+			if (task.getTaskId() == id) {
+				return task;
+			}
+		}
+		
+		return null;
 	}
 }
