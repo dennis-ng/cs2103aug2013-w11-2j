@@ -44,6 +44,7 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		this.setUndecorated(true);
 		this.setLayout(new BorderLayout());
 		this.setBackground(new Color(0, 0, 0, 0));
+		this.setAlwaysOnTop(true);
 		addWindowListener(this);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -134,11 +135,9 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					if (getState() == JFrame.ICONIFIED) {
-						setAlwaysOnTop(true);
 						setExtendedState(JFrame.NORMAL);
 						toFront();
 						txtCmd.requestFocusInWindow();
-						setAlwaysOnTop(false);
 					} else {
 						setExtendedState(JFrame.ICONIFIED);
 					}
