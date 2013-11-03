@@ -98,8 +98,14 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		try {
 			GlobalScreen.registerNativeHook();
 		} catch (NativeHookException ex) {
-			JOptionPane.showMessageDialog(null,
-					"There was a problem registering the native hook.");
+			this.setAlwaysOnTop(false);
+			JOptionPane
+					.showMessageDialog(
+							null,
+							"There was a problem registering the global hotkey.\n"
+									+ "For mavericks OSX users:\n"
+									+ "Please go to Preferences>Security & Privacy>Privacy>Acessibility to allow Jar Launcher.");
+			this.setAlwaysOnTop(true);
 			ex.printStackTrace();
 		}
 
