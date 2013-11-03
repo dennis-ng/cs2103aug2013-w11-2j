@@ -42,13 +42,18 @@ public class CommandParser {
 		HashMap<CommandType, List<String>> commandSynonyms = new HashMap<CommandType, List<String>>();
 		/** hard coded library of possible various user command inputs. */
 		commandSynonyms.put(CommandType.ADD, Arrays.asList("add", "insert"));
-		commandSynonyms.put(CommandType.DELETE,Arrays.asList("delete", "del", "de", "-", "remove"));
-		commandSynonyms.put(CommandType.DONE, Arrays.asList("done", "finished","finish", "completed", "complete"));
-		commandSynonyms.put(CommandType.DISPLAY, Arrays.asList("display", "view", "show", "see", "list"));
+		commandSynonyms.put(CommandType.DELETE,
+				Arrays.asList("delete", "del", "de", "-", "remove"));
+		commandSynonyms.put(CommandType.DONE, Arrays.asList("done", "finished",
+				"finish", "completed", "complete"));
+		commandSynonyms.put(CommandType.DISPLAY,
+				Arrays.asList("display", "view", "show", "see", "list"));
 		commandSynonyms.put(CommandType.HELP, Arrays.asList("help"));
 		commandSynonyms.put(CommandType.HOME, Arrays.asList("home", "today"));
-		commandSynonyms.put(CommandType.UPDATE, Arrays.asList("update", "edit", "change"));
-		commandSynonyms.put(CommandType.SEARCH, Arrays.asList("search", "find"));
+		commandSynonyms.put(CommandType.UPDATE,
+				Arrays.asList("update", "edit", "change"));
+		commandSynonyms
+				.put(CommandType.SEARCH, Arrays.asList("search", "find"));
 		commandSynonyms.put(CommandType.UNDO, Arrays.asList("undo"));
 		commandSynonyms.put(CommandType.EXIT, Arrays.asList("exit"));
 		commandSynonyms.put(CommandType.SYNC, Arrays.asList("sync"));
@@ -58,7 +63,8 @@ public class CommandParser {
 				return commandType;
 			}
 		}
-		throw new InvalidCommandException("Invalid command");
+		throw new InvalidCommandException(
+				"Invalid command, please refer to catalog by entering 'help'.");
 	}
 
 	/**
@@ -85,7 +91,8 @@ public class CommandParser {
 												// leading/trailing spaces
 		scanner.close();
 		if (title.equals("")) {
-			throw new MissingFieldException("Title of task is missing");
+			throw new MissingFieldException(
+					"Title of task is missing, please refer to catalog by entering 'help'");
 		} else if (title.contains("+")) {
 			throw new InvalidFormatException(
 					"'+' is a reserved character and should not be found in the title");
@@ -172,7 +179,8 @@ public class CommandParser {
 			fieldName = this.convertToFieldName(scanner.next());
 		} catch (NoSuchElementException e) {
 			scanner.close();
-			throw new MissingFieldException("Field Name is missing");
+			throw new MissingFieldException(
+					"Field Name is missing, please refer to catalog by entering 'help'");
 		}
 		scanner.close();
 		return fieldName;
@@ -186,7 +194,7 @@ public class CommandParser {
 	 * @param userInput
 	 *            Raw user input
 	 * @return the new value
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private Object getNewValue(String userInput) throws Exception {
 		Scanner scanner = new Scanner(userInput);
@@ -199,7 +207,8 @@ public class CommandParser {
 			newValue = scanner.nextLine().trim();
 		} catch (NoSuchElementException e) {
 			scanner.close();
-			throw new MissingFieldException("New value is missing");
+			throw new MissingFieldException(
+					"New value is missing, please refer to catalog by entering 'help'");
 		}
 		scanner.close();
 
@@ -238,7 +247,7 @@ public class CommandParser {
 		return keyword.trim();
 	}
 
-	private ArrayList<DateTime> getDates (String userInput) throws Exception {
+	private ArrayList<DateTime> getDates(String userInput) throws Exception {
 		String dateField;
 		Scanner scanner = new Scanner(userInput);
 		scanner.next();// throw away command
@@ -248,18 +257,17 @@ public class CommandParser {
 			scanner.useDelimiter("\\+");
 			dateField = scanner.next().substring(1).trim();
 			System.out.println(dateField);
-		} else if(this.getCommand(userInput).equals(CommandType.DISPLAY)) {
+		} else if (this.getCommand(userInput).equals(CommandType.DISPLAY)) {
 			dateField = scanner.nextLine().trim();
 			System.out.println(dateField);
-			//TODO:
-		}
-		else {
+			// TODO:
+		} else {
 			scanner.next();// throw away index
 			scanner.next();// throw away fieldName
 			dateField = scanner.nextLine().trim();
 			System.out.println(dateField);
 		}
-		
+
 		scanner.close();
 		List<java.util.Date> javaDates = new PrettyTimeParser()
 				.parse(dateField);
@@ -293,8 +301,11 @@ public class CommandParser {
 				return fieldName;
 			}
 		}
-		throw new InvalidFieldNameException("\"" + fnString
-				+ "\" is not a valid Field Name");
+
+		throw new InvalidFieldNameException(
+				"\""
+						+ fnString
+						+ "\" is not a valid Field Name, please refer to catalog by entering 'help'");
 	}
 	
 	private boolean isViewAll(String userInput) {
@@ -389,7 +400,8 @@ public class CommandParser {
 			try {
 				dateTime = this.getDates(userInput).get(0);
 			} catch (IndexOutOfBoundsException e) {
-				throw new InvalidFormatException("Invalid view mode");
+				throw new InvalidFormatException(
+						"Invalid view mode, please refer to catalog by entering 'help'");
 			}
 			command = new CommandView(schedule, dateTime);
 			break;
