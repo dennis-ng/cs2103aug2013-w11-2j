@@ -34,18 +34,33 @@ public class DeadlineTask extends Task {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<font face=\"century gothic\">");
-		sb.append("<b>");
-		sb.append(this.getTitle() + " ");
-		sb.append("</b>");
-		
-		sb.append("due at ");
-		sb.append("<font face=\"century gothic\" color=\"red\">");
-		sb.append("<b>");
-		sb.append(this.getDeadline().toString("HH:mm"));
-		sb.append("</b>");
-		sb.append("</font>");
-		
+			
+		if (this.getDeadline().isBefore(new DateTime())) {
+			sb.append("<font face=\"century gothic\" color=\"#B6B6B4\">");
+			sb.append("[Id: " + this.getTaskId() + "] ");
+			sb.append("<b>");
+			sb.append(this.getTitle() + " ");
+			sb.append("</b>");
+			
+			sb.append("due at ");
+			sb.append("<b>");
+			sb.append(this.getDeadline().toString("HH:mm"));
+			sb.append("</b>");
+		} else {
+			sb.append("<font face=\"century gothic\">");
+			sb.append("[Id: " + this.getTaskId() + "] ");
+			sb.append("<b>");
+			sb.append(this.getTitle() + " ");
+			sb.append("</b>");
+
+			sb.append("due at ");
+			sb.append("<font face=\"century gothic\" color=\"red\">");
+			sb.append("<b>");
+			sb.append(this.getDeadline().toString("HH:mm"));
+			sb.append("</b>");
+			sb.append("</font>");
+		}
+
 		if (!this.getDescription().equals("")) {
 			sb.append("\n");
 			sb.append("<br>");

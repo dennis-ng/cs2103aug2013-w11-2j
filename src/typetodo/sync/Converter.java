@@ -7,6 +7,7 @@ import typetodo.model.DeadlineTask;
 import typetodo.model.FloatingTask;
 import typetodo.model.Task;
 import typetodo.model.TimedTask;
+import typetodo.model.Task.Status;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
@@ -22,7 +23,7 @@ public class Converter {
 	}
 	
 	public static DateTime toGoogleDateTime(org.joda.time.DateTime jodaDateTime) {
-		System.out.println(jodaDateTime.toString());
+		//System.out.println(jodaDateTime.toString());
 		DateTime googleDateTime = DateTime.parseRfc3339(jodaDateTime.toString());
 		return googleDateTime;
 	}
@@ -79,7 +80,8 @@ public class Converter {
 		googleEvent.setDescription(description);
 		googleEvent.setStart(new EventDateTime().setDateTime(deadline));
 		googleEvent.setEnd(new EventDateTime().setDateTime(deadline));
-		
+
+		//TODO: set completed
 		return googleEvent;
 	}
 	
@@ -144,6 +146,10 @@ public class Converter {
 		task = new FloatingTask(name, description);
 		task.setGoogleId(googleId);
 		task.setDateModified(dateModified);
+		
+		if (googleTask.getCompleted() != null) {
+			task.setStatus(Status.COMPLETED);
+		}
 		
 		return task;
 	}

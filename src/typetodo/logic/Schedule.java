@@ -44,13 +44,16 @@ public class Schedule {
 	public int addTask(Task task) throws Exception {
 		int taskId = -1;
 		if (task instanceof TimedTask) {
+			if (((TimedTask) task).getStart().isAfter(((TimedTask) task).getEnd())) {
+				throw new Exception("Time of start cannot be after time of end");
+			}
 			if(db.isAvailable(((TimedTask) task).getStart(), ((TimedTask) task).getEnd())) {
 				taskId = db.addTask(task);
-			}
-			else {
+			} else {
 				//TODO:
 				throw new Exception("Task cannot be added as current time frame is busy");
 			}
+			
 		} else {
 			taskId = db.addTask(task);
 		}
@@ -131,7 +134,8 @@ public class Schedule {
 			throws Exception {
 		Task taskToBeEdited = null;
 		try {
-			taskToBeEdited = currentListOfTasks.get(index - 1);
+			//taskToBeEdited = currentListOfTasks.get(index - 1);
+			taskToBeEdited = this.getTaskByIdFromCurrentListOfTasks(index);
 		}
 		catch (IndexOutOfBoundsException e) {
 			throw new IndexOutOfBoundsException("Given index is not in range");

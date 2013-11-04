@@ -2,9 +2,11 @@ package typetodo.logic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.joda.time.Seconds;
 import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
 
@@ -18,68 +20,38 @@ public class ViewHelper {
 	
 	public static String generateHTMLDisplayContent(ArrayList<Task> tasks) {
 		StringBuilder sb = new StringBuilder();
-		ArrayList<Task> floatingTask = new ArrayList<Task>();
-		
-		HashMap<LocalDate, ArrayList<Task>> tasksSortedByDate = new HashMap<LocalDate, ArrayList<Task>>();
+		ArrayList<Task> floatingTasks = new ArrayList<Task>();
+		HashMap<LocalDate, ArrayList<Task>> timedAndDeadlineTasks = new HashMap<LocalDate, ArrayList<Task>>();
 	
-		for (Task task : tasks) {
-			LocalDate date = null;
-			
-			if (task instanceof DeadlineTask) {
-				date = ((DeadlineTask) task).getDeadline().toLocalDate();
-				
-				if (tasksSortedByDate.containsKey(date)) {
-					tasksSortedByDate.get(date).add(task);
-				} else {
-					tasksSortedByDate.put(date, new ArrayList<Task>());
-					tasksSortedByDate.get(date).add(task);
-				}
-			} else if (task instanceof TimedTask) {
-				date = ((TimedTask) task).getStart().toLocalDate();
-				while (!date.isAfter(((TimedTask) task).getEnd().toLocalDate())) {
-					if (tasksSortedByDate.containsKey(date)) {
-						tasksSortedByDate.get(date).add(task);
-					} else {
-						tasksSortedByDate.put(date, new ArrayList<Task>());
-						tasksSortedByDate.get(date).add(task);
-					}
-					date = date.plusDays(1);
-				}
-			} else if (task instanceof FloatingTask) {
-				floatingTask.add(task);
-			}
-		}
-	
-		ArrayList<LocalDate> sortedDates = new ArrayList<LocalDate>(tasksSortedByDate.keySet());
-		Collections.sort(sortedDates, new LocalDateComparator());
+		groupTasksByDates(tasks, timedAndDeadlineTasks, floatingTasks);
 		
-		for (LocalDate date : sortedDates) {
+		ArrayList<LocalDate> sortedKeysInAscendingDate = sortKeySetByAscendingDate(timedAndDeadlineTasks.keySet());
+		
+		for (LocalDate date : sortedKeysInAscendingDate) {
 			printDateHeading(date, sb);
 			
-			for (Task task : tasksSortedByDate.get(date)) {
+			for (Task task : timedAndDeadlineTasks.get(date)) {
 				if (isNewlyCreated(task) || isRecentlyModified(task)) {
 					highlightTask(task, sb);
 				} else if (task.getStatus().equals(Status.COMPLETED)) {
 					strikeOutTask(task, sb);
 				} else {
-					sb.append("[Id: " + task.getTaskId() + "] ");
 					sb.append(task);
 				}
 			}
 			sb.append("<hr>");
 		}
 
-		if (!floatingTask.isEmpty()) {
+		if (!floatingTasks.isEmpty()) {
 			printFloatingTaskHeading(sb);
 		}
 
-		for (Task task : floatingTask) {
+		for (Task task : floatingTasks) {
 			if (isNewlyCreated(task) || isRecentlyModified(task)) {
 				highlightTask(task, sb);
 			} else if (task.getStatus().equals(Status.COMPLETED)) {
 				strikeOutTask(task, sb);
 			} else { 
-				sb.append("[Id: " + task.getTaskId() + "] ");
 				sb.append(task);
 			}
 		}
@@ -87,6 +59,86 @@ public class ViewHelper {
 		return sb.toString();
 	}
 
+	private static void groupTasksByDates(ArrayList<Task> tasksToBeGrouped, 
+			HashMap<LocalDate, ArrayList<Task>> timedAndDeadlineTasks, ArrayList<Task> floatingTasks) {
+
+		for (Task task : tasksToBeGrouped) {
+			LocalDate date = null;
+
+			if (task instanceof DeadlineTask) {
+				date = ((DeadlineTask) task).getDeadline().toLocalDate();
+				if (timedAndDeadlineTasks.containsKey(date)) {
+					timedAndDeadlineTasks.get(date).add(task);
+				} else {
+					timedAndDeadlineTasks.put(date, new ArrayList<Task>());
+					timedAndDeadlineTasks.get(date).add(task);
+				}
+			} else if (task instanceof TimedTask) {
+				TimedTask taskToBeDisplayed = (TimedTask) task.makeCopy();
+				date = taskToBeDisplayed.getStart().toLocalDate();
+				LocalDate endDate = ((TimedTask)task).getEnd().toLocalDate();
+				
+				if (date.isEqual(endDate)){
+					if (timedAndDeadlineTasks.containsKey(date)) {
+						timedAndDeadlineTasks.get(date).add(task);
+					} else {
+						timedAndDeadlineTasks.put(date, new ArrayList<Task>());
+						timedAndDeadlineTasks.get(date).add(task);
+					}
+				} else {
+					LocalTime endTime = taskToBeDisplayed.getEnd().toLocalTime();
+
+					if (date.isBefore(endDate)) {
+						taskToBeDisplayed.setEnd(date.toDateTime(LocalTime.parse("23:59"), null));
+						if (timedAndDeadlineTasks.containsKey(date)) {
+							timedAndDeadlineTasks.get(date).add(taskToBeDisplayed.makeCopy());
+
+						} else {
+							timedAndDeadlineTasks.put(date, new ArrayList<Task>());
+							timedAndDeadlineTasks.get(date).add(taskToBeDisplayed.makeCopy());
+						}
+						
+						date = date.plusDays(1);
+					} else {
+							
+					}
+
+					while (date.isBefore(endDate)) {
+						taskToBeDisplayed.setStart(date.toDateTime(LocalTime.parse("00:00"), null));
+
+						if (timedAndDeadlineTasks.containsKey(date)) {
+							timedAndDeadlineTasks.get(date).add(taskToBeDisplayed.makeCopy());
+						} else {
+							timedAndDeadlineTasks.put(date, new ArrayList<Task>());
+							timedAndDeadlineTasks.get(date).add(taskToBeDisplayed.makeCopy());
+						}
+
+						date = date.plusDays(1);
+					}
+
+					taskToBeDisplayed.setStart(date.toDateTime(LocalTime.parse("00:00"), null));
+					taskToBeDisplayed.setEnd(date.toDateTime(endTime));
+
+					if (timedAndDeadlineTasks.containsKey(date)) {
+						timedAndDeadlineTasks.get(date).add(taskToBeDisplayed.makeCopy());
+					} else {
+						timedAndDeadlineTasks.put(date, new ArrayList<Task>());
+						timedAndDeadlineTasks.get(date).add(taskToBeDisplayed.makeCopy());
+					}
+				}
+			} else if (task instanceof FloatingTask) {
+				floatingTasks.add(task);
+			}
+		}
+	}
+	
+	private static ArrayList<LocalDate> sortKeySetByAscendingDate(Set<LocalDate> keySet) {
+		ArrayList<LocalDate> sortedDates = new ArrayList<LocalDate>(keySet);
+		Collections.sort(sortedDates, new LocalDateComparator());
+		
+		return sortedDates;
+	}
+	
 	private static boolean isNewlyCreated(Task task) {
 		DateTime dateCreated = task.getDateCreated();
 		DateTime currentDateTime = new DateTime();
@@ -104,7 +156,6 @@ public class ViewHelper {
 	private static void highlightTask(Task task, StringBuilder sb) {
 		sb.append("<span style=\"background-color: #FFFF00\">");
 		sb.append("<marker>");
-		sb.append("[Id: " + task.getTaskId() + "] ");
 		sb.append(task);
 		sb.append("</span>");
 	}
@@ -125,8 +176,8 @@ public class ViewHelper {
 	
 	private static void strikeOutTask(Task task, StringBuilder sb) {
 		sb.append("<strike>");
-		sb.append("[Id: " + task.getTaskId() + "] ");
 		sb.append(task);
+		sb.append("</font>");
 		sb.append("</strike>");
 	}
 }
