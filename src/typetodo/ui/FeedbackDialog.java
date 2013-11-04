@@ -149,11 +149,14 @@ public class FeedbackDialog extends JDialog {
 		int indexOfMarker = htmlText.indexOf("<marker>");
 
 		if (indexOfMarker != -1) {
-			String test = htmlText.substring(htmlText.indexOf("<marker>") + 8,
-					htmlText.length());
-			Scanner sc = new Scanner(test);
+			String startOfTask = htmlText.substring(htmlText.indexOf("<marker>"), htmlText.length());
+			String idOfTask = "";
+			idOfTask = startOfTask.substring(startOfTask.indexOf("["), startOfTask.length());
+			
+			Scanner sc = new Scanner(idOfTask);
 			sc.useDelimiter("]");
-			String idOfTask = sc.next() + "]";
+			idOfTask = sc.next() + "]";
+			System.out.println(idOfTask);
 			sc.close();
 
 			return textWithOutHtmlTags.indexOf(idOfTask);
