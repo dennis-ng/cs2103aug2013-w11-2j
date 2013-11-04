@@ -9,7 +9,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public class DateTimeTypeConverter implements JsonSerializer<DateTime>, JsonDeserializer<DateTime> {
+public class DateTimeTypeAdapter implements JsonSerializer<DateTime>, JsonDeserializer<DateTime> {
 	// No need for an InstanceCreator since DateTime provides a no-args constructor
 	@Override
 	public JsonElement serialize(DateTime src, java.lang.reflect.Type srcType, JsonSerializationContext context) {
