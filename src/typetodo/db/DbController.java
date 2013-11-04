@@ -50,7 +50,7 @@ public class DbController {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
 		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
-				new DateTimeTypeConverter());
+				new DateTimeTypeAdapter());
 		gson = gsonBuilder.setPrettyPrinting().create();
 		// Create a comparator to sort by type of tasks and end datetime
 		tasksCache = new TreeMap<Integer, Task>();

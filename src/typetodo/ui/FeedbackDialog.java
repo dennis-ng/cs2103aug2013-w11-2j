@@ -12,14 +12,19 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Scanner;
 
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 
 /**
@@ -149,10 +154,12 @@ public class FeedbackDialog extends JDialog {
 		int indexOfMarker = htmlText.indexOf("<marker>");
 
 		if (indexOfMarker != -1) {
-			String startOfTask = htmlText.substring(htmlText.indexOf("<marker>"), htmlText.length());
+			String startOfTask = htmlText.substring(htmlText.indexOf("<marker>"),
+					htmlText.length());
 			String idOfTask = "";
-			idOfTask = startOfTask.substring(startOfTask.indexOf("["), startOfTask.length());
-			
+			idOfTask = startOfTask.substring(startOfTask.indexOf("["),
+					startOfTask.length());
+
 			Scanner sc = new Scanner(idOfTask);
 			sc.useDelimiter("]");
 			idOfTask = sc.next() + "]";
@@ -163,6 +170,13 @@ public class FeedbackDialog extends JDialog {
 		}
 
 		return 0;
+	}
+
+	@Override
+	public boolean requestFocusInWindow() {
+		// The scrollableDisplay will be the first component that require focus in
+		// this dialog
+		return scrollableDisplay.requestFocusInWindow();
 	}
 
 	/**
@@ -208,9 +222,26 @@ public class FeedbackDialog extends JDialog {
 		scrollableDisplay.setBorder(null);
 		scrollableDisplay
 				.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollableDisplay.setPreferredSize(new Dimension(txtListOutput.getWidth(),
-				0));
+		scrollableDisplay
+				.setPreferredSize(new Dimension(getMinimumSize().width, 0));
 		taskListPanel.add(scrollableDisplay, BorderLayout.NORTH);
+
+		scrollableDisplay.getInputMap().put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "navDown");
+		scrollableDisplay.getActionMap().put("navDown", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				JScrollBar vertical = scrollableDisplay.getVerticalScrollBar();
+				vertical.setValue(vertical.getValue() + scrollableDisplay.getHeight());
+			}
+		});
+		scrollableDisplay.getInputMap().put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "navUp");
+		scrollableDisplay.getActionMap().put("navUp", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				JScrollBar vertical = scrollableDisplay.getVerticalScrollBar();
+				vertical.setValue(vertical.getValue() - scrollableDisplay.getHeight());
+			}
+		});
 
 		this.setBackground(dialogColor);
 		this.setLayout(new BorderLayout());
