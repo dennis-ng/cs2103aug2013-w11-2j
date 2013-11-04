@@ -39,7 +39,7 @@ public class DbController {
 
 	// Variables
 	private HashMap<String, File> allFiles;
-	private final HashMap<String, Object> properties;
+	private HashMap<String, Object> properties;
 	private TreeMap<Integer, Task> tasksCache;
 
 	// Controllers and external libraries
@@ -112,7 +112,7 @@ public class DbController {
 				}.getType();
 				// The following statement throws JsonSyntaxException when contents of
 				// the file to load is incorrect
-				tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
+				properties = gson.fromJson(fileToTextBuffer.toString(), collectionType);
 
 			}
 		}
