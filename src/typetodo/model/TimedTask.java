@@ -51,26 +51,48 @@ public class TimedTask extends Task {
 	}
 
 	public Task makeCopy() {
-		return new TimedTask(this.getTaskId(), this.getTitle(),
+		TimedTask copy = new TimedTask(this.getTaskId(), this.getTitle(),
 				this.getDescription(), this.getStart(), this.getEnd(), this.isBusy());
+		copy.setStatus(this.getStatus());
+		copy.setDateCreated(this.getDateCreated());
+		copy.setDateModified(this.getDateModified());
+		
+		return copy;
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<font face=\"century gothic\">");
-		sb.append("<b>");
-		sb.append(this.getTitle() + " ");
-		sb.append("</b>");
-		
-		sb.append("from ");
-		sb.append("<font face=\"century gothic\" color=\"red\">");
-		sb.append("<b>");
-		sb.append(this.getStart().toString("HH:mm"));
-		sb.append(" to ");
-		sb.append(this.getEnd().toString("HH:mm"));
-		sb.append("</b>");
-		sb.append("</font>");
-		
+
+		if (this.getEnd().isBefore(new DateTime())) {
+			sb.append("<font face=\"century gothic\" color=\"#B6B6B4\">");
+			sb.append("[Id: " + this.getTaskId() + "] ");
+			sb.append("<b>");
+			sb.append(this.getTitle() + " ");
+			sb.append("</b>");
+
+			sb.append("from ");
+			sb.append("<b>");
+			sb.append(this.getStart().toString("HH:mm"));
+			sb.append(" to ");
+			sb.append(this.getEnd().toString("HH:mm"));
+			sb.append("</b>");
+		} else {
+			sb.append("[Id: " + this.getTaskId() + "] ");
+			sb.append("<font face=\"century gothic\">");
+			sb.append("<b>");
+			sb.append(this.getTitle() + " ");
+			sb.append("</b>");
+
+			sb.append("from ");
+			sb.append("<font face=\"century gothic\" color=\"red\">");
+			sb.append("<b>");
+			sb.append(this.getStart().toString("HH:mm"));
+			sb.append(" to ");
+			sb.append(this.getEnd().toString("HH:mm"));
+			sb.append("</b>");
+			sb.append("</font>");
+		}
+
 		if (!this.getDescription().equals("")) {
 			sb.append("\n");
 			sb.append("<br>");

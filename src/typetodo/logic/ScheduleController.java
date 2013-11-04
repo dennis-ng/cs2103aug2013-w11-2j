@@ -2,6 +2,7 @@ package typetodo.logic;
 
 import java.util.Stack;
 
+import typetodo.db.DbController;
 import typetodo.ui.View;
 
 public class ScheduleController {
@@ -10,6 +11,7 @@ public class ScheduleController {
 	private Stack<Command> historyOfCommands;
 	private CommandParser commandParser;
 	private Schedule schedule;
+	private DbController db;
 	
 	public ScheduleController(View view, Schedule schedule) {
 		this.view = view;
