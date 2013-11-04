@@ -1,12 +1,12 @@
 package typetodo.logic;
 
 public class CommandHelp implements Command {
-	private static final String MESSAGE_HELP = "Command catalog is shown below: \n";
+	private static final String MESSAGE_HELP = "Command catalog is shown below:";
 	private Schedule sc;
 	private CommandType helpType;
 
-	private static final String HELP_INSTRUCTION = "Please enter 'help <command>'.\n"
-			+ "i.e.help hotkey, add, del, edit, undo, complete, search, sync, home, etc\n";
+	private static final String HELP_INSTRUCTION = "Please enter 'help <command>'."
+			+ "i.e.help hotkey, add, del, edit, undo, complete, search, sync, home, etc";
 	private static final String HELP_ADD = "ADD:(add new task into typetodo)\n"
 			+ "(FLOATING TASK) add <task title>;\n"
 			+ "(DEADLINE TASK) add <task title>; <deadline date and time>\n"
@@ -91,11 +91,21 @@ public class CommandHelp implements Command {
 		String feedback;
 		sc.help();
 		if (helpType != null) {
-			String TYPE_CATALOG = help(helpType);
-			feedback = MESSAGE_HELP + TYPE_CATALOG;
+			feedback = MESSAGE_HELP;
 		} else {
 			feedback = HELP_INSTRUCTION;
 		}
 		return feedback;
+	}
+	
+	public String getHelpMessage() {
+		String helpMessage;
+		if (helpType != null) {
+			String TYPE_CATALOG = help(helpType);
+			helpMessage = TYPE_CATALOG;
+		} else {
+			helpMessage = HELP_INSTRUCTION;
+		}
+		return helpMessage;
 	}
 }
