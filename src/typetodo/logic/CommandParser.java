@@ -50,6 +50,7 @@ public class CommandParser {
 				Arrays.asList("display", "view", "show", "see", "list"));
 		commandSynonyms.put(CommandType.HELP, Arrays.asList("help"));
 		commandSynonyms.put(CommandType.HOME, Arrays.asList("home", "today"));
+		commandSynonyms.put(CommandType.HOTKEY, Arrays.asList("hotkey","quick","hot key","hotkeys"));
 		commandSynonyms.put(CommandType.UPDATE,
 				Arrays.asList("update", "edit", "change"));
 		commandSynonyms
@@ -79,7 +80,7 @@ public class CommandParser {
 	 *             if user input does not contain a title
 	 */
 	private String getTitle(String userInput) throws InvalidFormatException,
-			MissingFieldException {
+			MissingFieldException, ReservedCharacterException {
 		if (userInput.indexOf(';') == -1) {
 			throw new InvalidFormatException("Missing ';'");
 		}
@@ -94,7 +95,7 @@ public class CommandParser {
 			throw new MissingFieldException(
 					"Title of task is missing, please refer to catalog by entering 'help'");
 		} else if (title.contains("+")) {
-			throw new InvalidFormatException(
+			throw new ReservedCharacterException(
 					"'+' is a reserved character and should not be found in the title");
 		}
 
@@ -111,7 +112,7 @@ public class CommandParser {
 	 *             if restricted char ';' is found in the description
 	 */
 	private String getDescription(String userInput)
-			throws InvalidFormatException {
+			throws ReservedCharacterException {
 		int indexOfDescription = userInput.indexOf('+');
 		if (indexOfDescription == -1) { // if user input does not contain a
 										// description
@@ -125,19 +126,20 @@ public class CommandParser {
 
 		String description = "";
 		int indexOfBusy = userInput.lastIndexOf("BUSY");
-		
+
 		if (indexOfBusy == -1) {
 			// Description will always be at the end of the userinput
 			description = userInput.substring(++indexOfDescription);
 		} else {
-			description = userInput.substring(++indexOfDescription, indexOfBusy);
+			description = userInput
+					.substring(++indexOfDescription, indexOfBusy);
 		}
-		
+
 		if (description.indexOf(';') != -1) {
-			throw new InvalidFormatException(
+			throw new ReservedCharacterException(
 					"';' is a reserved character and should not be found in the description");
 		}
-		
+
 		return description.trim();
 	}
 
@@ -180,7 +182,7 @@ public class CommandParser {
 		} catch (NoSuchElementException e) {
 			scanner.close();
 			throw new MissingFieldException(
-					"Field Name is missing, please refer to catalog by entering 'help'");
+					"Field Name is missing, please refer to catalog by entering 'help edit'");
 		}
 		scanner.close();
 		return fieldName;
@@ -208,7 +210,7 @@ public class CommandParser {
 		} catch (NoSuchElementException e) {
 			scanner.close();
 			throw new MissingFieldException(
-					"New value is missing, please refer to catalog by entering 'help'");
+					"New value is missing, please refer to catalog by entering 'help edit'");
 		}
 		scanner.close();
 
@@ -280,6 +282,19 @@ public class CommandParser {
 		return jodaDates;
 	}
 
+	private String getHelpType(String userInput) throws InvalidCommandException {
+		String helpType;
+		Scanner scanner = new Scanner(userInput);
+		scanner.next();// throw away command;
+		if (scanner.hasNext()) {
+			helpType = scanner.next();
+			scanner.close();
+		} else {
+			helpType = "";
+		}
+		return helpType;
+	}
+
 	/**
 	 * convert from string to FieldName and return FieldName.
 	 * 
@@ -305,33 +320,38 @@ public class CommandParser {
 		throw new InvalidFieldNameException(
 				"\""
 						+ fnString
-						+ "\" is not a valid Field Name, please refer to catalog by entering 'help'");
+						+ "\" is not a valid Field Name, please refer to catalog by entering 'help edit'");
 	}
-	
+
 	private boolean isViewAll(String userInput) {
 		Scanner scanner = new Scanner(userInput);
-		scanner.next(); //discard user command
+		scanner.next(); // discard user command
 		if (scanner.next().equals("all")) {
 			scanner.close();
 			return true;
 		}
 		scanner.close();
-		
+
 		return false;
 	}
 
-	private void checkForReservedCharacters(String userInput) throws ReservedCharacterException {
+	private void checkForReservedCharacters(String userInput)
+			throws ReservedCharacterException {
 		if (userInput.indexOf("<") != -1) {
-			throw new ReservedCharacterException("'<' is a reserved character and cannot be used");
-		} 
+			throw new ReservedCharacterException(
+					"'<' is a reserved character and cannot be used");
+		}
 		if (userInput.indexOf(">") != -1) {
-			throw new ReservedCharacterException("'>' is a reserved character and cannot be used");
+			throw new ReservedCharacterException(
+					"'>' is a reserved character and cannot be used");
 		}
 		if (userInput.indexOf("[") != -1) {
-			throw new ReservedCharacterException("'[' is a reserved character and cannot be used");
+			throw new ReservedCharacterException(
+					"'[' is a reserved character and cannot be used");
 		}
 		if (userInput.indexOf("]") != -1) {
-			throw new ReservedCharacterException("']' is a reserved character and cannot be used");
+			throw new ReservedCharacterException(
+					"']' is a reserved character and cannot be used");
 		}
 	}
 
@@ -343,7 +363,7 @@ public class CommandParser {
 	 */
 	public Command parse(String userInput) throws Exception {
 		this.checkForReservedCharacters(userInput);
-		
+
 		Command command = null;
 		switch (this.getCommand(userInput)) {
 
@@ -368,6 +388,8 @@ public class CommandParser {
 						start, end, false);
 			} else {
 				// TODO: invalid new view
+				throw new Exception(
+						"INVALID FORMAT. Please refer to catalog by entering 'help add'");
 			}
 			break;
 
@@ -378,7 +400,8 @@ public class CommandParser {
 			} catch (Exception e) {
 				String keyword = this.getKeyword(userInput);
 				if (keyword == null) {
-					throw new Exception("INVALID FORMAT");
+					throw new Exception(
+							"INVALID FORMAT. Please refer to catalog by entering 'help delete'");
 				}
 				command = new CommandDeleteTask(schedule, keyword);
 			}
@@ -399,12 +422,19 @@ public class CommandParser {
 						(Boolean) newValue);
 			} else {
 				// TODO: invalid view
+				throw new Exception(
+						"INVALID FORMAT. Please refer to catalog by entering 'help edit'");
 			}
 			break;
 
 		case SEARCH:
-			String keyword = this.getKeyword(userInput);
-			command = new CommandSearch(schedule, keyword);
+			try {
+				String keyword = this.getKeyword(userInput);
+				command = new CommandSearch(schedule, keyword);
+			} catch (Exception e) {
+				throw new Exception(
+						"INVALID FORMAT. Please refer to catalog by entering 'help search'");
+			}
 			break;
 
 		case DISPLAY:
@@ -418,14 +448,19 @@ public class CommandParser {
 				dateTime = this.getDates(userInput).get(0);
 			} catch (IndexOutOfBoundsException e) {
 				throw new InvalidFormatException(
-						"Invalid view mode, please refer to catalog by entering 'help'");
+						"INVALID FORMAT. Please refer to catalog by entering 'help display'");
 			}
 			command = new CommandView(schedule, dateTime);
 			break;
 
 		case DONE:
-			int indexOfCompletedTask = this.getIndex(userInput);
-			command = new CommandCompleted(schedule, indexOfCompletedTask);
+			try {
+				int indexOfCompletedTask = this.getIndex(userInput);
+				command = new CommandCompleted(schedule, indexOfCompletedTask);
+			} catch (Exception e) {
+				throw new Exception(
+						"INVALID FORMAT. Please refer to catalog by entering 'help done'");
+			}
 			break;
 
 		case HOME:
@@ -437,7 +472,14 @@ public class CommandParser {
 			break;
 
 		case HELP:
-			command = new CommandHelp(schedule);
+			String helpType = getHelpType(userInput);
+			if (helpType != "") {
+				CommandType commandType = getCommand(helpType);
+				command = new CommandHelp(schedule, commandType);
+			} else {
+				command = new CommandHelp(schedule);
+			}
+
 			break;
 
 		case INVALID:
@@ -459,7 +501,6 @@ public class CommandParser {
 			// TODO:
 			throw new Error();
 		}
-
 		return command;
 	}
 

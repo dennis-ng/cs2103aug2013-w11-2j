@@ -6,7 +6,7 @@ import typetodo.db.DbController;
 import typetodo.ui.View;
 
 public class ScheduleController {
-	private static final String MESSAGE_WELCOME = "Welcome to TypeToDo!";
+	private static final String MESSAGE_WELCOME = "Welcome to TypeToDo! Please enter 'help' for instructions.";
 	private View view;
 	private Stack<Command> historyOfCommands;
 	private CommandParser commandParser;

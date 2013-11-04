@@ -255,8 +255,8 @@ public class Schedule {
 	public void viewTasksByDate(DateTime dateTime) {
 		setKeyItem(dateTime);
 	}
-
-	public void help() {
+	
+	public void help(){
 	}
 
 	private void refreshList() {
@@ -287,4 +287,5 @@ public class Schedule {
 		
 		return null;
 	}
+
 }
