@@ -12,8 +12,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.RenderingHints;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Scanner;
 
@@ -35,8 +33,10 @@ public class FeedbackDialog extends JDialog {
 	private JTextArea txtFeedback;
 	private JTextPane txtListOutput;
 	private JScrollPane scrollableDisplay;
-	private static ComponentAdapter DIALOG_RESIZE_ACTION;
 	public final static Color dialogColor = new Color(230, 230, 230);
+
+	private static final String MESSAGE_NO_TASK = "Start using TypeToDo by typing "
+			+ "<font color=\"#FF0000\">\"add your task;\"</font> now!";
 
 	public FeedbackDialog() {
 		super();
@@ -102,42 +102,66 @@ public class FeedbackDialog extends JDialog {
 	}
 
 	public void setTableOfTasks(String htmlText) {
-		this.txtListOutput.setText(htmlText);
-		
-		//lineCount = this.countLinesInJTextPane(this.txtListOutput);
-		//if (lineCount > 10) {
-			//txtListOutput.setRows(10);
-		//} else {
-			//txtListOutput.set.setRows(lineCount);
-		//}
+		String displayText;
+		if (htmlText.isEmpty()) {
+			displayText = MESSAGE_NO_TASK;
+		} else {
+			displayText = htmlText;
+		}
+		this.txtListOutput.setText(displayText);
 
 		try {
-			String textWithoutHtmlTags = txtListOutput.getDocument().getText(0, txtListOutput.getDocument().getLength());
-			int indexToScrollTo = getIndexToScrollTo(htmlText, textWithoutHtmlTags);
+			String textWithoutHtmlTags = txtListOutput.getDocument().getText(0,
+					txtListOutput.getDocument().getLength());
+			int indexToScrollTo = getIndexToScrollTo(displayText, textWithoutHtmlTags);
 			txtListOutput.setCaretPosition(indexToScrollTo);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		int textHeight = getTextHeight(displayText);
+		int windowWidth = getMinimumSize().width;
+		if (textHeight > 250) {
+			scrollableDisplay.setPreferredSize(new Dimension(windowWidth, 250));
+		} else {
+			scrollableDisplay
+					.setPreferredSize(new Dimension(windowWidth, textHeight));
+		}
 		this.pack();
-	}	
+	}
+
+	private int getTextHeight(String text) {
+		// A surrogate JTextPane is used in place of the actual JTextPane due to the
+		// eccentric behavior with JTextPane
+		JTextPane surrogate = new JTextPane();
+		surrogate.setContentType("text/html");
+		surrogate.setMinimumSize(new Dimension(txtListOutput.getWidth(), 0));
+		surrogate.setMaximumSize(new Dimension(txtListOutput.getWidth(), 20));
+		JPanel surrogatePanel = new JPanel(new BorderLayout());
+		surrogatePanel.add(surrogate, BorderLayout.NORTH);
+		surrogate.setText(text);
+		surrogatePanel.revalidate();
+		return surrogatePanel.getPreferredSize().height;
+	}
 
 	public int getIndexToScrollTo(String htmlText, String textWithOutHtmlTags) {
 		int indexOfMarker = htmlText.indexOf("<marker>");
-	
+
 		if (indexOfMarker != -1) {
-			String test = htmlText.substring(htmlText.indexOf("<marker>") + 8, htmlText.length());
+			String test = htmlText.substring(htmlText.indexOf("<marker>") + 8,
+					htmlText.length());
 			Scanner sc = new Scanner(test);
 			sc.useDelimiter("]");
 			String idOfTask = sc.next() + "]";
 			sc.close();
-			
+
 			return textWithOutHtmlTags.indexOf(idOfTask);
 		}
-		
+
 		return 0;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -156,13 +180,6 @@ public class FeedbackDialog extends JDialog {
 						getHeight() + 10, 20, 20));
 			}
 		};
-		DIALOG_RESIZE_ACTION = new ComponentAdapter() {
-			// Resize the dialog as the textarea increase in size
-			@Override
-			public void componentResized(ComponentEvent e) {
-				FeedbackDialog.this.pack();
-			}
-		};
 		txtFeedback = new JTextArea();
 		txtFeedback.setForeground(Color.WHITE);
 		txtFeedback.setBackground(Color.DARK_GRAY);
@@ -172,15 +189,11 @@ public class FeedbackDialog extends JDialog {
 		txtFeedback.setMinimumSize(new Dimension(txtFeedback.getWidth(), 0));
 		txtFeedback.setMaximumSize(new Dimension(txtFeedback.getWidth(), 20));
 		txtFeedback.setEditable(false);
-		txtFeedback.addComponentListener(DIALOG_RESIZE_ACTION);
 		feedbackPanel.add(txtFeedback);
 
-		taskListPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		taskListPanel = new JPanel(new BorderLayout());
 		txtListOutput = new JTextPane();
 		txtListOutput.setContentType("text/html");
-		txtListOutput.addComponentListener(DIALOG_RESIZE_ACTION);
-		//txtListOutput.setLineWrap(true);
-		//txtListOutput.setWrapStyleWord(true);
 		txtListOutput.setBackground(dialogColor);
 		txtListOutput.setEditable(false);
 		txtListOutput.setSize(this.getMinimumSize());
@@ -190,10 +203,11 @@ public class FeedbackDialog extends JDialog {
 
 		scrollableDisplay = new JScrollPane(txtListOutput);
 		scrollableDisplay.setBorder(null);
-		scrollableDisplay.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollableDisplay.setPreferredSize(new Dimension(txtListOutput.getWidth(), 200));
-		taskListPanel.add(scrollableDisplay);
-		// taskListPanel.add(txtListOutput);
+		scrollableDisplay
+				.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollableDisplay.setPreferredSize(new Dimension(txtListOutput.getWidth(),
+				0));
+		taskListPanel.add(scrollableDisplay, BorderLayout.NORTH);
 
 		this.setBackground(dialogColor);
 		this.setLayout(new BorderLayout());
