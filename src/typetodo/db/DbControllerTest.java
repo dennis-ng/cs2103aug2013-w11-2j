@@ -5,6 +5,7 @@ package typetodo.db;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
@@ -20,6 +21,18 @@ import typetodo.model.FloatingTask;
  * 
  */
 public class DbControllerTest {
+
+	@Test
+	public void test2() {
+		DbController db;
+		try {
+			db = DbController.getInstance();
+			assertEquals("Check property", "Date", db.getProperty("Test"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	public void test() {
