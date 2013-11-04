@@ -6,14 +6,12 @@ package typetodo.logic;
  * @author Shiyu
  *
  */
-public class InvalidFormatException extends Exception{
-    public InvalidFormatException()
-    {
-    	super();
-    }
-    
-    public InvalidFormatException(String message)
-    {
-       super(message);
-    }
+public class InvalidFormatException extends Exception {
+	public InvalidFormatException() {
+		super();
+	}
+
+	public InvalidFormatException(String message) {
+		super(message);
+	}
 }

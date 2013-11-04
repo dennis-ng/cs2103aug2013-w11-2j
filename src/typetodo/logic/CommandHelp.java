@@ -7,38 +7,46 @@ public class CommandHelp implements Command {
 
 	private static final String HELP_INSTRUCTION = "Please enter 'help <command>'.\n"
 			+ "i.e.help hotkey, add, del, edit, undo, complete, search, sync, home, etc\n";
-
 	private static final String HELP_ADD = "ADD:(add new task into typetodo)\n"
 			+ "(FLOATING TASK) add <task title>;\n"
 			+ "(DEADLINE TASK) add <task title>; <deadline date and time>\n"
 			+ "(TIMED TASK)         add <task title>; <time span>  busy (only if you want to block this slot)\n"
 			+ "\n"
-			+ "*If you want to add description, you may type '+<description>' at the end of task\n"
-			+ "\n";
+			+ "*If you want to add description, you may type '+<description>' at the end of task\n";
 	private static final String HELP_DELETE = "DELETE:(delete exist task from typetodo)\n"
 			+ "(BY INDEX) del <index of task on current list>\n"
-			+ "(BY KEYWORD) del <keyword of the task title>\n"
-			+ "\n";
+			+ "(BY KEYWORD) del <keyword of the task title>\n";
 	private static final String HELP_DONE = "COMPLETE: (mark certain task is completed and remove from task list)\n"
-			+ "(SYNTAX) done <index of task>\n" + "\n";
+			+ "(SYNTAX) done <index of task>\n";
 	private static final String HELP_DISPLAY = "DISPLAY: (the default view is today's tasks)\n"
-			+ "(SYNTAX) view <date>\n" + "\n";
+			+ "(SYNTAX) view <date>\n";
 	private static final String HELP_EXIT = "EXIT:(save and quit TypeToDo)\n"
-			+ "(SYNTAX) exit\n" + "\n";
+			+ "(SYNTAX) exit\n";
 	private static final String HELP_HOME = "HOME:(display default task list)\n"
-			+ "(SYNTAX) home\n" + "\n";
+			+ "(SYNTAX) home\n";
 	private static final String HELP_SEARCH = "SEARCH:(find tasks that contain given keyword)\n"
-			+ "(SYNTAX) search <keyword>\n" + "\n";
+			+ "(SYNTAX) search <keyword>\n";
 	private static final String HELP_SYNC = "SYNC:(synchronize with google calendar. Either export typetodo tasks into GCal, or import editted GCal tasks)\n"
-			+ "(SYNTAX) sync\n" + "\n";
+			+ "(SYNTAX) sync\n";
 	private static final String HELP_UPDATE = "UPDATE:(modify exist task from typetodo. Note field name must be in capital letters,i.e.TITLE,DESCRIPTION,DEADLINE,START,END,BUSY)\n"
-			+ "(SYNTAX) edit <index of task on current list> <field name> <new value>\n"
-			+ "\n";
+			+ "(SYNTAX) edit <index of task on current list> <field name> <new value>\n";
 	private static final String HELP_UNDO = "UNDO:(undo last operation. you may undo as many times as you want until the first operation you have committed)"
-			+ "(SYNTAX) undo\n" + "(HOTKEY) <ctrl> + <backspace>\n" + "\n";
+			+ "(SYNTAX) undo\n" + "(HOTKEY) <ctrl> + <backspace>\n";
 	private static final String HELP_HOTKEY = "HOT-KEYS:(simple view application window and simple undo)\n"
-			+ "(VIEW WINDOW) <ctrl> + <space>\n"
-			+ "(UNDO) <ctrl> + <backspace>\n" + "\n";
+			+ "(HIDE/RESTORE WINDOW) <ctrl> + <space>\n"
+			+ "(UNDO) <ctrl> + <backspace>\n"
+			+ "\n"
+			+ "NAVIGATION MODE:\n"
+			+ "(switch into navigation mode) <Esc>\n"
+			+ "(scroll up) <UP>\n"
+			+ "(scroll down) <DOWN>\n"
+			+ "(previous page) <LEFT>"
+			+ "(next page) <RIGHT>\n"
+			+ "\n"
+			+ "INPUT MODE:\n"
+			+ "(switch into input mode) <i>\n"
+			+ "(last operation) <UP>\n"
+			+ "(next operation) <DOWN>\n";
 
 	public CommandHelp(Schedule sc, CommandType helpType) {
 		this.sc = sc;
