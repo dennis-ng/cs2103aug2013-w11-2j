@@ -320,6 +320,21 @@ public class CommandParser {
 		return false;
 	}
 
+	private void checkForReservedCharacters(String userInput) throws ReservedCharacterException {
+		if (userInput.indexOf("<") != -1) {
+			throw new ReservedCharacterException("'<' is a reserved character and cannot be used");
+		} 
+		if (userInput.indexOf(">") != -1) {
+			throw new ReservedCharacterException("'>' is a reserved character and cannot be used");
+		}
+		if (userInput.indexOf("[") != -1) {
+			throw new ReservedCharacterException("'[' is a reserved character and cannot be used");
+		}
+		if (userInput.indexOf("]") != -1) {
+			throw new ReservedCharacterException("']' is a reserved character and cannot be used");
+		}
+	}
+
 	/**
 	 * 
 	 * @param userInput
@@ -327,6 +342,8 @@ public class CommandParser {
 	 * @throws Exception
 	 */
 	public Command parse(String userInput) throws Exception {
+		this.checkForReservedCharacters(userInput);
+		
 		Command command = null;
 		switch (this.getCommand(userInput)) {
 
