@@ -12,40 +12,48 @@ public class ScheduleController {
 	private CommandParser commandParser;
 	private Schedule schedule;
 	private DbController db;
-	
+
 	public ScheduleController(View view, Schedule schedule) {
 		this.view = view;
 		this.commandParser = new CommandParser(this, schedule);
 		this.historyOfCommands = new Stack<Command>();
 		this.schedule = schedule;
-		
-		String htmlDisplayContent = ViewHelper.generateHTMLDisplayContent(schedule.getCurrentListOfTasks());
+
+		String htmlDisplayContent = ViewHelper
+				.generateHTMLDisplayContent(schedule.getCurrentListOfTasks());
 		view.displayTasks(htmlDisplayContent);
 		view.displayFeedBack(MESSAGE_WELCOME);
 	}
-	
+
 	public void parseAndExecute(String userInput) {
 		Command command;
 		try {
 			command = commandParser.parse(userInput);
 			String feedback = command.execute();
 			view.displayFeedBack(feedback);
-			
+
+			if (command instanceof CommandHelp) {
+				CommandHelp ch = (CommandHelp) command;
+				String helpMessage = ch.getHelpMessage();
+				view.displayHelp(helpMessage);
+			}
+
 			if (command instanceof Undoable) {
 				historyOfCommands.add(command);
 			}
-			
+
 		} catch (Exception e) {
 			// TODO;
 			e.printStackTrace();
 			view.displayErrorMessage(e.getMessage());
 		}
-		
-		String htmlDisplayContent = ViewHelper.generateHTMLDisplayContent(schedule.getCurrentListOfTasks());
+
+		String htmlDisplayContent = ViewHelper
+				.generateHTMLDisplayContent(schedule.getCurrentListOfTasks());
 		view.displayTasks(htmlDisplayContent);
-		//view.displayTasks(schedule.getCurrentListOfTasks());
+		// view.displayTasks(schedule.getCurrentListOfTasks());
 	}
-	
+
 	public void undo() throws Exception {
 		if (!historyOfCommands.isEmpty()) {
 			try {
