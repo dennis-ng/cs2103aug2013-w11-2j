@@ -17,6 +17,7 @@ public class FloatingTask extends Task {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("[Id: " + this.getTaskId() + "] ");
 		sb.append("<font face=\"century gothic\">");
 		sb.append("<b>");
 		sb.append(this.getTitle() + " ");

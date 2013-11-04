@@ -71,7 +71,7 @@ public abstract class Task implements Comparable<Task> {
 	public void setDateCreated(DateTime dateCreated) {
 		this.dateCreated = dateCreated;
 	}
-
+	
 	/**
 	 * @return the dateCreated
 	 */
