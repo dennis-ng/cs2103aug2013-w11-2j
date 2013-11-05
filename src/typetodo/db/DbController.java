@@ -39,7 +39,7 @@ public class DbController {
 
 	// Variables
 	private HashMap<String, File> allFiles;
-	private HashMap<String, Object> properties;
+	private HashMap<String, String> properties;
 	private TreeMap<Integer, Task> tasksCache;
 
 	// Controllers and external libraries
@@ -54,7 +54,7 @@ public class DbController {
 		gson = gsonBuilder.setPrettyPrinting().create();
 		// Create a comparator to sort by type of tasks and end datetime
 		tasksCache = new TreeMap<Integer, Task>();
-		properties = new HashMap<String, Object>();
+		properties = new HashMap<String, String>();
 		initializeFiles();
 		for (String fileName : allFiles.keySet()) {
 			this.loadFile(fileName);
@@ -387,7 +387,7 @@ public class DbController {
 	 *          is the name of the property that was saved.
 	 * @return Returns null when the property doesn't exist.
 	 */
-	public Object getProperty(String propertyName) {
+	public String getProperty(String propertyName) {
 		return properties.get(propertyName);
 	}
 
@@ -395,9 +395,9 @@ public class DbController {
 	 * @param propertyName
 	 *          The name of the property you want to save.
 	 * @param property
-	 *          Can be any objects that you want to save as a property.
+	 *          A string that you want to save as a property.
 	 */
-	public void setProperty(String propertyName, Object property) {
+	public void setProperty(String propertyName, String property) {
 		properties.put(propertyName, property);
 		this.writeChangesToFile(FILENAME_PROPERTIES);
 	}
