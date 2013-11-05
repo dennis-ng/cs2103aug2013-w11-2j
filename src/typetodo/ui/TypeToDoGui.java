@@ -267,8 +267,6 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		tray.remove(trayIcon);
 		setVisible(true);
 		System.out.println("Tray icon removed");
-		toFront();
-		txtCmd.requestFocusInWindow();
 	}
 
 	public void windowActivated(WindowEvent e) { /* Unimplemented */
@@ -286,6 +284,8 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 					if (getExtendedState() == JFrame.ICONIFIED) {
 						setVisible(true);
 						setExtendedState(JFrame.NORMAL);
+						toFront();
+						txtCmd.requestFocusInWindow();
 					} else {
 						setExtendedState(JFrame.ICONIFIED);
 					}
