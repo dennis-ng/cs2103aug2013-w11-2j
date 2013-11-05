@@ -3,14 +3,22 @@
  */
 package typetodo.ui;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.net.URL;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -37,10 +45,17 @@ import typetodo.logic.ScheduleController;
 public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		WindowListener {
 
+	public final static String IMAGE_DIRECTORY = "images/";
+	public final static String FILENAME_TRAY_LOGO = "logo.png";
+
 	private static TypeToDoGui mainGui;
 	private static CommandPanel cmdPanel;
 	private static JTextField txtCmd;
 	private static FeedbackDialog feedbackDialog;
+	private Image imgLogo;
+	private TrayIcon trayIcon;
+	private SystemTray tray;
+
 	private static ScheduleController sc;
 	private final LinkedList<String> inputHistory;
 	private int historyIndex;
@@ -54,7 +69,14 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		this.setBackground(new Color(0, 0, 0, 0));
 		this.setAlwaysOnTop(true);
 		addWindowListener(this);
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+		URL imgLogoUrl = TypeToDoGui.class.getResource(IMAGE_DIRECTORY
+				+ FILENAME_TRAY_LOGO);
+		if (imgLogoUrl != null) {
+			imgLogo = Toolkit.getDefaultToolkit().getImage(imgLogoUrl);
+			this.setIconImage(imgLogo);
+		}
 
 		cmdPanel = new CommandPanel();
 		cmdPanel.setFrameToMinimize(this);
@@ -158,6 +180,38 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 				feedbackDialog.requestFocusInWindow();
 			}
 		});
+
+		if (SystemTray.isSupported()) {
+			System.out.println("system tray supported");
+			tray = SystemTray.getSystemTray();
+			ActionListener exitListener = new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					System.out.println("Exiting....");
+					System.exit(0);
+				}
+			};
+			PopupMenu popup = new PopupMenu();
+			MenuItem defaultItem = new MenuItem("Exit");
+			defaultItem.addActionListener(exitListener);
+			popup.add(defaultItem);
+			defaultItem = new MenuItem("Open");
+			defaultItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					setVisible(true);
+					setExtendedState(JFrame.NORMAL);
+				}
+			});
+			popup.add(defaultItem);
+			URL imgTrayUrl = TypeToDoGui.class.getResource(IMAGE_DIRECTORY
+					+ FILENAME_TRAY_LOGO);
+			if (imgLogo != null) {
+				trayIcon = new TrayIcon(imgLogo, "TypeToDo", popup);
+				trayIcon.setImageAutoSize(true);
+			}
+		} else {
+			System.out.println("system tray not supported");
+		}
+
 		this.setVisible(true);
 		txtCmd.requestFocusInWindow();
 	}
@@ -200,9 +254,21 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	}
 
 	public void windowIconified(WindowEvent e) { /* Unimplemented */
+		try {
+			tray.add(trayIcon);
+			setVisible(false);
+			System.out.println("added to SystemTray");
+		} catch (AWTException ex) {
+			System.out.println("unable to add to tray");
+		}
 	}
 
 	public void windowDeiconified(WindowEvent e) { /* Unimplemented */
+		tray.remove(trayIcon);
+		setVisible(true);
+		System.out.println("Tray icon removed");
+		toFront();
+		txtCmd.requestFocusInWindow();
 	}
 
 	public void windowActivated(WindowEvent e) { /* Unimplemented */
@@ -218,9 +284,8 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					if (getExtendedState() == JFrame.ICONIFIED) {
+						setVisible(true);
 						setExtendedState(JFrame.NORMAL);
-						toFront();
-						txtCmd.requestFocusInWindow();
 					} else {
 						setExtendedState(JFrame.ICONIFIED);
 					}
