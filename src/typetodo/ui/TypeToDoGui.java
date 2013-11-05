@@ -106,12 +106,17 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 				"traverseBackInHistory");
 		txtCmd.getActionMap().put("traverseBackInHistory", new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
+				String history;
 				if (historyIndex == 0) {
 					addToHistory(txtCmd.getText());
 				}
 				if (historyIndex < inputHistory.size() - 1) {
 					historyIndex++;
-					txtCmd.setText(inputHistory.get(historyIndex));
+					history = inputHistory.get(historyIndex);
+					txtCmd.setText(history);
+					if (history.contains(" ")) {
+						txtCmd.select(history.indexOf(' ') + 1, history.length());
+					}
 				}
 			}
 		});
@@ -129,6 +134,9 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 						history = inputHistory.get(historyIndex);
 					}
 					txtCmd.setText(history);
+					if (history.contains(" ")) {
+						txtCmd.select(history.indexOf(' ') + 1, history.length());
+					}
 				}
 			}
 		});
