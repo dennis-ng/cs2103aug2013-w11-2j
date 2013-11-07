@@ -40,7 +40,7 @@ public class GCalHandler {
 	 */
 	public void addTask(Task taskToBeAdded) throws IOException {
 		if (taskToBeAdded instanceof TimedTask) {
-			System.out.println(taskToBeAdded);
+//			System.out.println(taskToBeAdded);
 			Event event = Converter.timedTaskToEvent((TimedTask) taskToBeAdded);
 			Event result = gCalendarClient.events().insert(gCalendarId, event).execute();
 			taskToBeAdded.setGoogleId(result.getId()); //append GCal's id to task
@@ -103,7 +103,7 @@ public class GCalHandler {
 	 */
 	public ArrayList<Task> retrieveAllTasks() {
 		ArrayList<Task> tasks = new ArrayList<Task>();
-		
+
 		//1. Extract Deadline/Timed Tasks from Google Calendar
 		Events feed = null;
 		try {
@@ -129,18 +129,20 @@ public class GCalHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		for (com.google.api.services.tasks.model.Task googleTask : taskList) {
+		if (taskList != null) {
+			for (com.google.api.services.tasks.model.Task googleTask : taskList) {
 				if ((googleTask.getDeleted() != null) && !googleTask.getDeleted()) {
 					tasks.add(Converter.googleTaskToTask(googleTask));
 				}
 				if (googleTask.getDeleted() == null) {
 					tasks.add(Converter.googleTaskToTask(googleTask));
 				}
+			}
 		}
-		
+
 		return tasks;
 	}
-	
+
 	/**
 	 * Retrieves and return equivalent Task from the Google System
 	 * @param task Local Task
