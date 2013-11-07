@@ -23,7 +23,7 @@ public class FloatingTask extends Task {
 		sb.append(this.getTitle() + " ");
 		sb.append("</b>");
 		
-		if (!this.getDescription().equals("")) {
+		if (this.getDescription() != null && !this.getDescription().equals("")) {
 			sb.append("\n");
 			sb.append("<br>");
 			sb.append("<i>");
