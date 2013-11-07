@@ -197,13 +197,11 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 			defaultItem = new MenuItem("Open");
 			defaultItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					setVisible(true);
+					// setVisible(true);
 					setExtendedState(JFrame.NORMAL);
 				}
 			});
 			popup.add(defaultItem);
-			URL imgTrayUrl = TypeToDoGui.class.getResource(IMAGE_DIRECTORY
-					+ FILENAME_TRAY_LOGO);
 			if (imgLogo != null) {
 				trayIcon = new TrayIcon(imgLogo, "TypeToDo", popup);
 				trayIcon.setImageAutoSize(true);
@@ -255,8 +253,8 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 
 	public void windowIconified(WindowEvent e) { /* Unimplemented */
 		try {
+			// setVisible(false);
 			tray.add(trayIcon);
-			setVisible(false);
 			System.out.println("added to SystemTray");
 		} catch (AWTException ex) {
 			System.out.println("unable to add to tray");
@@ -264,9 +262,10 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	}
 
 	public void windowDeiconified(WindowEvent e) { /* Unimplemented */
-
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				toFront();
+				txtCmd.requestFocusInWindow();
 				tray.remove(trayIcon);
 				System.out.println("Tray icon removed");
 			}
@@ -274,12 +273,6 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	}
 
 	public void windowActivated(WindowEvent e) { /* Unimplemented */
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				tray.remove(trayIcon);
-				System.out.println("Tray icon removed");
-			}
-		});
 	}
 
 	public void windowDeactivated(WindowEvent e) { /* Unimplemented */
@@ -289,18 +282,12 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	public void nativeKeyReleased(NativeKeyEvent e) {
 		if (e.getKeyCode() == NativeKeyEvent.VK_SPACE
 				&& e.getModifiers() == NativeKeyEvent.CTRL_MASK) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					if (getExtendedState() == JFrame.ICONIFIED) {
-						setExtendedState(JFrame.NORMAL);
-						setVisible(true);
-						toFront();
-						txtCmd.requestFocusInWindow();
-					} else {
-						setExtendedState(JFrame.ICONIFIED);
-					}
-				}
-			});
+			if (getExtendedState() == JFrame.ICONIFIED) {
+				// setVisible(true);
+				setExtendedState(JFrame.NORMAL);
+			} else {
+				setExtendedState(JFrame.ICONIFIED);
+			}
 		} else if (e.getKeyCode() == NativeKeyEvent.VK_F4
 				&& e.getModifiers() == NativeKeyEvent.ALT_MASK) {
 			dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
