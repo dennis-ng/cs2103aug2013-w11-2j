@@ -290,10 +290,10 @@ public class CommandParser {
 		scanner.next();// throw away command;
 		if (scanner.hasNext()) {
 			helpType = scanner.next();
-			scanner.close();
 		} else {
 			helpType = "";
 		}
+		scanner.close();
 		return helpType;
 	}
 
@@ -475,14 +475,16 @@ public class CommandParser {
 
 		case HELP:
 			String helpType = getHelpType(userInput);
-			if (helpType != "") {
+			if(helpType!=""){
 				CommandType commandType = getCommand(helpType);
 				HelpController helpController = new HelpController(commandType);
 				command = new CommandHelp(schedule, helpController);
-			} else {
-				command = new CommandHelp(schedule);
 			}
-
+			else{
+				HelpController helpController = new HelpController(helpType);
+				command = new CommandHelp(schedule, helpController);
+			}
+			
 			break;
 
 		case INVALID:
