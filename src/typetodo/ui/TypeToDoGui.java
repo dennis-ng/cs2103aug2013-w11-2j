@@ -264,12 +264,22 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	}
 
 	public void windowDeiconified(WindowEvent e) { /* Unimplemented */
-		tray.remove(trayIcon);
-		setVisible(true);
-		System.out.println("Tray icon removed");
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				tray.remove(trayIcon);
+				System.out.println("Tray icon removed");
+			}
+		});
 	}
 
 	public void windowActivated(WindowEvent e) { /* Unimplemented */
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				tray.remove(trayIcon);
+				System.out.println("Tray icon removed");
+			}
+		});
 	}
 
 	public void windowDeactivated(WindowEvent e) { /* Unimplemented */
@@ -282,8 +292,8 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					if (getExtendedState() == JFrame.ICONIFIED) {
-						setVisible(true);
 						setExtendedState(JFrame.NORMAL);
+						setVisible(true);
 						toFront();
 						txtCmd.requestFocusInWindow();
 					} else {
