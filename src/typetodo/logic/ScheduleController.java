@@ -32,12 +32,6 @@ public class ScheduleController {
 			String feedback = command.execute();
 			view.displayFeedBack(feedback);
 
-			if (command instanceof CommandHelp) {
-				CommandHelp ch = (CommandHelp) command;
-				String helpMessage = ch.getHelpMessage();
-				view.displayHelp(helpMessage);
-			}
-
 			if (command instanceof Undoable) {
 				historyOfCommands.add(command);
 			}

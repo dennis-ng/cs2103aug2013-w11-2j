@@ -50,7 +50,7 @@ public class CommandParser {
 				Arrays.asList("display", "view", "show", "see", "list"));
 		commandSynonyms.put(CommandType.HELP, Arrays.asList("help"));
 		commandSynonyms.put(CommandType.HOME, Arrays.asList("home", "today"));
-		commandSynonyms.put(CommandType.HOTKEY, Arrays.asList("hotkey","quick","hot key","hotkeys"));
+		commandSynonyms.put(CommandType.HOTKEY, Arrays.asList("hotkey","quick","hot key","hotkeys","hot","short"));
 		commandSynonyms.put(CommandType.UPDATE,
 				Arrays.asList("update", "edit", "change"));
 		commandSynonyms
@@ -271,6 +271,8 @@ public class CommandParser {
 		}
 
 		scanner.close();
+		
+		dateField = dateField.replaceAll("-", " to ");
 		List<java.util.Date> javaDates = new PrettyTimeParser()
 				.parse(dateField);
 		ArrayList<DateTime> jodaDates = new ArrayList<DateTime>();
@@ -475,7 +477,8 @@ public class CommandParser {
 			String helpType = getHelpType(userInput);
 			if (helpType != "") {
 				CommandType commandType = getCommand(helpType);
-				command = new CommandHelp(schedule, commandType);
+				HelpController helpController = new HelpController(commandType);
+				command = new CommandHelp(schedule, helpController);
 			} else {
 				command = new CommandHelp(schedule);
 			}
