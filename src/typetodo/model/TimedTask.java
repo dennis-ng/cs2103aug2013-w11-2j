@@ -93,7 +93,7 @@ public class TimedTask extends Task {
 			sb.append("</font>");
 		}
 
-		if (!this.getDescription().equals("")) {
+		if (this.getDescription() != null && !this.getDescription().equals("")) {
 			sb.append("\n");
 			sb.append("<br>");
 			sb.append("<i>");
