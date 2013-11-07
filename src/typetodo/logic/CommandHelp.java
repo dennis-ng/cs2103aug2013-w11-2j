@@ -15,8 +15,9 @@ public class CommandHelp implements Command {
 
 	@Override
 	public String execute() throws Exception {
+		String feedback;
 		sc.help();
-		String feedback=hc.getFeedback();
+		feedback=hc.getFeedback();
 		return feedback;
 	}
 }
