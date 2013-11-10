@@ -4,15 +4,15 @@ public class HelpController {
 	private String typeString;
 	private CommandType helpType;
 
-	public HelpController(String typeString){
-		this.typeString=typeString;
+	public HelpController(String typeString) {
+		this.typeString = typeString;
 	}
-	
-	public HelpController(CommandType helpType){
+
+	public HelpController(CommandType helpType) {
 		typeString = helpType.toString();
-		this.helpType=helpType;
+		this.helpType = helpType;
 	}
-	
+
 	public String help(CommandType helpType) {
 		switch (helpType) {
 		case ADD:
@@ -41,10 +41,10 @@ public class HelpController {
 			return HELP_INSTRUCTION;
 		}
 	}
-	
-	public String getFeedback(){
+
+	public String getFeedback() {
 		String feedback;
-		if (typeString!="") {
+		if (typeString != "") {
 			String thisHelp = help(helpType);
 			feedback = thisHelp;
 		} else {
@@ -52,8 +52,8 @@ public class HelpController {
 		}
 		return feedback;
 	}
-	
-	//hard-coded catalog
+
+	// hard-coded catalog
 	private static final String HELP_INSTRUCTION = "Please enter 'help <command>'\n"
 			+ "i.e.help hotkey, add, del, edit, undo, complete, search, sync, home, etc";
 	private static final String HELP_ADD = "ADD:\n"
@@ -65,7 +65,7 @@ public class HelpController {
 	private static final String HELP_DONE = "COMPLETE: (mark certain task is completed and remove from task list)\n"
 			+ "(SYNTAX) done <index of task>";
 	private static final String HELP_DISPLAY = "DISPLAY: (the default view is today's tasks)\n"
-			+ "(SYNTAX) view <date>";
+			+ "(SYNTAX) view <date> (Please do no use abbreviation.)";
 	private static final String HELP_EXIT = "EXIT:(save and quit TypeToDo)\n"
 			+ "(SYNTAX) exit";
 	private static final String HELP_HOME = "HOME:(display default task list)\n"
@@ -76,10 +76,9 @@ public class HelpController {
 			+ "(SYNTAX) sync";
 	private static final String HELP_UPDATE = "UPDATE:(modify exist task from typetodo. Note field name must be in capital letters,i.e.TITLE,DESCRIPTION,DEADLINE,START,END,BUSY)\n"
 			+ "(SYNTAX) edit <index of task on current list> <field name> <new value>";
-	private static final String HELP_UNDO = "UNDO:\n"
-			+ "(SYNTAX) undo\n" + "(HOTKEY) <ctrl> + <backspace>";
+	private static final String HELP_UNDO = "UNDO:\n" + "(SYNTAX) undo\n"
+			+ "(HOTKEY) <ctrl> + <backspace>";
 	private static final String HELP_HOTKEY = "HOT-KEYS:\n"
 			+ "HIDE/RESTORE WINDOW: <ctrl> + <space>\n"
-			+ "NAVIGATION MODE: <Esc>\n"
-			+ "INPUT MODE: <i> or <Enter>";
+			+ "NAVIGATION MODE: <Esc>\n" + "INPUT MODE: <i> or <Enter>";
 }

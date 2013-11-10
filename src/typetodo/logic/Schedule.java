@@ -230,6 +230,7 @@ public class Schedule {
 			//taskToBeMarked = currentListOfTasks.get(index - 1);
 			taskToBeMarked = this.getTaskByIdFromCurrentListOfTasks(index);
 		} catch (IndexOutOfBoundsException e) {
+			//TODO: failed test
 			throw new IndexOutOfBoundsException("Given index is not in range");
 		}
 		
