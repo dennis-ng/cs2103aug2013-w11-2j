@@ -173,17 +173,28 @@ public class DbController {
 
 	/**
 	 * 
-	 * @param task
-	 * @return Will return true when deleted, and false if not found
+	 * @param taskId
+	 *          The taskId of the task that exists in the database.
+	 * @return This method returns true when deleted, and false if not found
 	 */
-	public boolean deleteTask(int taskIdToDelete) {
-		if (tasksCache.containsKey(taskIdToDelete)) {
-			tasksCache.remove(taskIdToDelete);
+	public boolean deleteTask(int taskId) {
+		if (tasksCache.containsKey(taskId)) {
+			tasksCache.remove(taskId);
 			this.writeChangesToFile(FILENAME_TASK);
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * @param taskId
+	 *          The taskId of the task that exist in the database.
+	 * @return This method returns the task if the taskId is valid, else it will
+	 *         return null.
+	 */
+	public Task getTask(int taskId) {
+		return tasksCache.get(taskId);
 	}
 
 	/**
@@ -208,50 +219,12 @@ public class DbController {
 
 	/**
 	 * 
-	 * @param datetime
-	 * @return An arraylist of all the tasks on this day. null will be returned if
-	 *         nothing is found.
-	 * @throws Exception
-	 */
-	public ArrayList<Task> retrieveList(DateTime datetime) {
-		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
-		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
-		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
-		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache instanceof DeadlineTask) {
-				if (!((DeadlineTask) taskInCache).getDeadline().isBefore(datetime)) {
-					deadlineTasks.add((DeadlineTask) taskInCache);
-				}
-			} else if (taskInCache instanceof TimedTask) {
-				TimedTask timedTask = (TimedTask) taskInCache;
-				// Get the localdate only so that we can compare without time
-				LocalDate taskStart = timedTask.getStart().toLocalDate();
-				LocalDate taskEnd = timedTask.getEnd().toLocalDate();
-				LocalDate dateToCheck = datetime.toLocalDate();
-
-				if (!(dateToCheck.isAfter(taskEnd) || dateToCheck.isBefore(taskStart))) {
-					// Note: isAfter() and isBefore() are not inclusive, wrapping with a !
-					// makes them include the day
-					if (timedTask.getEnd().isAfter(datetime)) {
-						// Exclude the day's tasks that have already ended
-						timedTasks.add(timedTask);
-					}
-				}
-			} else if (taskInCache instanceof FloatingTask) {
-				floatingTasks.add((FloatingTask) taskInCache);
-			}
-		}
-		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
-	}
-
-	/**
-	 * 
 	 * @param
-	 * @return An arraylist of all the tasks on this day. null will be returned if
-	 *         nothing is found.
+	 * @return An arraylist of all the tasks within a given date range. null will
+	 *         be returned if nothing is found.
 	 * @throws Exception
 	 */
-	public ArrayList<Task> retrieveByRange(DateTime startDay, DateTime endDay) {
+	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay) {
 		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
 		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
 		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
@@ -271,11 +244,9 @@ public class DbController {
 				LocalDate rangeStart = startDay.toLocalDate();
 				LocalDate rangeEnd = endDay.toLocalDate();
 
-				if (!(taskStart.isAfter(rangeEnd) || taskStart.isBefore(rangeStart))) {
-					timedTasks.add(timedTask);
-				} else if (!(taskEnd.isAfter(rangeEnd) || taskEnd.isBefore(rangeStart))) {
-					timedTasks.add(timedTask);
-				} else if (taskStart.isBefore(rangeStart) && taskEnd.isAfter(rangeEnd)) {
+				if (!(taskStart.isAfter(rangeEnd) || taskStart.isBefore(rangeStart))
+						|| !(taskEnd.isAfter(rangeEnd) || taskEnd.isBefore(rangeStart))
+						|| taskStart.isBefore(rangeStart) && taskEnd.isAfter(rangeEnd)) {
 					timedTasks.add(timedTask);
 				}
 			} else if (taskInCache instanceof FloatingTask) {
@@ -348,38 +319,6 @@ public class DbController {
 		filteredTasks.addAll(timedTasks);
 		filteredTasks.addAll(floatingTasks);
 		return filteredTasks;
-	}
-
-	public boolean isAvailable(DateTime start, DateTime end) {
-		boolean isAvailable = true;
-		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache instanceof TimedTask) {
-				TimedTask timedTask = (TimedTask) taskInCache;
-				if (timedTask.isBusy()
-						&& !(timedTask.getStart().isAfter(end) || timedTask.getEnd()
-								.isBefore(start))) {
-					isAvailable = false;
-					return isAvailable;
-				}
-			}
-		}
-		return isAvailable;
-	}
-
-	public Task retrieveBusyTask(DateTime start, DateTime end) {
-		Task busyTask = null;
-		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache instanceof TimedTask) {
-				TimedTask timedTask = (TimedTask) taskInCache;
-				if (timedTask.isBusy()
-						&& !(timedTask.getStart().isAfter(end) || timedTask.getEnd()
-								.isBefore(start))) {
-					busyTask = timedTask;
-					return busyTask;
-				}
-			}
-		}
-		return busyTask;
 	}
 
 	/**
