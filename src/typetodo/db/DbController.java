@@ -144,6 +144,26 @@ public class DbController {
 	}
 
 	/**
+	 * @param propertyName
+	 *          is the name of the property that was saved.
+	 * @return Returns null when the property doesn't exist.
+	 */
+	public String getProperty(String propertyName) {
+		return properties.get(propertyName);
+	}
+
+	/**
+	 * @param propertyName
+	 *          The name of the property you want to save.
+	 * @param property
+	 *          A string that you want to save as a property.
+	 */
+	public void setProperty(String propertyName, String property) {
+		properties.put(propertyName, property);
+		this.writeChangesToFile(FILENAME_PROPERTIES);
+	}
+
+	/**
 	 * 
 	 * @param task
 	 * @return If successful: taskId of successfully edited task. This allows
@@ -221,11 +241,13 @@ public class DbController {
 
 	/**
 	 * @param startDay
+	 *          Start of the time range of the tasks you want
 	 * @param endDay
+	 *          End of the time range of the tasks you want
 	 * @return An arraylist of all the tasks within a given date range. null will
 	 *         be returned if nothing is found.
 	 * @throws InvalidDateRangeException
-	 *           endDay is before startDay
+	 *           endDay cannot be strictly earlier than startDay
 	 */
 	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay)
 			throws InvalidDateRangeException {
@@ -264,6 +286,204 @@ public class DbController {
 	}
 
 	/**
+	 * @param startDay
+	 *          Start of the time range of the tasks you want
+	 * @param endDay
+	 *          End of the time range of the tasks you want
+	 * @param taskType
+	 *          Only DeadlineTask, TimedTask and Floating task will be considered.
+	 * @return An arraylist of a specific type of task within a given date range.
+	 *         An empty arraylist will be returned if nothing is found or the
+	 *         TaskType specified is incorrect.
+	 * @throws InvalidDateRangeException
+	 *           endDay cannot be strictly earlier than startDay
+	 */
+	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay,
+			TaskType taskType) throws InvalidDateRangeException {
+		ArrayList<Task> selectedTasks = new ArrayList<Task>();
+		LocalDate rangeStart = startDay.toLocalDate();
+		LocalDate rangeEnd = endDay.toLocalDate();
+		if (rangeEnd.isBefore(rangeStart)) {
+			throw new InvalidDateRangeException(
+					"End time is earlier than start time.");
+		} else {
+			for (Task taskInCache : tasksCache.values()) {
+				switch (taskType) {
+				// Only add the type of task that is needed
+					case DEADLINE_TASK:
+						if (taskInCache instanceof DeadlineTask) {
+							DeadlineTask deadlineTask = (DeadlineTask) taskInCache;
+							// Get the localdate only so that we can compare without time
+							LocalDate deadline = deadlineTask.getDeadline().toLocalDate();
+							if (isWithin(deadline, rangeStart, rangeEnd)) {
+								selectedTasks.add(taskInCache);
+							}
+						}
+						break;
+					case TIMED_TASK:
+						if (taskInCache instanceof TimedTask) {
+							TimedTask timedTask = (TimedTask) taskInCache;
+							// Get the localdate only so that we can compare without time
+							LocalDate taskStart = timedTask.getStart().toLocalDate();
+							LocalDate taskEnd = timedTask.getEnd().toLocalDate();
+
+							if (isWithin(taskStart, taskEnd, rangeStart, rangeEnd)) {
+								selectedTasks.add(timedTask);
+							}
+						}
+						break;
+					case FLOATING_TASK:
+						if (taskInCache instanceof FloatingTask) {
+							selectedTasks.add(taskInCache);
+						}
+				}
+			}
+		}
+		return selectedTasks;
+	}
+
+	/**
+	 * 
+	 * @return An arraylist of all the tasks in the system. An empty arraylist
+	 *         will be returned if nothing is found.
+	 */
+	public ArrayList<Task> retrieveAll() {
+		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
+		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
+		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		for (Task taskInCache : tasksCache.values()) {
+			if (taskInCache instanceof DeadlineTask) {
+				deadlineTasks.add((DeadlineTask) taskInCache);
+			} else if (taskInCache instanceof TimedTask) {
+				timedTasks.add((TimedTask) taskInCache);
+			} else if (taskInCache instanceof FloatingTask) {
+				floatingTasks.add((FloatingTask) taskInCache);
+			}
+		}
+		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
+	}
+
+	/**
+	 * 
+	 * @return An arraylist of all the specific type of tasks in the system. An
+	 *         empty arraylist will be returned if nothing is found or if type of
+	 *         task is incorrect.
+	 */
+	public ArrayList<Task> retrieveAll(TaskType taskType) {
+		ArrayList<Task> selectedTasks = new ArrayList<Task>();
+		for (Task taskInCache : tasksCache.values()) {
+			switch (taskType) {
+				case DEADLINE_TASK:
+					if (taskInCache instanceof DeadlineTask) {
+						selectedTasks.add(taskInCache);
+					}
+					break;
+				case TIMED_TASK:
+					if (taskInCache instanceof TimedTask) {
+						selectedTasks.add(taskInCache);
+					}
+					break;
+				case FLOATING_TASK:
+					if (taskInCache instanceof FloatingTask) {
+						selectedTasks.add(taskInCache);
+					}
+					break;
+
+			}
+		}
+		return selectedTasks;
+	}
+
+	/**
+	 * 
+	 * @param searchCriteria
+	 * @return An arraylist of all the tasks that meets the searching criteria. An
+	 *         empty arraylist will be returned if nothing is found.
+	 * @throws Exception
+	 */
+	public ArrayList<Task> retrieveContaining(String searchCriteria) {
+		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
+		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
+		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		for (Task taskInCache : tasksCache.values()) {
+			if (taskInCache.getTitle().toUpperCase()
+					.contains(searchCriteria.toUpperCase())
+					|| taskInCache.getDescription().toUpperCase()
+							.contains(searchCriteria.toUpperCase())) {
+				if (taskInCache instanceof DeadlineTask) {
+					deadlineTasks.add((DeadlineTask) taskInCache);
+				} else if (taskInCache instanceof TimedTask) {
+					timedTasks.add((TimedTask) taskInCache);
+				} else if (taskInCache instanceof FloatingTask) {
+					floatingTasks.add((FloatingTask) taskInCache);
+				}
+			}
+		}
+		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
+
+	}
+
+	/**
+	 * 
+	 * @param searchCriteria
+	 * @return An arraylist of all the tasks that meets the searching criteria. An
+	 *         empty arraylist will be returned if nothing is found.
+	 * @throws Exception
+	 */
+	public ArrayList<Task> retrieveContaining(String searchCriteria,
+			TaskType taskType) {
+		ArrayList<Task> selectedTasks = new ArrayList<Task>();
+		for (Task taskInCache : tasksCache.values()) {
+			if (foundInTask(taskInCache, searchCriteria)) {
+				switch (taskType) {
+					case DEADLINE_TASK:
+						if (taskInCache instanceof DeadlineTask) {
+							selectedTasks.add(taskInCache);
+						}
+						break;
+					case TIMED_TASK:
+						if (taskInCache instanceof TimedTask) {
+							selectedTasks.add(taskInCache);
+						}
+						break;
+					case FLOATING_TASK:
+						if (taskInCache instanceof FloatingTask) {
+							selectedTasks.add(taskInCache);
+						}
+						break;
+
+				}
+			}
+		}
+		return selectedTasks;
+
+	}
+
+	/**
+	 * @return Returns true if searchCriteria is found in the name or description
+	 *         of the task.
+	 */
+	private boolean foundInTask(Task task, String searchCriteria) {
+		return (task.getTitle().toUpperCase()
+				.contains(searchCriteria.toUpperCase()) || task.getDescription()
+				.toUpperCase().contains(searchCriteria.toUpperCase()));
+	}
+
+	private ArrayList<Task> combineTasksForViewing(
+			List<DeadlineTask> deadlineTasks, List<TimedTask> timedTasks,
+			List<FloatingTask> floatingTasks) {
+		ArrayList<Task> filteredTasks = new ArrayList<Task>();
+
+		Collections.sort(deadlineTasks, DeadlineTask.COMPARE_BY_DATE);
+		Collections.sort(timedTasks, TimedTask.COMPARE_BY_DATE);
+
+		filteredTasks.addAll(deadlineTasks);
+		filteredTasks.addAll(timedTasks);
+		filteredTasks.addAll(floatingTasks);
+		return filteredTasks;
+	}
+
+	/**
 	 * @param taskStart
 	 *          Start date of the task
 	 * @param taskEnd
@@ -296,131 +516,4 @@ public class DbController {
 		return (!dateToCheck.isBefore(rangeStart) && !dateToCheck.isAfter(rangeEnd));
 	}
 
-	/**
-	 * 
-	 * @param
-	 * @return An arraylist of a specific type of task within a given date range.
-	 *         null will be returned if nothing is found.
-	 * @throws Exception
-	 */
-	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay,
-			TaskType taskType) throws InvalidDateRangeException {
-		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
-		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
-		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
-		LocalDate rangeStart = startDay.toLocalDate();
-		LocalDate rangeEnd = endDay.toLocalDate();
-		if (rangeEnd.isBefore(rangeStart)) {
-			throw new InvalidDateRangeException(
-					"End time is earlier than start time.");
-		} else {
-			for (Task taskInCache : tasksCache.values()) {
-				if (taskInCache instanceof DeadlineTask) {
-					DeadlineTask deadlineTask = (DeadlineTask) taskInCache;
-					// Get the localdate only so that we can compare without time
-					LocalDate deadline = deadlineTask.getDeadline().toLocalDate();
-					if (isWithin(deadline, rangeStart, rangeEnd)) {
-						deadlineTasks.add((DeadlineTask) taskInCache);
-					}
-				} else if (taskInCache instanceof TimedTask) {
-					TimedTask timedTask = (TimedTask) taskInCache;
-					// Get the localdate only so that we can compare without time
-					LocalDate taskStart = timedTask.getStart().toLocalDate();
-					LocalDate taskEnd = timedTask.getEnd().toLocalDate();
-
-					if (isWithin(taskStart, taskEnd, rangeStart, rangeEnd)) {
-						timedTasks.add(timedTask);
-					}
-				} else if (taskInCache instanceof FloatingTask) {
-					floatingTasks.add((FloatingTask) taskInCache);
-				}
-			}
-		}
-		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
-	}
-
-	/**
-	 * 
-	 * @return An arraylist of all the tasks in the system. null will be returned
-	 *         if nothing is found.
-	 * @throws Exception
-	 */
-	public ArrayList<Task> retrieveAll() {
-		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
-		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
-		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
-		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache instanceof DeadlineTask) {
-				deadlineTasks.add((DeadlineTask) taskInCache);
-			} else if (taskInCache instanceof TimedTask) {
-				timedTasks.add((TimedTask) taskInCache);
-			} else if (taskInCache instanceof FloatingTask) {
-				floatingTasks.add((FloatingTask) taskInCache);
-			}
-		}
-		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
-	}
-
-	/**
-	 * 
-	 * @param searchCriteria
-	 * @return An arraylist of all the tasks that meets the searching criteria.
-	 *         null will be returned if nothing is found.
-	 * @throws Exception
-	 */
-	public ArrayList<Task> retrieveContaining(String searchCriteria) {
-		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
-		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
-		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
-		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache.getTitle().toUpperCase()
-					.contains(searchCriteria.toUpperCase())
-					|| taskInCache.getDescription().toUpperCase()
-							.contains(searchCriteria.toUpperCase())) {
-				if (taskInCache instanceof DeadlineTask) {
-					deadlineTasks.add((DeadlineTask) taskInCache);
-				} else if (taskInCache instanceof TimedTask) {
-					timedTasks.add((TimedTask) taskInCache);
-				} else if (taskInCache instanceof FloatingTask) {
-					floatingTasks.add((FloatingTask) taskInCache);
-				}
-			}
-		}
-		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
-
-	}
-
-	private ArrayList<Task> combineTasksForViewing(
-			List<DeadlineTask> deadlineTasks, List<TimedTask> timedTasks,
-			List<FloatingTask> floatingTasks) {
-		ArrayList<Task> filteredTasks = new ArrayList<Task>();
-
-		Collections.sort(deadlineTasks, DeadlineTask.COMPARE_BY_DATE);
-		Collections.sort(timedTasks, TimedTask.COMPARE_BY_DATE);
-
-		filteredTasks.addAll(deadlineTasks);
-		filteredTasks.addAll(timedTasks);
-		filteredTasks.addAll(floatingTasks);
-		return filteredTasks;
-	}
-
-	/**
-	 * @param propertyName
-	 *          is the name of the property that was saved.
-	 * @return Returns null when the property doesn't exist.
-	 */
-	public String getProperty(String propertyName) {
-		return properties.get(propertyName);
-	}
-
-	/**
-	 * @param propertyName
-	 *          The name of the property you want to save.
-	 * @param property
-	 *          A string that you want to save as a property.
-	 */
-	public void setProperty(String propertyName, String property) {
-		properties.put(propertyName, property);
-		this.writeChangesToFile(FILENAME_PROPERTIES);
-	}
 }
