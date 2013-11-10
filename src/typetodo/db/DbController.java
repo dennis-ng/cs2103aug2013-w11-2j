@@ -20,17 +20,19 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import typetodo.exception.DuplicateKeyException;
+import typetodo.exception.InvalidDateRangeException;
 import typetodo.exception.MissingFieldException;
 import typetodo.model.DeadlineTask;
 import typetodo.model.FloatingTask;
 import typetodo.model.Task;
+import typetodo.model.TaskType;
 import typetodo.model.TimedTask;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-
 
 public class DbController {
 
@@ -142,6 +144,26 @@ public class DbController {
 	}
 
 	/**
+	 * @param propertyName
+	 *          is the name of the property that was saved.
+	 * @return Returns null when the property doesn't exist.
+	 */
+	public String getProperty(String propertyName) {
+		return properties.get(propertyName);
+	}
+
+	/**
+	 * @param propertyName
+	 *          The name of the property you want to save.
+	 * @param property
+	 *          A string that you want to save as a property.
+	 */
+	public void setProperty(String propertyName, String property) {
+		properties.put(propertyName, property);
+		this.writeChangesToFile(FILENAME_PROPERTIES);
+	}
+
+	/**
 	 * 
 	 * @param task
 	 * @return If successful: taskId of successfully edited task. This allows
@@ -152,8 +174,7 @@ public class DbController {
 		// Supports for undoing deleted task
 		if (newTask.getTaskId() != 0) {
 			if (tasksCache.containsKey(newTask.getTaskId())) {
-				// TODO create a specific exception
-				throw new Exception("Task with the same id already exist.");
+				throw new DuplicateKeyException("Task with the same id already exist.");
 			}
 			tasksCache.put(newTask.getTaskId(), newTask);
 			this.writeChangesToFile(FILENAME_TASK);
@@ -209,7 +230,6 @@ public class DbController {
 	public boolean updateTask(Task taskToUpdate) throws Exception {
 		int taskIdToUpdate = taskToUpdate.getTaskId();
 		if (taskIdToUpdate == 0) {
-			// TODO create specific exception
 			throw new MissingFieldException("The task did not contain a taskId.");
 		}
 		if (tasksCache.put(taskIdToUpdate, taskToUpdate) != null) {
@@ -220,49 +240,112 @@ public class DbController {
 	}
 
 	/**
-	 * 
-	 * @param
+	 * @param startDay
+	 *          Start of the time range of the tasks you want
+	 * @param endDay
+	 *          End of the time range of the tasks you want
 	 * @return An arraylist of all the tasks within a given date range. null will
 	 *         be returned if nothing is found.
-	 * @throws Exception
+	 * @throws InvalidDateRangeException
+	 *           endDay cannot be strictly earlier than startDay
 	 */
-	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay) {
+	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay)
+			throws InvalidDateRangeException {
 		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
 		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
 		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
-		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache instanceof DeadlineTask) {
-				if (!((DeadlineTask) taskInCache).getDeadline().toLocalDate()
-						.isBefore(startDay.toLocalDate())
-						&& !((DeadlineTask) taskInCache).getDeadline().toLocalDate()
-								.isAfter(endDay.toLocalDate())) {
-					deadlineTasks.add((DeadlineTask) taskInCache);
-				}
-			} else if (taskInCache instanceof TimedTask) {
-				TimedTask timedTask = (TimedTask) taskInCache;
-				// Get the localdate only so that we can compare without time
-				LocalDate taskStart = timedTask.getStart().toLocalDate();
-				LocalDate taskEnd = timedTask.getEnd().toLocalDate();
-				LocalDate rangeStart = startDay.toLocalDate();
-				LocalDate rangeEnd = endDay.toLocalDate();
+		LocalDate rangeStart = startDay.toLocalDate();
+		LocalDate rangeEnd = endDay.toLocalDate();
+		if (rangeEnd.isBefore(rangeStart)) {
+			throw new InvalidDateRangeException(
+					"End time is earlier than start time.");
+		} else {
+			for (Task taskInCache : tasksCache.values()) {
+				if (taskInCache instanceof DeadlineTask) {
+					DeadlineTask deadlineTask = (DeadlineTask) taskInCache;
+					// Get the localdate only so that we can compare without time
+					LocalDate deadline = deadlineTask.getDeadline().toLocalDate();
+					if (isWithin(deadline, rangeStart, rangeEnd)) {
+						deadlineTasks.add((DeadlineTask) taskInCache);
+					}
+				} else if (taskInCache instanceof TimedTask) {
+					TimedTask timedTask = (TimedTask) taskInCache;
+					// Get the localdate only so that we can compare without time
+					LocalDate taskStart = timedTask.getStart().toLocalDate();
+					LocalDate taskEnd = timedTask.getEnd().toLocalDate();
 
-				if (!(taskStart.isAfter(rangeEnd) || taskStart.isBefore(rangeStart))
-						|| !(taskEnd.isAfter(rangeEnd) || taskEnd.isBefore(rangeStart))
-						|| taskStart.isBefore(rangeStart) && taskEnd.isAfter(rangeEnd)) {
-					timedTasks.add(timedTask);
+					if (isWithin(taskStart, taskEnd, rangeStart, rangeEnd)) {
+						timedTasks.add(timedTask);
+					}
+				} else if (taskInCache instanceof FloatingTask) {
+					floatingTasks.add((FloatingTask) taskInCache);
 				}
-			} else if (taskInCache instanceof FloatingTask) {
-				floatingTasks.add((FloatingTask) taskInCache);
 			}
 		}
 		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
 	}
 
 	/**
+	 * @param startDay
+	 *          Start of the time range of the tasks you want
+	 * @param endDay
+	 *          End of the time range of the tasks you want
+	 * @param taskType
+	 *          Only DeadlineTask, TimedTask and Floating task will be considered.
+	 * @return An arraylist of a specific type of task within a given date range.
+	 *         An empty arraylist will be returned if nothing is found or the
+	 *         TaskType specified is incorrect.
+	 * @throws InvalidDateRangeException
+	 *           endDay cannot be strictly earlier than startDay
+	 */
+	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay,
+			TaskType taskType) throws InvalidDateRangeException {
+		ArrayList<Task> selectedTasks = new ArrayList<Task>();
+		LocalDate rangeStart = startDay.toLocalDate();
+		LocalDate rangeEnd = endDay.toLocalDate();
+		if (rangeEnd.isBefore(rangeStart)) {
+			throw new InvalidDateRangeException(
+					"End time is earlier than start time.");
+		} else {
+			for (Task taskInCache : tasksCache.values()) {
+				switch (taskType) {
+				// Only add the type of task that is needed
+					case DEADLINE_TASK:
+						if (taskInCache instanceof DeadlineTask) {
+							DeadlineTask deadlineTask = (DeadlineTask) taskInCache;
+							// Get the localdate only so that we can compare without time
+							LocalDate deadline = deadlineTask.getDeadline().toLocalDate();
+							if (isWithin(deadline, rangeStart, rangeEnd)) {
+								selectedTasks.add(taskInCache);
+							}
+						}
+						break;
+					case TIMED_TASK:
+						if (taskInCache instanceof TimedTask) {
+							TimedTask timedTask = (TimedTask) taskInCache;
+							// Get the localdate only so that we can compare without time
+							LocalDate taskStart = timedTask.getStart().toLocalDate();
+							LocalDate taskEnd = timedTask.getEnd().toLocalDate();
+
+							if (isWithin(taskStart, taskEnd, rangeStart, rangeEnd)) {
+								selectedTasks.add(timedTask);
+							}
+						}
+						break;
+					case FLOATING_TASK:
+						if (taskInCache instanceof FloatingTask) {
+							selectedTasks.add(taskInCache);
+						}
+				}
+			}
+		}
+		return selectedTasks;
+	}
+
+	/**
 	 * 
-	 * @return An arraylist of all the tasks in the system. null will be returned
-	 *         if nothing is found.
-	 * @throws Exception
+	 * @return An arraylist of all the tasks in the system. An empty arraylist
+	 *         will be returned if nothing is found.
 	 */
 	public ArrayList<Task> retrieveAll() {
 		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
@@ -282,9 +365,40 @@ public class DbController {
 
 	/**
 	 * 
+	 * @return An arraylist of all the specific type of tasks in the system. An
+	 *         empty arraylist will be returned if nothing is found or if type of
+	 *         task is incorrect.
+	 */
+	public ArrayList<Task> retrieveAll(TaskType taskType) {
+		ArrayList<Task> selectedTasks = new ArrayList<Task>();
+		for (Task taskInCache : tasksCache.values()) {
+			switch (taskType) {
+				case DEADLINE_TASK:
+					if (taskInCache instanceof DeadlineTask) {
+						selectedTasks.add(taskInCache);
+					}
+					break;
+				case TIMED_TASK:
+					if (taskInCache instanceof TimedTask) {
+						selectedTasks.add(taskInCache);
+					}
+					break;
+				case FLOATING_TASK:
+					if (taskInCache instanceof FloatingTask) {
+						selectedTasks.add(taskInCache);
+					}
+					break;
+
+			}
+		}
+		return selectedTasks;
+	}
+
+	/**
+	 * 
 	 * @param searchCriteria
-	 * @return An arraylist of all the tasks that meets the searching criteria.
-	 *         null will be returned if nothing is found.
+	 * @return An arraylist of all the tasks that meets the searching criteria. An
+	 *         empty arraylist will be returned if nothing is found.
 	 * @throws Exception
 	 */
 	public ArrayList<Task> retrieveContaining(String searchCriteria) {
@@ -309,6 +423,52 @@ public class DbController {
 
 	}
 
+	/**
+	 * 
+	 * @param searchCriteria
+	 * @return An arraylist of all the tasks that meets the searching criteria. An
+	 *         empty arraylist will be returned if nothing is found.
+	 * @throws Exception
+	 */
+	public ArrayList<Task> retrieveContaining(String searchCriteria,
+			TaskType taskType) {
+		ArrayList<Task> selectedTasks = new ArrayList<Task>();
+		for (Task taskInCache : tasksCache.values()) {
+			if (foundInTask(taskInCache, searchCriteria)) {
+				switch (taskType) {
+					case DEADLINE_TASK:
+						if (taskInCache instanceof DeadlineTask) {
+							selectedTasks.add(taskInCache);
+						}
+						break;
+					case TIMED_TASK:
+						if (taskInCache instanceof TimedTask) {
+							selectedTasks.add(taskInCache);
+						}
+						break;
+					case FLOATING_TASK:
+						if (taskInCache instanceof FloatingTask) {
+							selectedTasks.add(taskInCache);
+						}
+						break;
+
+				}
+			}
+		}
+		return selectedTasks;
+
+	}
+
+	/**
+	 * @return Returns true if searchCriteria is found in the name or description
+	 *         of the task.
+	 */
+	private boolean foundInTask(Task task, String searchCriteria) {
+		return (task.getTitle().toUpperCase()
+				.contains(searchCriteria.toUpperCase()) || task.getDescription()
+				.toUpperCase().contains(searchCriteria.toUpperCase()));
+	}
+
 	private ArrayList<Task> combineTasksForViewing(
 			List<DeadlineTask> deadlineTasks, List<TimedTask> timedTasks,
 			List<FloatingTask> floatingTasks) {
@@ -324,22 +484,36 @@ public class DbController {
 	}
 
 	/**
-	 * @param propertyName
-	 *          is the name of the property that was saved.
-	 * @return Returns null when the property doesn't exist.
+	 * @param taskStart
+	 *          Start date of the task
+	 * @param taskEnd
+	 *          End date of the task
+	 * @param rangeStart
+	 *          Start of the range to check
+	 * @param rangeEnd
+	 *          End of the range to check
+	 * @return Returns true when a day between taskStart and taskEnd is within
+	 *         rangeStart and rangeEnd
 	 */
-	public String getProperty(String propertyName) {
-		return properties.get(propertyName);
+	private boolean isWithin(LocalDate taskStart, LocalDate taskEnd,
+			LocalDate rangeStart, LocalDate rangeEnd) {
+		return (!(taskStart.isAfter(rangeEnd) || taskStart.isBefore(rangeStart))
+				|| !(taskEnd.isAfter(rangeEnd) || taskEnd.isBefore(rangeStart)) || taskStart
+				.isBefore(rangeStart) && taskEnd.isAfter(rangeEnd));
 	}
 
 	/**
-	 * @param propertyName
-	 *          The name of the property you want to save.
-	 * @param property
-	 *          A string that you want to save as a property.
+	 * @param dateToCheck
+	 *          The date to check if within the given range.
+	 * @param rangeStart
+	 *          Start of the range to check
+	 * @param rangeEnd
+	 *          End of the range to check
+	 * @return Returns true when the day is within rangeStart and rangeEnd
 	 */
-	public void setProperty(String propertyName, String property) {
-		properties.put(propertyName, property);
-		this.writeChangesToFile(FILENAME_PROPERTIES);
+	private boolean isWithin(LocalDate dateToCheck, LocalDate rangeStart,
+			LocalDate rangeEnd) {
+		return (!dateToCheck.isBefore(rangeStart) && !dateToCheck.isAfter(rangeEnd));
 	}
+
 }
