@@ -1,6 +1,4 @@
-/**
- * 
- */
+// @author A0097968Y
 package typetodo.ui;
 
 import java.awt.BorderLayout;
@@ -27,10 +25,6 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 
-/**
- * @author DennZ
- * 
- */
 public class FeedbackDialog extends JDialog {
 
 	private JPanel feedbackPanel;
@@ -121,7 +115,6 @@ public class FeedbackDialog extends JDialog {
 			int indexToScrollTo = getIndexToScrollTo(displayText, textWithoutHtmlTags);
 			txtListOutput.setCaretPosition(indexToScrollTo);
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

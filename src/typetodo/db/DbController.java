@@ -1,12 +1,10 @@
-/**
- * Author : Dennis Ng
- * Email	: a0097968@nus.edu.sg
- */
+// @author A0097968Y
 package typetodo.db;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -50,7 +48,8 @@ public class DbController {
 	private static DbController mainDbHandler;
 	private final Gson gson;
 
-	private DbController() throws IOException, JsonSyntaxException {
+	private DbController() throws IOException, JsonSyntaxException,
+			FileNotFoundException {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
 		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
@@ -59,19 +58,27 @@ public class DbController {
 		// Create a comparator to sort by type of tasks and end datetime
 		tasksCache = new TreeMap<Integer, Task>();
 		properties = new HashMap<String, String>();
-		initializeFiles();
+		initializeFiles(); // Throws IOException
 		for (String fileName : allFiles.keySet()) {
 			this.loadFile(fileName);
 		}
 	}
 
-	public static DbController getInstance() throws IOException {
+	public static DbController getInstance() throws IOException,
+			JsonSyntaxException, FileNotFoundException {
 		if (mainDbHandler == null) {
 			mainDbHandler = new DbController();
 		}
 		return mainDbHandler;
 	}
 
+	/**
+	 * This method creates file only if the directory doesn't exist.
+	 * 
+	 * @throws IOException
+	 *           Problem creating the file.
+	 * 
+	 */
 	private void initializeFiles() throws IOException {
 		allFiles = new HashMap<String, File>(3);
 		final File subdirectory = new File(DIRECTORY_NAME);
@@ -88,6 +95,9 @@ public class DbController {
 	}
 
 	/**
+	 * @throws FileNotFoundException
+	 *           During loadFile, if directory exist but file does not,
+	 *           FileNotFoundException will be thrown.
 	 * @throws JsonSyntaxException
 	 *           when contents of the file to load is incorrect
 	 */

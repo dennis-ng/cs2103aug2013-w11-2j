@@ -1,6 +1,4 @@
-/**
- * @author Dennis Ng
- */
+// @author A0097968Y
 package typetodo.db;
 
 import java.lang.reflect.Type;
