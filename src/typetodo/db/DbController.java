@@ -20,17 +20,19 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import typetodo.exception.DuplicateKeyException;
+import typetodo.exception.InvalidDateRangeException;
 import typetodo.exception.MissingFieldException;
 import typetodo.model.DeadlineTask;
 import typetodo.model.FloatingTask;
 import typetodo.model.Task;
+import typetodo.model.TaskType;
 import typetodo.model.TimedTask;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-
 
 public class DbController {
 
@@ -152,8 +154,7 @@ public class DbController {
 		// Supports for undoing deleted task
 		if (newTask.getTaskId() != 0) {
 			if (tasksCache.containsKey(newTask.getTaskId())) {
-				// TODO create a specific exception
-				throw new Exception("Task with the same id already exist.");
+				throw new DuplicateKeyException("Task with the same id already exist.");
 			}
 			tasksCache.put(newTask.getTaskId(), newTask);
 			this.writeChangesToFile(FILENAME_TASK);
@@ -209,7 +210,6 @@ public class DbController {
 	public boolean updateTask(Task taskToUpdate) throws Exception {
 		int taskIdToUpdate = taskToUpdate.getTaskId();
 		if (taskIdToUpdate == 0) {
-			// TODO create specific exception
 			throw new MissingFieldException("The task did not contain a taskId.");
 		}
 		if (tasksCache.put(taskIdToUpdate, taskToUpdate) != null) {
@@ -220,39 +220,120 @@ public class DbController {
 	}
 
 	/**
-	 * 
-	 * @param
+	 * @param startDay
+	 * @param endDay
 	 * @return An arraylist of all the tasks within a given date range. null will
 	 *         be returned if nothing is found.
-	 * @throws Exception
+	 * @throws InvalidDateRangeException
+	 *           endDay is before startDay
 	 */
-	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay) {
+	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay)
+			throws InvalidDateRangeException {
 		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
 		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
 		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
-		for (Task taskInCache : tasksCache.values()) {
-			if (taskInCache instanceof DeadlineTask) {
-				if (!((DeadlineTask) taskInCache).getDeadline().toLocalDate()
-						.isBefore(startDay.toLocalDate())
-						&& !((DeadlineTask) taskInCache).getDeadline().toLocalDate()
-								.isAfter(endDay.toLocalDate())) {
-					deadlineTasks.add((DeadlineTask) taskInCache);
-				}
-			} else if (taskInCache instanceof TimedTask) {
-				TimedTask timedTask = (TimedTask) taskInCache;
-				// Get the localdate only so that we can compare without time
-				LocalDate taskStart = timedTask.getStart().toLocalDate();
-				LocalDate taskEnd = timedTask.getEnd().toLocalDate();
-				LocalDate rangeStart = startDay.toLocalDate();
-				LocalDate rangeEnd = endDay.toLocalDate();
+		LocalDate rangeStart = startDay.toLocalDate();
+		LocalDate rangeEnd = endDay.toLocalDate();
+		if (rangeEnd.isBefore(rangeStart)) {
+			throw new InvalidDateRangeException(
+					"End time is earlier than start time.");
+		} else {
+			for (Task taskInCache : tasksCache.values()) {
+				if (taskInCache instanceof DeadlineTask) {
+					DeadlineTask deadlineTask = (DeadlineTask) taskInCache;
+					// Get the localdate only so that we can compare without time
+					LocalDate deadline = deadlineTask.getDeadline().toLocalDate();
+					if (isWithin(deadline, rangeStart, rangeEnd)) {
+						deadlineTasks.add((DeadlineTask) taskInCache);
+					}
+				} else if (taskInCache instanceof TimedTask) {
+					TimedTask timedTask = (TimedTask) taskInCache;
+					// Get the localdate only so that we can compare without time
+					LocalDate taskStart = timedTask.getStart().toLocalDate();
+					LocalDate taskEnd = timedTask.getEnd().toLocalDate();
 
-				if (!(taskStart.isAfter(rangeEnd) || taskStart.isBefore(rangeStart))
-						|| !(taskEnd.isAfter(rangeEnd) || taskEnd.isBefore(rangeStart))
-						|| taskStart.isBefore(rangeStart) && taskEnd.isAfter(rangeEnd)) {
-					timedTasks.add(timedTask);
+					if (isWithin(taskStart, taskEnd, rangeStart, rangeEnd)) {
+						timedTasks.add(timedTask);
+					}
+				} else if (taskInCache instanceof FloatingTask) {
+					floatingTasks.add((FloatingTask) taskInCache);
 				}
-			} else if (taskInCache instanceof FloatingTask) {
-				floatingTasks.add((FloatingTask) taskInCache);
+			}
+		}
+		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
+	}
+
+	/**
+	 * @param taskStart
+	 *          Start date of the task
+	 * @param taskEnd
+	 *          End date of the task
+	 * @param rangeStart
+	 *          Start of the range to check
+	 * @param rangeEnd
+	 *          End of the range to check
+	 * @return Returns true when a day between taskStart and taskEnd is within
+	 *         rangeStart and rangeEnd
+	 */
+	private boolean isWithin(LocalDate taskStart, LocalDate taskEnd,
+			LocalDate rangeStart, LocalDate rangeEnd) {
+		return (!(taskStart.isAfter(rangeEnd) || taskStart.isBefore(rangeStart))
+				|| !(taskEnd.isAfter(rangeEnd) || taskEnd.isBefore(rangeStart)) || taskStart
+				.isBefore(rangeStart) && taskEnd.isAfter(rangeEnd));
+	}
+
+	/**
+	 * @param dateToCheck
+	 *          The date to check if within the given range.
+	 * @param rangeStart
+	 *          Start of the range to check
+	 * @param rangeEnd
+	 *          End of the range to check
+	 * @return Returns true when the day is within rangeStart and rangeEnd
+	 */
+	private boolean isWithin(LocalDate dateToCheck, LocalDate rangeStart,
+			LocalDate rangeEnd) {
+		return (!dateToCheck.isBefore(rangeStart) && !dateToCheck.isAfter(rangeEnd));
+	}
+
+	/**
+	 * 
+	 * @param
+	 * @return An arraylist of a specific type of task within a given date range.
+	 *         null will be returned if nothing is found.
+	 * @throws Exception
+	 */
+	public ArrayList<Task> retrieveTasks(DateTime startDay, DateTime endDay,
+			TaskType taskType) throws InvalidDateRangeException {
+		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
+		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
+		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
+		LocalDate rangeStart = startDay.toLocalDate();
+		LocalDate rangeEnd = endDay.toLocalDate();
+		if (rangeEnd.isBefore(rangeStart)) {
+			throw new InvalidDateRangeException(
+					"End time is earlier than start time.");
+		} else {
+			for (Task taskInCache : tasksCache.values()) {
+				if (taskInCache instanceof DeadlineTask) {
+					DeadlineTask deadlineTask = (DeadlineTask) taskInCache;
+					// Get the localdate only so that we can compare without time
+					LocalDate deadline = deadlineTask.getDeadline().toLocalDate();
+					if (isWithin(deadline, rangeStart, rangeEnd)) {
+						deadlineTasks.add((DeadlineTask) taskInCache);
+					}
+				} else if (taskInCache instanceof TimedTask) {
+					TimedTask timedTask = (TimedTask) taskInCache;
+					// Get the localdate only so that we can compare without time
+					LocalDate taskStart = timedTask.getStart().toLocalDate();
+					LocalDate taskEnd = timedTask.getEnd().toLocalDate();
+
+					if (isWithin(taskStart, taskEnd, rangeStart, rangeEnd)) {
+						timedTasks.add(timedTask);
+					}
+				} else if (taskInCache instanceof FloatingTask) {
+					floatingTasks.add((FloatingTask) taskInCache);
+				}
 			}
 		}
 		return combineTasksForViewing(deadlineTasks, timedTasks, floatingTasks);
