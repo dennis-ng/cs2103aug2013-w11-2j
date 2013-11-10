@@ -20,6 +20,7 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import typetodo.exception.MissingFieldException;
 import typetodo.model.DeadlineTask;
 import typetodo.model.FloatingTask;
 import typetodo.model.Task;
@@ -29,6 +30,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+
 
 public class DbController {
 
@@ -208,7 +210,7 @@ public class DbController {
 		int taskIdToUpdate = taskToUpdate.getTaskId();
 		if (taskIdToUpdate == 0) {
 			// TODO create specific exception
-			throw new Exception("The task did not contain a taskId");
+			throw new MissingFieldException("The task did not contain a taskId.");
 		}
 		if (tasksCache.put(taskIdToUpdate, taskToUpdate) != null) {
 			this.writeChangesToFile(FILENAME_TASK);
