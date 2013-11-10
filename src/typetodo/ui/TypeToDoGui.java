@@ -3,15 +3,10 @@
  */
 package typetodo.ui;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
 import java.awt.Toolkit;
-import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -46,15 +41,13 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		WindowListener {
 
 	public final static String IMAGE_DIRECTORY = "images/";
-	public final static String FILENAME_TRAY_LOGO = "logo.png";
+	public final static String FILENAME_LOGO = "logo.png";
 
 	private static TypeToDoGui mainGui;
 	private static CommandPanel cmdPanel;
 	private static JTextField txtCmd;
 	private static FeedbackDialog feedbackDialog;
 	private Image imgLogo;
-	private TrayIcon trayIcon;
-	private SystemTray tray;
 
 	private static ScheduleController sc;
 	private final LinkedList<String> inputHistory;
@@ -72,7 +65,7 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		URL imgLogoUrl = TypeToDoGui.class.getResource(IMAGE_DIRECTORY
-				+ FILENAME_TRAY_LOGO);
+				+ FILENAME_LOGO);
 		if (imgLogoUrl != null) {
 			imgLogo = Toolkit.getDefaultToolkit().getImage(imgLogoUrl);
 			this.setIconImage(imgLogo);
@@ -181,35 +174,6 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 			}
 		});
 
-		if (SystemTray.isSupported()) {
-			System.out.println("system tray supported");
-			tray = SystemTray.getSystemTray();
-			ActionListener exitListener = new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					System.out.println("Exiting....");
-					System.exit(0);
-				}
-			};
-			PopupMenu popup = new PopupMenu();
-			MenuItem defaultItem = new MenuItem("Exit");
-			defaultItem.addActionListener(exitListener);
-			popup.add(defaultItem);
-			defaultItem = new MenuItem("Open");
-			defaultItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					// setVisible(true);
-					setExtendedState(JFrame.NORMAL);
-				}
-			});
-			popup.add(defaultItem);
-			if (imgLogo != null) {
-				trayIcon = new TrayIcon(imgLogo, "TypeToDo", popup);
-				trayIcon.setImageAutoSize(true);
-			}
-		} else {
-			System.out.println("system tray not supported");
-		}
-
 		this.setVisible(true);
 		txtCmd.requestFocusInWindow();
 	}
@@ -252,22 +216,13 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	}
 
 	public void windowIconified(WindowEvent e) { /* Unimplemented */
-		try {
-			// setVisible(false);
-			tray.add(trayIcon);
-			System.out.println("added to SystemTray");
-		} catch (AWTException ex) {
-			System.out.println("unable to add to tray");
-		}
 	}
 
-	public void windowDeiconified(WindowEvent e) { /* Unimplemented */
+	public void windowDeiconified(WindowEvent e) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				toFront();
 				txtCmd.requestFocusInWindow();
-				tray.remove(trayIcon);
-				System.out.println("Tray icon removed");
 			}
 		});
 	}
@@ -283,7 +238,6 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		if (e.getKeyCode() == NativeKeyEvent.VK_SPACE
 				&& e.getModifiers() == NativeKeyEvent.CTRL_MASK) {
 			if (getExtendedState() == JFrame.ICONIFIED) {
-				// setVisible(true);
 				setExtendedState(JFrame.NORMAL);
 			} else {
 				setExtendedState(JFrame.ICONIFIED);
