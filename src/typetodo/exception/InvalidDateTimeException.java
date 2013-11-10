@@ -1,4 +1,4 @@
-package typetodo.logic;
+package typetodo.exception;
 @SuppressWarnings("serial")
 
 public class InvalidDateTimeException extends Exception {
