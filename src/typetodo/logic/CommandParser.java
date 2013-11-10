@@ -35,8 +35,8 @@ public class CommandParser {
 			throws InvalidCommandException {
 
 		Scanner scanner = new Scanner(userInput);
-		String command = scanner.next().toLowerCase(); // Extract the first
-		// string
+		// Extract the first string
+		String command = scanner.next().toLowerCase(); 
 		scanner.close();
 
 		HashMap<CommandType, List<String>> commandSynonyms = new HashMap<CommandType, List<String>>();
@@ -50,7 +50,8 @@ public class CommandParser {
 				Arrays.asList("display", "view", "show", "see", "list"));
 		commandSynonyms.put(CommandType.HELP, Arrays.asList("help"));
 		commandSynonyms.put(CommandType.HOME, Arrays.asList("home", "today"));
-		commandSynonyms.put(CommandType.HOTKEY, Arrays.asList("hotkey","quick","hot key","hotkeys","hot","short"));
+		commandSynonyms.put(CommandType.HOTKEY, Arrays.asList("hotkey",
+				"quick", "hot key", "hotkeys", "hot", "short"));
 		commandSynonyms.put(CommandType.UPDATE,
 				Arrays.asList("update", "edit", "change"));
 		commandSynonyms
@@ -64,6 +65,7 @@ public class CommandParser {
 				return commandType;
 			}
 		}
+
 		throw new InvalidCommandException(
 				"Invalid command, please refer to catalog by entering 'help'.");
 	}
@@ -86,11 +88,11 @@ public class CommandParser {
 		}
 
 		Scanner scanner = new Scanner(userInput);
-		scanner.next(); // discard user command;
-		scanner.useDelimiter(";"); // title of task must always end with a ;
-		String title = scanner.next().trim(); // extract title and remove all
-												// leading/trailing spaces
+		scanner.next(); // throw user command;
+		scanner.useDelimiter(";"); // title of task must always end with ";"
+		String title = scanner.next().trim();
 		scanner.close();
+
 		if (title.equals("")) {
 			throw new MissingFieldException(
 					"Title of task is missing, please refer to catalog by entering 'help'");
@@ -114,13 +116,13 @@ public class CommandParser {
 	private String getDescription(String userInput)
 			throws ReservedCharacterException {
 		int indexOfDescription = userInput.indexOf('+');
-		if (indexOfDescription == -1) { // if user input does not contain a
-										// description
+		// no description entered
+		if (indexOfDescription == -1) {
 			return "";
 		}
 
-		if (indexOfDescription == (userInput.length() - 1)) { // if description
-																// is blank
+		// description is empty
+		if (indexOfDescription == (userInput.length() - 1)) {
 			return "";
 		}
 
@@ -128,7 +130,7 @@ public class CommandParser {
 		int indexOfBusy = userInput.lastIndexOf("BUSY");
 
 		if (indexOfBusy == -1) {
-			// Description will always be at the end of the userinput
+			// Description will always be at the end of the userInput
 			description = userInput.substring(++indexOfDescription);
 		} else {
 			description = userInput
@@ -152,9 +154,8 @@ public class CommandParser {
 	 */
 	private int getIndex(String userInput) {
 		Scanner scanner = new Scanner(userInput);
-		scanner.next(); // discard the command
-		int index = scanner.nextInt(); // next expected field should be the
-										// index
+		scanner.next(); // throw the command
+		int index = scanner.nextInt(); // next expected field is the index
 		scanner.close();
 
 		return index;
@@ -177,6 +178,7 @@ public class CommandParser {
 		Scanner scanner = new Scanner(userInput);
 		scanner.next(); // discard the command
 		scanner.nextInt(); // discard the index
+
 		try {
 			fieldName = this.convertToFieldName(scanner.next());
 		} catch (NoSuchElementException e) {
@@ -185,6 +187,7 @@ public class CommandParser {
 					"Field Name is missing, please refer to catalog by entering 'help edit'");
 		}
 		scanner.close();
+
 		return fieldName;
 	}
 
@@ -221,14 +224,11 @@ public class CommandParser {
 		case START:
 		case END:
 		case DEADLINE:
-			// TODO: date format might be wrong or date might be missing,
-			// exception has to be thrown
 			return new DateTime(this.getDates(userInput).get(0));
 		case BUSYFIELD:
-			// TODO: same as the above^
 			return (this.getIsBusy(userInput));
 		default:
-			// TODO: assert?
+
 		}
 		return null;
 	}
@@ -258,29 +258,30 @@ public class CommandParser {
 			scanner.next();
 			scanner.useDelimiter("\\+");
 			dateField = scanner.next().substring(1).trim();
-			System.out.println(dateField);
 		} else if (this.getCommand(userInput).equals(CommandType.DISPLAY)) {
 			dateField = scanner.nextLine().trim();
-			System.out.println(dateField);
-			// TODO:
 		} else {
 			scanner.next();// throw away index
 			scanner.next();// throw away fieldName
 			dateField = scanner.nextLine().trim();
-			System.out.println(dateField);
 		}
 
 		scanner.close();
-		
-		dateField = dateField.replaceAll("-", " to ");
+
+		dateField = dateField.replaceAll("-", " to ").toLowerCase();
 		List<java.util.Date> javaDates = new PrettyTimeParser()
 				.parse(dateField);
 		ArrayList<DateTime> jodaDates = new ArrayList<DateTime>();
 
 		while (!javaDates.isEmpty()) {
-			jodaDates.add(new DateTime(javaDates.remove(0)));
+			DateTime validDates = new DateTime(javaDates.remove(0));
+			jodaDates.add(validDates);
 		}
 
+		if (dateField.contains(" to ") && jodaDates.size() == 1) {
+			throw new InvalidDateTimeException(
+					"Please specify both date and time in all fields. Please use 'dd/mm' format if you want to type standard date.");
+		}
 		return jodaDates;
 	}
 
@@ -288,12 +289,14 @@ public class CommandParser {
 		String helpType;
 		Scanner scanner = new Scanner(userInput);
 		scanner.next();// throw away command;
+
 		if (scanner.hasNext()) {
 			helpType = scanner.next();
 		} else {
 			helpType = "";
 		}
 		scanner.close();
+
 		return helpType;
 	}
 
@@ -373,6 +376,7 @@ public class CommandParser {
 			String title = this.getTitle(userInput);
 			String description = this.getDescription(userInput);
 			ArrayList<DateTime> dates = this.getDates(userInput);
+			DateTime now = new DateTime();
 
 			if (dates.isEmpty()) {
 				command = new CommandAddTask(schedule, title, description);
@@ -384,13 +388,10 @@ public class CommandParser {
 				DateTime start = dates.get(0);
 				DateTime end = dates.get(1);
 
-				// Boolean isBusy = this.isBusy();
-
 				command = new CommandAddTask(schedule, title, description,
 						start, end, false);
 			} else {
-				// TODO: invalid new view
-				throw new Exception(
+				throw new InvalidFormatException(
 						"INVALID FORMAT. Please refer to catalog by entering 'help add'");
 			}
 			break;
@@ -402,7 +403,7 @@ public class CommandParser {
 			} catch (Exception e) {
 				String keyword = this.getKeyword(userInput);
 				if (keyword == null) {
-					throw new Exception(
+					throw new InvalidFormatException(
 							"INVALID FORMAT. Please refer to catalog by entering 'help delete'");
 				}
 				command = new CommandDeleteTask(schedule, keyword);
@@ -423,8 +424,7 @@ public class CommandParser {
 				command = new CommandEditTask(schedule, index, fieldName,
 						(Boolean) newValue);
 			} else {
-				// TODO: invalid view
-				throw new Exception(
+				throw new InvalidFormatException(
 						"INVALID FORMAT. Please refer to catalog by entering 'help edit'");
 			}
 			break;
@@ -434,7 +434,7 @@ public class CommandParser {
 				String keyword = this.getKeyword(userInput);
 				command = new CommandSearch(schedule, keyword);
 			} catch (Exception e) {
-				throw new Exception(
+				throw new InvalidFormatException(
 						"INVALID FORMAT. Please refer to catalog by entering 'help search'");
 			}
 			break;
@@ -460,7 +460,7 @@ public class CommandParser {
 				int indexOfCompletedTask = this.getIndex(userInput);
 				command = new CommandCompleted(schedule, indexOfCompletedTask);
 			} catch (Exception e) {
-				throw new Exception(
+				throw new InvalidFormatException(
 						"INVALID FORMAT. Please refer to catalog by entering 'help done'");
 			}
 			break;
@@ -475,20 +475,14 @@ public class CommandParser {
 
 		case HELP:
 			String helpType = getHelpType(userInput);
-			if(helpType!=""){
+			if (helpType != "") {
 				CommandType commandType = getCommand(helpType);
 				HelpController helpController = new HelpController(commandType);
 				command = new CommandHelp(schedule, helpController);
-			}
-			else{
+			} else {
 				HelpController helpController = new HelpController(helpType);
 				command = new CommandHelp(schedule, helpController);
 			}
-			
-			break;
-
-		case INVALID:
-			// TODO: view invalid
 			break;
 
 		case EXIT:
