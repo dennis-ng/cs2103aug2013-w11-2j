@@ -4,10 +4,12 @@ public class HelpController {
 	private String typeString;
 	private CommandType helpType;
 
+	//constructor for help with no specific helpType
 	public HelpController(String typeString) {
 		this.typeString = typeString;
 	}
 
+	//constructor for help with helpType
 	public HelpController(CommandType helpType) {
 		typeString = helpType.toString();
 		this.helpType = helpType;
@@ -48,12 +50,13 @@ public class HelpController {
 			String thisHelp = help(helpType);
 			feedback = thisHelp;
 		} else {
+			assert typeString == "";
 			feedback = HELP_INSTRUCTION;
 		}
 		return feedback;
 	}
 
-	// hard-coded catalog
+	/** hard coded catalog*/
 	private static final String HELP_INSTRUCTION = "Please enter 'help <command>'\n"
 			+ "i.e.help hotkey, add, del, edit, undo, complete, search, sync, home, etc";
 	private static final String HELP_ADD = "ADD:\n"
@@ -74,7 +77,7 @@ public class HelpController {
 			+ "(SYNTAX) search <keyword>";
 	private static final String HELP_SYNC = "SYNC:(synchronize with google calendar. Either export typetodo tasks into GCal, or import editted GCal tasks)\n"
 			+ "(SYNTAX) sync";
-	private static final String HELP_UPDATE = "UPDATE:(modify exist task from typetodo. Note field name must be in capital letters,i.e.TITLE,DESCRIPTION,DEADLINE,START,END,BUSY)\n"
+	private static final String HELP_UPDATE = "UPDATE:(modify exist task from typetodo. Note field name must be in capital letters,i.e.TITLE,DESCRIPTION,DEADLINE,START,END)\n"
 			+ "(SYNTAX) edit <index of task on current list> <field name> <new value>";
 	private static final String HELP_UNDO = "UNDO:\n" + "(SYNTAX) undo\n"
 			+ "(HOTKEY) <ctrl> + <backspace>";

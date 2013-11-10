@@ -36,7 +36,7 @@ public class CommandParser {
 
 		Scanner scanner = new Scanner(userInput);
 		// Extract the first string
-		String command = scanner.next().toLowerCase(); 
+		String command = scanner.next().toLowerCase();
 		scanner.close();
 
 		HashMap<CommandType, List<String>> commandSynonyms = new HashMap<CommandType, List<String>>();
@@ -99,9 +99,10 @@ public class CommandParser {
 		} else if (title.contains("+")) {
 			throw new ReservedCharacterException(
 					"'+' is a reserved character and should not be found in the title");
+		} else {
+			assert title != "" && !title.contains("+") && !title.contains(";");
+			return title.trim();
 		}
-
-		return title.trim();
 	}
 
 	/**
@@ -115,26 +116,19 @@ public class CommandParser {
 	 */
 	private String getDescription(String userInput)
 			throws ReservedCharacterException {
+		String description;
 		int indexOfDescription = userInput.indexOf('+');
+
 		// no description entered
 		if (indexOfDescription == -1) {
 			return "";
 		}
 
 		// description is empty
-		if (indexOfDescription == (userInput.length() - 1)) {
+		else if (indexOfDescription == (userInput.length() - 1)) {
 			return "";
-		}
-
-		String description = "";
-		int indexOfBusy = userInput.lastIndexOf("BUSY");
-
-		if (indexOfBusy == -1) {
-			// Description will always be at the end of the userInput
-			description = userInput.substring(++indexOfDescription);
 		} else {
-			description = userInput
-					.substring(++indexOfDescription, indexOfBusy);
+			description = userInput.substring(++indexOfDescription);
 		}
 
 		if (description.indexOf(';') != -1) {
@@ -225,27 +219,21 @@ public class CommandParser {
 		case END:
 		case DEADLINE:
 			return new DateTime(this.getDates(userInput).get(0));
-		case BUSYFIELD:
-			return (this.getIsBusy(userInput));
 		default:
-
+			assert this.getFieldName(userInput) != null;
 		}
+
 		return null;
-	}
-
-	private boolean getIsBusy(String userInput) {
-		if (userInput.indexOf("BUSY") != -1) {
-			return true;
-		}
-		return false;
 	}
 
 	private String getKeyword(String userInput) {
 		String keyword = null;
 		Scanner scanner = new Scanner(userInput);
+
 		scanner.next(); // throw away command
 		keyword = scanner.nextLine();// get keyword
 		scanner.close();
+
 		return keyword.trim();
 	}
 
@@ -253,6 +241,7 @@ public class CommandParser {
 		String dateField;
 		Scanner scanner = new Scanner(userInput);
 		scanner.next();// throw away command
+
 		if (userInput.contains(";")) {
 			scanner.useDelimiter(";");
 			scanner.next();
@@ -282,6 +271,7 @@ public class CommandParser {
 			throw new InvalidDateTimeException(
 					"Please specify both date and time in all fields. Please use 'dd/mm' format if you want to type standard date.");
 		}
+
 		return jodaDates;
 	}
 
@@ -314,7 +304,6 @@ public class CommandParser {
 		fieldNameSynonyms.put(FieldName.START, Arrays.asList("START"));
 		fieldNameSynonyms.put(FieldName.END, Arrays.asList("END"));
 		fieldNameSynonyms.put(FieldName.DEADLINE, Arrays.asList("DEADLINE"));
-		fieldNameSynonyms.put(FieldName.BUSYFIELD, Arrays.asList("BUSYFIELD"));
 
 		for (FieldName fieldName : fieldNameSynonyms.keySet()) {
 			if (fieldNameSynonyms.get(fieldName).contains(fnString)) {
@@ -376,7 +365,6 @@ public class CommandParser {
 			String title = this.getTitle(userInput);
 			String description = this.getDescription(userInput);
 			ArrayList<DateTime> dates = this.getDates(userInput);
-			DateTime now = new DateTime();
 
 			if (dates.isEmpty()) {
 				command = new CommandAddTask(schedule, title, description);
@@ -414,15 +402,13 @@ public class CommandParser {
 			int index = this.getIndex(userInput);
 			FieldName fieldName = this.getFieldName(userInput);
 			Object newValue = this.getNewValue(userInput);
+
 			if (newValue instanceof String) {
 				command = new CommandEditTask(schedule, index, fieldName,
 						(String) newValue);
 			} else if (newValue instanceof DateTime) {
 				command = new CommandEditTask(schedule, index, fieldName,
 						(DateTime) newValue);
-			} else if (newValue instanceof Boolean) {
-				command = new CommandEditTask(schedule, index, fieldName,
-						(Boolean) newValue);
 			} else {
 				throw new InvalidFormatException(
 						"INVALID FORMAT. Please refer to catalog by entering 'help edit'");
