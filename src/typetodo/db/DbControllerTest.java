@@ -1,6 +1,4 @@
-/**
- * 
- */
+// @author A0097968Y
 package typetodo.db;
 
 import static org.junit.Assert.assertEquals;
@@ -16,11 +14,8 @@ import org.junit.Test;
 import typetodo.model.DeadlineTask;
 import typetodo.model.FloatingTask;
 
-/**
- * @author DennZ
- * 
- */
 public class DbControllerTest {
+	// Always start with a clean state
 
 	@Test
 	public void test2() {

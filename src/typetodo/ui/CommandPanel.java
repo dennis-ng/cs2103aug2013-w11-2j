@@ -1,6 +1,4 @@
-/**
- * 
- */
+// @author A0097968Y
 package typetodo.ui;
 
 import java.awt.Color;
@@ -22,10 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-/**
- * @author DennZ
- * 
- */
+@SuppressWarnings("serial")
 public class CommandPanel extends JPanel {
 	private JLabel lblTitle;
 	private JLabel lblMinimize;

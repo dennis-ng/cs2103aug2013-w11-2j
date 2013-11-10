@@ -1,6 +1,5 @@
-/**
- * 
- */
+// @author A0097968Y
+
 package typetodo.ui;
 
 import java.awt.BorderLayout;
@@ -33,15 +32,15 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import typetodo.logic.Schedule;
 import typetodo.logic.ScheduleController;
 
-/**
- * @author DennZ
- * 
- */
 public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		WindowListener {
 
-	public final static String IMAGE_DIRECTORY = "images/";
-	public final static String FILENAME_LOGO = "logo.png";
+	public static final String IMAGE_DIRECTORY = "images/";
+	public static final String FILENAME_LOGO = "logo.png";
+	private static final String MESSAGE_ERROR_INITIALIZING = "There is an error initializing the scheduler. Please make sure to download the latest version.";
+	private static final String MESSAGE_ERROR_NATIVE_HOOK = "There was a problem registering the global hotkey.\n"
+			+ "For mavericks OSX users:\n"
+			+ "Please go to Preferences>Security & Privacy>Privacy>Acessibility to allow Jar Launcher.";
 
 	private static TypeToDoGui mainGui;
 	private static CommandPanel cmdPanel;
@@ -192,12 +191,7 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 			GlobalScreen.registerNativeHook();
 		} catch (NativeHookException ex) {
 			this.setAlwaysOnTop(false);
-			JOptionPane
-					.showMessageDialog(
-							null,
-							"There was a problem registering the global hotkey.\n"
-									+ "For mavericks OSX users:\n"
-									+ "Please go to Preferences>Security & Privacy>Privacy>Acessibility to allow Jar Launcher.");
+			JOptionPane.showMessageDialog(null, MESSAGE_ERROR_NATIVE_HOOK);
 			this.setAlwaysOnTop(true);
 			ex.printStackTrace();
 		}
@@ -313,11 +307,12 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 				try {
 					sc = new ScheduleController(cmdFrame, new Schedule());
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, MESSAGE_ERROR_INITIALIZING);
+
+					System.exit(0);
 					e.printStackTrace();
 				}
 			}
 		});
 	}
-
 }
