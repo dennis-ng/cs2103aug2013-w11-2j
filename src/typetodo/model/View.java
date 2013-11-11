@@ -6,9 +6,7 @@ package typetodo.model;
 import java.util.ArrayList;
 
 /**
- * This class is to encapsulate the relevant information that is to be
- * displayed to the user. I.e the feedback and tasks.
- * @author Phan Shi Yu
+ * @author A0091024U
  * 
  */
 public class View {

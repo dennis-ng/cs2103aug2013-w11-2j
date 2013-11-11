@@ -4,6 +4,11 @@ import java.util.Comparator;
 
 import org.joda.time.DateTime;
 
+/**
+ * 
+ * @author A0091024U
+ *
+ */
 public class DeadlineTask extends Task {
 	private DateTime deadline;
 
@@ -30,48 +35,6 @@ public class DeadlineTask extends Task {
 	public Task makeCopy() {
 		return new DeadlineTask(this.getTaskId(), this.getTitle(),
 				this.getDescription(), this.getDeadline());
-	}
-
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-			
-		if (this.getDeadline().isBefore(new DateTime())) {
-			sb.append("<font face=\"century gothic\" color=\"#B6B6B4\">");
-			sb.append("[Id: " + this.getTaskId() + "] ");
-			sb.append("<b>");
-			sb.append(this.getTitle() + " ");
-			sb.append("</b>");
-			
-			sb.append("due at ");
-			sb.append("<b>");
-			sb.append(this.getDeadline().toString("HH:mm"));
-			sb.append("</b>");
-		} else {
-			sb.append("<font face=\"century gothic\">");
-			sb.append("[Id: " + this.getTaskId() + "] ");
-			sb.append("<b>");
-			sb.append(this.getTitle() + " ");
-			sb.append("</b>");
-
-			sb.append("due at ");
-			sb.append("<font face=\"century gothic\" color=\"red\">");
-			sb.append("<b>");
-			sb.append(this.getDeadline().toString("HH:mm"));
-			sb.append("</b>");
-			sb.append("</font>");
-		}
-
-		if (this.getDescription() != null && !this.getDescription().equals("")) {
-			sb.append("\n");
-			sb.append("<br>");
-			sb.append("<i>");
-			sb.append(" - " + this.getDescription().trim());
-			sb.append("</i>");
-		}
-		sb.append("</font>");
-		sb.append("<br>");
-		
-		return sb.toString();
 	}
 
 	public static final Comparator<DeadlineTask> COMPARE_BY_DATE = new Comparator<DeadlineTask>() {

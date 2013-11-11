@@ -1,5 +1,10 @@
 package typetodo.model;
 
+/**
+ * A0091024U
+ * @author Shiyu
+ *
+ */
 public class FloatingTask extends Task {
 	public FloatingTask(String name, String description) {
 		super(name, description);
@@ -12,28 +17,6 @@ public class FloatingTask extends Task {
 	
 	public Task makeCopy() {
 		return new FloatingTask(this.getTaskId(), this.getTitle(), this.getDescription());
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[Id: " + this.getTaskId() + "] ");
-		sb.append("<font face=\"century gothic\">");
-		sb.append("<b>");
-		sb.append(this.getTitle() + " ");
-		sb.append("</b>");
-		
-		if (this.getDescription() != null && !this.getDescription().equals("")) {
-			sb.append("\n");
-			sb.append("<br>");
-			sb.append("<i>");
-			sb.append(" - " + this.getDescription().trim());
-			sb.append("</i>");
-		}
-		sb.append("</font>");
-		sb.append("<br>");
-		
-		return sb.toString();
 	}
 	
 	@Override

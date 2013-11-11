@@ -3,6 +3,11 @@ package typetodo.logic;
 import typetodo.model.Task;
 import typetodo.model.Task.Status;
 
+/**
+ * Concrete command class to mark task as completed.
+ * @author A0091024U
+ *
+ */
 public class CommandCompleted implements Command, Undoable{
 	private static final String MESSAGE_COMPLETED = "\"%s\" has been marked as completed";
 	private int taskId;
