@@ -55,10 +55,13 @@ public class DbController {
 		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
 				new DateTimeTypeAdapter());
 		gson = gsonBuilder.setPrettyPrinting().create();
-		// Create a comparator to sort by type of tasks and end datetime
 		tasksCache = new TreeMap<Integer, Task>();
 		properties = new HashMap<String, String>();
-		initializeFiles(); // Throws IOException
+		initializeFiles();
+		reloadAllFiles();
+	}
+
+	public void reloadAllFiles() {
 		for (String fileName : allFiles.keySet()) {
 			this.loadFile(fileName);
 		}
@@ -72,13 +75,6 @@ public class DbController {
 		return mainDbHandler;
 	}
 
-	/**
-	 * This method creates file only if the directory doesn't exist.
-	 * 
-	 * @throws IOException
-	 *           Problem creating the file.
-	 * 
-	 */
 	private void initializeFiles() throws IOException {
 		allFiles = new HashMap<String, File>(3);
 		final File subdirectory = new File(DIRECTORY_NAME);
@@ -96,10 +92,9 @@ public class DbController {
 
 	/**
 	 * @throws FileNotFoundException
-	 *           During loadFile, if directory exist but file does not,
-	 *           FileNotFoundException will be thrown.
+	 *           During loadFile, if directory exist but file does not
 	 * @throws JsonSyntaxException
-	 *           when contents of the file to load is incorrect
+	 *           contents of the file to load is incorrect
 	 */
 	private void loadFile(String fileName) throws JsonSyntaxException {
 		StringBuilder fileToTextBuffer = new StringBuilder();
@@ -111,23 +106,18 @@ public class DbController {
 				fileToTextBuffer.append(nextLine);
 			}
 			reader.close();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		if (!fileToTextBuffer.toString().isEmpty()) {
 			if (fileName.equals(FILENAME_TASK)) {
 				Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
 				}.getType();
-				// The following statement throws JsonSyntaxException when contents of
-				// the file to load is incorrect
 				tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
 			} else if (fileName.equals(FILENAME_PROPERTIES)) {
 				Type collectionType = new TypeToken<HashMap<String, Object>>() {
 				}.getType();
-				// The following statement throws JsonSyntaxException when contents of
-				// the file to load is incorrect
 				properties = gson.fromJson(fileToTextBuffer.toString(), collectionType);
-
 			}
 		}
 	}
@@ -145,7 +135,6 @@ public class DbController {
 				Type collectionType = new TypeToken<HashMap<String, Object>>() {
 				}.getType();
 				writer.write(gson.toJson(properties, collectionType));
-
 			}
 			writer.close();
 		} catch (IOException e) {
@@ -155,8 +144,9 @@ public class DbController {
 
 	/**
 	 * @param propertyName
-	 *          is the name of the property that was saved.
-	 * @return Returns null when the property doesn't exist.
+	 *          the name of the property that was saved
+	 * @return A string of property matched by the propertyName, or null if the
+	 *         property doesn't exist
 	 */
 	public String getProperty(String propertyName) {
 		return properties.get(propertyName);
@@ -164,9 +154,9 @@ public class DbController {
 
 	/**
 	 * @param propertyName
-	 *          The name of the property you want to save.
+	 *          The name of the property to be saved.
 	 * @param property
-	 *          A string that you want to save as a property.
+	 *          A string to be saved as a property.
 	 */
 	public void setProperty(String propertyName, String property) {
 		properties.put(propertyName, property);
@@ -176,11 +166,11 @@ public class DbController {
 	/**
 	 * 
 	 * @param task
-	 * @return If successful: taskId of successfully edited task. This allows
-	 *         caller to know the taskId if undo is required.
-	 * @throws
+	 * @return generated taskId of successfully added task
+	 * @throws DuplicateKeyException
+	 *           task with same id is in the database
 	 */
-	public int addTask(Task newTask) throws Exception {
+	public int addTask(Task newTask) throws DuplicateKeyException {
 		// Supports for undoing deleted task
 		if (newTask.getTaskId() != 0) {
 			if (tasksCache.containsKey(newTask.getTaskId())) {
@@ -207,8 +197,8 @@ public class DbController {
 	/**
 	 * 
 	 * @param taskId
-	 *          The taskId of the task that exists in the database.
-	 * @return This method returns true when deleted, and false if not found
+	 *          taskId of the task to be deleted from the database
+	 * @return true when deleted, or false if not found
 	 */
 	public boolean deleteTask(int taskId) {
 		if (tasksCache.containsKey(taskId)) {
@@ -222,9 +212,8 @@ public class DbController {
 
 	/**
 	 * @param taskId
-	 *          The taskId of the task that exist in the database.
-	 * @return This method returns the task if the taskId is valid, else it will
-	 *         return null.
+	 *          askId of the task that exist in the database.
+	 * @return returns the task if the taskId is valid, or null if invalid
 	 */
 	public Task getTask(int taskId) {
 		return tasksCache.get(taskId);
@@ -233,9 +222,10 @@ public class DbController {
 	/**
 	 * 
 	 * @param taskToUpdate
-	 * @return true: Updated, false: Not found
-	 * @throws Exception
-	 *           : If clash with time slot
+	 *          The updated task to be written over the task in database
+	 * @return true if Updated, false if not found
+	 * @throws MissingFieldException
+	 *           task identifier missing
 	 */
 	public boolean updateTask(Task taskToUpdate) throws Exception {
 		int taskIdToUpdate = taskToUpdate.getTaskId();
@@ -254,8 +244,8 @@ public class DbController {
 	 *          Start of the time range of the tasks you want
 	 * @param endDay
 	 *          End of the time range of the tasks you want
-	 * @return An arraylist of all the tasks within a given date range. null will
-	 *         be returned if nothing is found.
+	 * @return An arraylist of all the tasks within a given date range. An empty
+	 *         arraylist will be returned if nothing is found.
 	 * @throws InvalidDateRangeException
 	 *           endDay cannot be strictly earlier than startDay
 	 */
@@ -470,8 +460,8 @@ public class DbController {
 	}
 
 	/**
-	 * @return Returns true if searchCriteria is found in the name or description
-	 *         of the task.
+	 * @return true if searchCriteria is found in the name or description of the
+	 *         task.
 	 */
 	private boolean foundInTask(Task task, String searchCriteria) {
 		return (task.getTitle().toUpperCase()
@@ -502,7 +492,7 @@ public class DbController {
 	 *          Start of the range to check
 	 * @param rangeEnd
 	 *          End of the range to check
-	 * @return Returns true when a day between taskStart and taskEnd is within
+	 * @return true if a day between taskStart and taskEnd inclusively is within
 	 *         rangeStart and rangeEnd
 	 */
 	private boolean isWithin(LocalDate taskStart, LocalDate taskEnd,
@@ -519,7 +509,7 @@ public class DbController {
 	 *          Start of the range to check
 	 * @param rangeEnd
 	 *          End of the range to check
-	 * @return Returns true when the day is within rangeStart and rangeEnd
+	 * @return true if the day is within rangeStart and rangeEnd
 	 */
 	private boolean isWithin(LocalDate dateToCheck, LocalDate rangeStart,
 			LocalDate rangeEnd) {

@@ -306,9 +306,8 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 				TypeToDoGui cmdFrame = new TypeToDoGui();
 				try {
 					sc = new ScheduleController(cmdFrame, new Schedule());
-				} catch (IOException e) {
+				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, MESSAGE_ERROR_INITIALIZING);
-
 					System.exit(0);
 					e.printStackTrace();
 				}
