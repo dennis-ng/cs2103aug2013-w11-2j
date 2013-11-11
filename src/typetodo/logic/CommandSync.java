@@ -1,17 +1,17 @@
 package typetodo.logic;
 
-import typetodo.sync.SyncHandler;
+import typetodo.sync.SyncController;
 
 public class CommandSync implements Command{
-	private SyncHandler sh;
+	private SyncController syncController;
 	
-	public CommandSync (SyncHandler sh) {
-		this.sh = sh;
+	public CommandSync (SyncController syncController) {
+		this.syncController = syncController;
 	}
 	
 	@Override
 	public String execute() throws Exception {
-		sh.twoWaySync();
+		syncController.twoWaySync();
 		return "null";
 	}
 }

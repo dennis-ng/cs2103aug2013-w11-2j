@@ -3,7 +3,7 @@ package typetodo.logic;
 import java.io.IOException;
 import java.util.Stack;
 
-import typetodo.sync.SyncHandler;
+import typetodo.sync.SyncController;
 import typetodo.ui.View;
 
 public class MainController {
@@ -12,15 +12,14 @@ public class MainController {
 	private Stack<Command> historyOfCommands;
 	private CommandParser commandParser;
 	private CurrentTaskListManager taskListManager;
-	private SyncHandler syncController;
+	private SyncController syncController;
 	
 	public MainController(View view, Schedule schedule) throws IOException {
 		this.view = view;
-		this.syncController = new SyncHandler(view);
+		this.syncController = new SyncController(view);
 		this.taskListManager = new CurrentTaskListManager(schedule);
 		this.commandParser = new CommandParser(this, schedule, taskListManager, syncController);
 		this.historyOfCommands = new Stack<Command>();
-
 		
 		String htmlDisplayContent = "";
 		

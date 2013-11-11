@@ -5,20 +5,20 @@ import typetodo.model.Task;
 public class CommandDeleteTask implements Command, Undoable{
 	private static final String MESSAGE_DELETED = "\"%s\" has been deleted from your schedule";
 	
-	private Schedule sc;
+	private Schedule schedule;
 	private Task taskToBeDeleted;
 	private Integer taskId;
 	
 	public CommandDeleteTask(Schedule sc, int taskId) {
-		this.sc = sc;
+		this.schedule = sc;
 		this.taskId = taskId;
 	}
 	
 	public String execute() throws Exception {
-		this.taskToBeDeleted = sc.getTask(taskId).makeCopy();
+		this.taskToBeDeleted = schedule.getTask(taskId).makeCopy();
 		
 		if (taskId != null) { 
-			sc.deleteTaskById(taskId);
+			schedule.deleteTaskById(taskId);
 		}
 		
 		String feedback = String.format(MESSAGE_DELETED, taskToBeDeleted.getTitle());
@@ -26,7 +26,7 @@ public class CommandDeleteTask implements Command, Undoable{
 	}
 	
 	public void undo() throws Exception{
-		sc.addTask(taskToBeDeleted);
+		schedule.addTask(taskToBeDeleted);
 	}
 }
 

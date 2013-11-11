@@ -18,15 +18,15 @@ import typetodo.exception.InvalidFormatException;
 import typetodo.exception.MissingFieldException;
 import typetodo.exception.ReservedCharacterException;
 import typetodo.model.FieldName;
-import typetodo.sync.SyncHandler;
+import typetodo.sync.SyncController;
 
 public class CommandParser {
 	private Schedule schedule;
 	private MainController sc;
-	private SyncHandler syncController;
+	private SyncController syncController;
 	private CurrentTaskListManager taskListManager;
 
-	public CommandParser(MainController sc, Schedule schedule, CurrentTaskListManager taskListManager, SyncHandler syncController) {
+	public CommandParser(MainController sc, Schedule schedule, CurrentTaskListManager taskListManager, SyncController syncController) {
 		this.sc = sc;
 		this.schedule = schedule;
 		this.taskListManager = taskListManager;
