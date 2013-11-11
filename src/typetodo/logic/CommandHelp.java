@@ -1,3 +1,4 @@
+//@author: A0090941E
 package typetodo.logic;
 
 public class CommandHelp implements Command {
@@ -10,7 +11,7 @@ public class CommandHelp implements Command {
 	@Override
 	public String execute() throws Exception {
 		String feedback;
-		feedback=hc.getFeedback();
+		feedback = hc.getFeedback();
 		return feedback;
 	}
 }

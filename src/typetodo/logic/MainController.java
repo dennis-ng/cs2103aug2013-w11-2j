@@ -21,12 +21,13 @@ public class MainController {
 	private CommandParser commandParser;
 	private CurrentTaskListManager taskListManager;
 	private SyncController syncController;
+	private HelpController helpController;
 	
 	public MainController(View view, Schedule schedule) throws IOException {
 		this.view = view;
 		this.syncController = new SyncController(view);
 		this.taskListManager = new CurrentTaskListManager(schedule);
-		this.commandParser = new CommandParser(this, schedule, taskListManager, syncController);
+		this.commandParser = new CommandParser(this, schedule, taskListManager, syncController,helpController);
 		this.historyOfCommands = new Stack<Command>();
 		
 		String htmlDisplayContent = "";
