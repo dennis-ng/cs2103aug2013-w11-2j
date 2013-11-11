@@ -41,6 +41,9 @@ public class DbController {
 	private static final String DIRECTORY_NAME = "savedfiles";
 	private static final String FILENAME_TASK = "tasks.txt";
 	private static final String FILENAME_PROPERTIES = "properties.txt";
+	private static final String EXCEPTION_MSG_DUPLICATE_ID = "Task with the same id already exist.";
+	private static final String EXCEPTION_MSG_INVALID_DATE_RANGE = "End time is earlier than start time.";
+	private static final String EXCEPTION_MSG_MISSING_ID = "The task did not contain a taskId.";
 
 	// Variables
 	private HashMap<String, File> allFiles;
@@ -206,7 +209,7 @@ public class DbController {
 		// Supports for undoing deleted task
 		if (newTask.getTaskId() != 0) {
 			if (tasksCache.containsKey(newTask.getTaskId())) {
-				throw new DuplicateKeyException("Task with the same id already exist.");
+				throw new DuplicateKeyException(EXCEPTION_MSG_DUPLICATE_ID);
 			}
 			tasksCache.put(newTask.getTaskId(), newTask);
 			this.writeChangesToFile(FILENAME_TASK);
@@ -271,7 +274,7 @@ public class DbController {
 	public boolean updateTask(Task taskToUpdate) throws Exception {
 		int taskIdToUpdate = taskToUpdate.getTaskId();
 		if (taskIdToUpdate == 0) {
-			throw new MissingFieldException("The task did not contain a taskId.");
+			throw new MissingFieldException(EXCEPTION_MSG_MISSING_ID);
 		}
 		if (tasksCache.put(taskIdToUpdate, taskToUpdate) != null) {
 			this.writeChangesToFile(FILENAME_TASK);
@@ -298,8 +301,7 @@ public class DbController {
 		LocalDate rangeStart = startDay.toLocalDate();
 		LocalDate rangeEnd = endDay.toLocalDate();
 		if (rangeEnd.isBefore(rangeStart)) {
-			throw new InvalidDateRangeException(
-					"End time is earlier than start time.");
+			throw new InvalidDateRangeException(EXCEPTION_MSG_INVALID_DATE_RANGE);
 		} else {
 			for (Task taskInCache : tasksCache.values()) {
 				if (taskInCache instanceof DeadlineTask) {
@@ -345,8 +347,7 @@ public class DbController {
 		LocalDate rangeStart = startDay.toLocalDate();
 		LocalDate rangeEnd = endDay.toLocalDate();
 		if (rangeEnd.isBefore(rangeStart)) {
-			throw new InvalidDateRangeException(
-					"End time is earlier than start time.");
+			throw new InvalidDateRangeException(EXCEPTION_MSG_INVALID_DATE_RANGE);
 		} else {
 			for (Task taskInCache : tasksCache.values()) {
 				switch (taskType) {
