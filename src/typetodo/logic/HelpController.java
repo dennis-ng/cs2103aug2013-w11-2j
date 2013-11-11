@@ -1,3 +1,4 @@
+//@author: A0090941E
 package typetodo.logic;
 
 public class HelpController {
@@ -68,7 +69,7 @@ public class HelpController {
 	private static final String HELP_DONE = "COMPLETE: (mark certain task is completed and remove from task list)\n"
 			+ "(SYNTAX) done <index of task>";
 	private static final String HELP_DISPLAY = "DISPLAY: (the default view is today's tasks)\n"
-			+ "(SYNTAX) view <date> (Please do no use abbreviation.)";
+			+ "(SYNTAX) view <date> OR view <type> (Please do no use abbreviation.)";
 	private static final String HELP_EXIT = "EXIT:(save and quit TypeToDo)\n"
 			+ "(SYNTAX) exit";
 	private static final String HELP_HOME = "HOME:(display default task list)\n"
