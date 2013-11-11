@@ -2,14 +2,14 @@ package typetodo.logic;
 
 public class CommandUndo implements Command{
 	private static final String MESSAGE_UNDO = "Undo is successful";
-	private MainController sc;
+	private MainController mainController;
 	
-	public CommandUndo(MainController sc) {
-		this.sc = sc;
+	public CommandUndo(MainController mainController) {
+		this.mainController = mainController;
 	}
 	
 	public String execute() throws Exception {
-		sc.undo();
+		mainController.undo();
 		String feedback = MESSAGE_UNDO;
 		return feedback;
 	}
