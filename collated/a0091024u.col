@@ -1,0 +1,2223 @@
+//@author: a0091024u
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\DuplicateKeyException.java
+	 */
+
+ *
+ */
+@SuppressWarnings("serial")
+public class DuplicateKeyException extends Exception {
+
+	public DuplicateKeyException() {
+		super();
+	}
+
+	public DuplicateKeyException(String message) {
+		super(message);
+	}
+
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\DuplicateKeyException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidAttributeException.java
+	 */
+
+ *
+ */
+@SuppressWarnings("serial")
+public class InvalidAttributeException extends Exception {
+
+	public InvalidAttributeException() {
+		super();
+	}
+
+	public InvalidAttributeException(String message) {
+		super(message);
+	}
+}
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidAttributeException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidCommandException.java
+	 */
+
+ *
+ */
+@SuppressWarnings("serial")
+public class InvalidCommandException extends Exception {
+	public InvalidCommandException() {
+		super();
+	}
+
+	public InvalidCommandException(String message) {
+		super(message);
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidCommandException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidDateRangeException.java
+	 */
+
+ *
+ */
+@SuppressWarnings("serial")
+public class InvalidDateRangeException extends Exception {
+
+	public InvalidDateRangeException() {
+		super();
+	}
+
+	public InvalidDateRangeException(String message) {
+		super(message);
+	}
+
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidDateRangeException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidDateTimeException.java
+	 */
+
+ *
+ */
+public class InvalidDateTimeException extends Exception {
+	public InvalidDateTimeException(){
+		super();
+	}
+	
+	public InvalidDateTimeException(String message) {
+		super(message);
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidDateTimeException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidFieldNameException.java
+	 */
+
+ *
+ */
+@SuppressWarnings("serial")
+public class InvalidFieldNameException extends Exception {
+	public InvalidFieldNameException() {
+		super();
+	}
+
+	public InvalidFieldNameException(String message) {
+		super(message);
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidFieldNameException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidFormatException.java
+	 */
+
+ *
+ */
+public class InvalidFormatException extends Exception {
+	public InvalidFormatException() {
+		super();
+	}
+
+	public InvalidFormatException(String message) {
+		super(message);
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidFormatException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidIdException.java
+	 */
+
+ *
+ */
+@SuppressWarnings("serial")
+public class InvalidIdException extends Exception {
+
+	public InvalidIdException() {
+		super();
+	}
+
+	public InvalidIdException(String message) {
+		super(message);
+	}
+}
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\InvalidIdException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\MissingFieldException.java
+	 */
+
+ *
+ */
+public class MissingFieldException extends Exception{
+    public MissingFieldException()
+    {
+    	super();
+    }
+    
+    public MissingFieldException(String message)
+    {
+       super(message);
+    }
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\MissingFieldException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\ReservedCharacterException.java
+	 */
+
+ *
+ */
+@SuppressWarnings("serial")
+public class ReservedCharacterException extends Exception {
+	public ReservedCharacterException() {
+		super();
+	}
+
+	public ReservedCharacterException(String message) {
+		super(message);
+	}
+}
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\exception\ReservedCharacterException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\Command.java
+	 */
+
+ *
+ */
+public interface Command {
+	public String execute() throws Exception;
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\Command.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandAddTask.java
+	 */
+
+ *
+ */
+public class CommandAddTask implements Command, Undoable {
+	private static final String MESSAGE_ADDED = "\"%s\" has been added to your schedule";
+	private Schedule schedule;
+	private int taskId;
+	private Task taskToBeAdded;
+	
+	public CommandAddTask(Schedule sc, String title, String description) {
+		this.schedule = sc;
+		this.taskToBeAdded = new FloatingTask(title, description);
+	}
+	
+	public CommandAddTask(Schedule sc, String title, String description, DateTime deadline) {	
+		this.schedule = sc;
+		this.taskToBeAdded = new DeadlineTask(title, description, deadline);
+	}
+	
+	public CommandAddTask(Schedule sc, String title, String description, DateTime start, DateTime end) {
+		this.schedule = sc;
+		this.taskToBeAdded = new TimedTask(title, description, start, end);
+	}
+	
+	public String execute() throws Exception {
+		taskId = schedule.addTask(taskToBeAdded);
+		
+		String feedback;
+		feedback = String.format(MESSAGE_ADDED, taskToBeAdded.getTitle());
+		return feedback;
+	}
+	
+	public void undo() throws Exception{
+		schedule.deleteTaskById(taskId);
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandAddTask.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandCompleted.java
+	 */
+
+ *
+ */
+public class CommandCompleted implements Command, Undoable{
+	private static final String MESSAGE_COMPLETED = "\"%s\" has been marked as completed";
+	private int taskId;
+	private Task taskBeforeMarking;
+	private Schedule schedule;
+	public CommandCompleted(Schedule schedule, int taskId) {
+		this.schedule = schedule;
+		this.taskId = taskId;
+	}
+	
+	@Override
+	public String execute() throws Exception {
+		taskBeforeMarking = schedule.getTask(taskId).makeCopy();
+		schedule.updateTaskStatus(taskId, Status.COMPLETED);
+		String feedback = String.format(MESSAGE_COMPLETED, taskBeforeMarking.getTitle());
+		return feedback;
+	}
+
+	@Override
+	public void undo() throws Exception {
+		schedule.updateTask(taskBeforeMarking);
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandCompleted.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandDeleteTask.java
+	 */
+
+ *
+ */
+public class CommandDeleteTask implements Command, Undoable{
+	private static final String MESSAGE_DELETED = "\"%s\" has been deleted from your schedule";
+	
+	private Schedule schedule;
+	private Task taskToBeDeleted;
+	private Integer taskId;
+	
+	public CommandDeleteTask(Schedule sc, int taskId) {
+		this.schedule = sc;
+		this.taskId = taskId;
+	}
+	
+	public String execute() throws Exception {
+		this.taskToBeDeleted = schedule.getTask(taskId).makeCopy();
+		
+		if (taskId != null) { 
+			schedule.deleteTaskById(taskId);
+		}
+		
+		String feedback = String.format(MESSAGE_DELETED, taskToBeDeleted.getTitle());
+		return feedback;
+	}
+	
+	public void undo() throws Exception{
+		schedule.addTask(taskToBeDeleted);
+	}
+}
+
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandDeleteTask.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandEditTask.java
+	 */
+
+ *
+ */
+public class CommandEditTask implements Command, Undoable{
+	private static final String MESSAGE_EDITED = "Edit successful";
+	private Schedule schedule;
+	private Task taskBeforeUpdate;
+	private int taskId;
+	private FieldName fieldName;
+	private String newString;
+	private DateTime newDateTime;
+	
+	public CommandEditTask(Schedule schedule, int taskId, FieldName fieldName, String newValue) {
+		this.schedule = schedule;
+		this.taskId = taskId;
+		this.fieldName = fieldName;
+		this.newString = newValue;
+	}
+	
+	public CommandEditTask(Schedule schedule, int taskId, FieldName fieldName, DateTime newDate) {
+		this.schedule = schedule;
+		this.taskId = taskId;
+		this.fieldName = fieldName;
+		this.newDateTime = newDate;
+	}
+	
+	public String execute() throws Exception {
+		taskBeforeUpdate = schedule.getTask(taskId).makeCopy();
+		
+		if (newString != null) {
+			schedule.updateTask(taskId, fieldName, newString);
+		} else if(newDateTime != null) {
+			schedule.updateTask(taskId, fieldName, newDateTime);
+		}
+		
+		String feedback = String.format(MESSAGE_EDITED);
+		return feedback;
+	}
+	
+	public void undo() throws Exception {
+		schedule.updateTask(taskBeforeUpdate);
+	}
+}
+
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandEditTask.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandExit.java
+	 */
+
+ *
+ */
+public class CommandExit implements Command{	
+	@Override
+	public String execute() throws Exception {
+		System.exit(0);
+		return null;
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandExit.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandHome.java
+	 */
+
+ *
+ */
+public class CommandHome implements Command {
+	private static final String MESSAGE_HOME = "Displaying Upcoming Tasks";
+	private CurrentTaskListManager taskListManager;
+	
+	public CommandHome(CurrentTaskListManager taskListManager) {
+		this.taskListManager = taskListManager;
+	}
+	
+	@Override
+	public String execute() throws Exception {
+		this.taskListManager.setByDefault();
+		String feedback = MESSAGE_HOME;
+		return feedback;
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CommandHome.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CurrentTaskListManager.java
+	 */
+
+ *
+ */
+public class CurrentTaskListManager {
+	Schedule schedule;
+	private ArrayList<Task> currentTaskList;
+	private DateTime start = null;
+	private DateTime end = null;
+	private Status status = null;
+	private String keyword = null;
+	private TaskType type = null;
+	
+	public CurrentTaskListManager(Schedule schedule) {
+		this.schedule = schedule;
+		setCurrentTaskList(new ArrayList<Task>());
+		this.setByDefault();
+	}
+
+	/**
+	 * Gets the current list of task based on the current set of attributes
+	 * @return returns a the current list of tasks
+	 * @throws Exception 
+	 */
+	public ArrayList<Task> getCurrentTaskList() throws Exception {
+		if (keyword != null) {
+			currentTaskList = schedule.search(keyword);
+		} else if (type != null) {
+			switch (type) {
+				case FLOATING_TASK :
+					currentTaskList = schedule.getFloatingTasks(status);
+					break;	
+				case DEADLINE_TASK :
+					currentTaskList = schedule.getDeadlineTasks(status);
+					break;		
+				case TIMED_TASK :
+					currentTaskList = schedule.getTimedTasks(status);
+					break;
+			}
+		} else {
+			currentTaskList = schedule.getTasksByDateRange(start, end, status);
+		}
+		
+		return currentTaskList;
+	}
+	
+	public void setCurrentTaskList(ArrayList<Task> currentListOfTasks) {
+		this.currentTaskList = currentListOfTasks;
+	}
+	
+	public void setBySearchResult(String keyword) {
+		if (keyword == null) {
+			this.keyword = "";
+		} else {
+			this.keyword = keyword;
+		}
+		
+		this.start = null;
+		this.end = null;
+		this.type = null;
+	}
+	
+	public void setByDefault() {
+		DateTime now = new DateTime();
+		this.start = now;
+		this.end = now.plusWeeks(1);
+	}
+	
+	public void setByDateRange(DateTime start, DateTime end) {
+		this.start = start;
+		this.end = end;
+		this.keyword = null;
+		this.type = null;
+	}
+	
+	public void setByType(TaskType type) {
+		this.type = type;
+		this.start = null;
+		this.end = null;
+		this.keyword = null;
+		this.type = null;
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\CurrentTaskListManager.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\MainController.java
+	 */
+
+ * 
+ */
+public class MainController {
+	private static final String MESSAGE_WELCOME = "Welcome to TypeToDo! Please type 'help' for instructions.";
+	private static final String ERROR_MESSAGE_NOTHING_TO_UNDO = "Nothing to undo";
+	
+	private View view;
+	private Stack<Command> historyOfCommands;
+	private CommandParser commandParser;
+	private CurrentTaskListManager taskListManager;
+	private SyncController syncController;
+	private HelpController helpController;
+	
+	public MainController(View view, Schedule schedule) throws IOException {
+		this.view = view;
+		this.syncController = new SyncController(view);
+		this.taskListManager = new CurrentTaskListManager(schedule);
+		this.commandParser = new CommandParser(this, schedule, taskListManager, syncController,helpController);
+		this.historyOfCommands = new Stack<Command>();
+		
+		String htmlDisplayContent = "";
+		
+		try {
+			htmlDisplayContent = TasksFormatter.formatTasks(taskListManager.getCurrentTaskList());
+		} catch (Exception e) {
+			view.displayErrorMessage(e.getMessage());
+		}
+		
+		view.displayTasks(htmlDisplayContent);
+		view.displayFeedBack(MESSAGE_WELCOME);
+	}
+
+	public void parseAndExecute(String userInput) {
+		Command command;
+		try {
+			command = commandParser.parse(userInput);
+			String feedback = command.execute();
+			view.displayFeedBack(feedback);
+
+			if (command instanceof Undoable) {
+				historyOfCommands.add(command);
+			}
+
+		} catch (Exception e) {
+			view.displayErrorMessage(e.getMessage());
+		}
+
+		String htmlDisplayContent = "";
+		try {
+			htmlDisplayContent = TasksFormatter.formatTasks(taskListManager.getCurrentTaskList());
+		} catch (Exception e) {
+			view.displayErrorMessage(e.getMessage());
+		}
+		
+		view.displayTasks(htmlDisplayContent);
+	}
+
+	public void undo() throws Exception {
+		if (!historyOfCommands.isEmpty()) {
+			try {
+				((Undoable) this.historyOfCommands.pop()).undo();
+			} catch (Exception e) {
+				view.displayErrorMessage(e.getMessage());
+			}
+		} else {
+			throw new Exception(ERROR_MESSAGE_NOTHING_TO_UNDO);
+		}
+	}
+	
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\MainController.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\Schedule.java
+	 */
+
+ *
+ */
+public class Schedule {
+	private static final String ERROR_MESSAGE_INVALID_ID = "ID does not exist in schedule";
+	private static final String ERROR_MESSAGE_INVALID_FIELD = "Invalid field name";
+	private static final String ERROR_MESSAGE_INVALID_DEADLINE_ATTRIBUTE = "This type of task does not support a deadline";
+	private static final String ERROR_MESSAGE_INVALID_START_ATTRIBUTE = "This type of task does not support a start date";
+	private static final String ERROR_MESSAGE_INVALID_END_ATTRIBUTE = "This type of task does not support a end date";
+	private static final String ERROR_MESSAGE_INVALID_DATE_START_AFTER_END = "Start date cannot be after end date";
+	private static final String ERROR_MESSAGE_INVALID_DATE_RANGE = "Invalid date range";
+	private static final String ERROR_MESSAGE_MISSING_TITLE = "Task must have a title";
+	private static final String ERROR_MESSAGE_MISSING_DEADLINE = "A Deadline Task must have deadline";
+	private static final String ERROR_MESSAGE_MISSING_DATES = "Missing start/end date(s)";
+		
+	private DbController db;
+
+	public Schedule() throws IOException {
+		db = DbController.getInstance();
+	}
+
+	/**
+	 * Adds a task into the Schedule.
+	 * @param task Task to be added
+	 * @return Returns the ID of the added task
+	 */
+	public int addTask(Task task) throws Exception {
+		this.checkForTitle(task);
+		
+		if (task instanceof TimedTask) {
+			this.checkForValidDateRange((TimedTask) task);
+		} else if (task instanceof DeadlineTask) {
+			this.checkForDeadline((DeadlineTask) task);
+		}
+		
+		int taskId = db.addTask(task);
+
+		return taskId;
+	}
+
+	/**
+	 * Deletes a task from the schedule.
+	 * @param taskId Task id of the task that is to be deleted
+	 * @throws Exception 
+	 */
+	public void deleteTaskById(int taskId) throws Exception {
+		if (!db.deleteTask(taskId)) {
+			throw new InvalidIdException(ERROR_MESSAGE_INVALID_ID);
+		}
+	}
+
+	/**
+	 * Updates an existing task with a given task.
+	 * @param task Task to replace existing task
+	 * @throws Exception 
+	 */
+	public void updateTask(Task task) throws Exception {
+		this.checkForTitle(task);
+		
+		if (task instanceof TimedTask) {
+			this.checkForValidDateRange((TimedTask) task);
+		} else if (task instanceof DeadlineTask) {
+			this.checkForDeadline((DeadlineTask) task);
+		}
+		
+		db.updateTask(task);
+	}
+
+	/**
+	 * Updates the TITLE/DESCRIPTION of an existing task.
+	 * @param taskId Task id of the existing task
+	 * @param fieldName TITLE/DESCRIPTION
+	 * @param newString new value
+	 * @throws Exception if Id is invalid, if attribute to be updated is does not exist in that 
+	 * particular type of task and if new value is invalid 
+	 */
+	public void updateTask(int taskId, FieldName fieldName, String newString) throws Exception {
+		Task taskToBeUpdated = db.getTask(taskId);
+		if (taskToBeUpdated == null) {
+			throw new InvalidIdException(ERROR_MESSAGE_INVALID_ID);
+		}
+
+		switch (fieldName) {
+		case TITLE :
+			taskToBeUpdated.setTitle(newString);
+			this.checkForTitle(taskToBeUpdated);
+			break;
+		case DESCRIPTION :
+			taskToBeUpdated.setDescription(newString);
+			break;
+		default:
+			throw new InvalidFieldNameException(ERROR_MESSAGE_INVALID_FIELD);
+		}
+
+		taskToBeUpdated.updateDateModified();
+		db.updateTask(taskToBeUpdated);
+	}
+
+	/**
+	 * Updates the DEADLINE/START/END of an existing task.
+	 * @param taskId Task id of the existing task
+	 * @param fieldName DEADLINE/START/END
+	 * @param newDateTime new value
+	 * @throws Exception if Id is invalid, if attribute to be updated is does not exist in that 
+	 * particular type of task and if new value is invalid
+	 */
+	public void updateTask(int taskId, FieldName fieldName, DateTime newDateTime) throws Exception {
+		Task taskToBeUpdated = db.getTask(taskId);
+		if (taskToBeUpdated == null) {
+			throw new InvalidAttributeException(ERROR_MESSAGE_INVALID_ID);
+		}
+
+		switch (fieldName) {
+		case DEADLINE :
+			if (taskToBeUpdated instanceof DeadlineTask) {
+				((DeadlineTask) taskToBeUpdated).setDeadline(newDateTime);
+			} else {
+				throw new InvalidAttributeException(ERROR_MESSAGE_INVALID_DEADLINE_ATTRIBUTE);
+			}
+			break;
+		case START :
+			if (taskToBeUpdated instanceof TimedTask) {
+				((TimedTask) taskToBeUpdated).setStart(newDateTime);
+				this.checkForValidDateRange((TimedTask) taskToBeUpdated);
+			} else {
+				throw new InvalidAttributeException(ERROR_MESSAGE_INVALID_START_ATTRIBUTE);
+			}
+			break;
+		case END :
+			if (taskToBeUpdated instanceof TimedTask) {
+				((TimedTask) taskToBeUpdated).setEnd(newDateTime);
+			} else {
+				throw new InvalidAttributeException(ERROR_MESSAGE_INVALID_END_ATTRIBUTE);
+			}
+			break;
+		default :
+			throw new InvalidFieldNameException(ERROR_MESSAGE_INVALID_FIELD);
+		}
+
+		taskToBeUpdated.updateDateModified();
+		db.updateTask(taskToBeUpdated);
+	}
+
+	/**
+	 * Updates the status of an existing task.
+	 * @param taskId Task id of the existing task
+	 * @param status COMPLETE/INCOMPLETE
+	 * @throws Exception if id is invalid
+	 */
+	public void updateTaskStatus(int taskId, Status status) throws Exception {
+		Task taskToBeMarked = db.getTask(taskId);
+
+		if (taskToBeMarked == null) {
+			throw new InvalidIdException(ERROR_MESSAGE_INVALID_ID);
+		}
+
+		taskToBeMarked.setStatus(status);
+		db.updateTask(taskToBeMarked);
+	}
+
+	/**
+	 * Searches the schedule and returns a list of Tasks which contain the given keyword in their 
+	 * TITLE/DESCRIPTION.
+	 * @param keyword Keyword to search
+	 * @return Returns a list of Tasks which contain the given keyword in their TITLE/DESCRIPTION.
+	 */
+	public ArrayList<Task> search(String keyword) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		if (keyword == null) {
+			return result;
+		}
+		
+		result = db.retrieveContaining(keyword);
+		return result;
+	}
+
+	/**
+	 * Gets a list of all the tasks from Schedule that falls within the given date range. If start and end are both null,
+	 * a list of all tasks from Schedule would be returned.
+	 * @param start Lower date bound of range
+	 * @param end Upper date bound of range
+	 * @param status Status of task. COMPLETED/INCOMPLETE
+	 * @return returns a list of either tasks which falls under a given date range, or all tasks in the schedule
+	 * @throws InvalidDateRangeException if given date range is invalid
+	 */
+	public ArrayList<Task> getTasksByDateRange(DateTime start, DateTime end, Status status) throws InvalidDateRangeException {
+		ArrayList<Task> tasks = new ArrayList<Task>();
+
+		if ((start == null) && (end == null)) {
+			return db.retrieveAll();
+		} else if ((start == null) || (end == null)) {
+			throw new InvalidDateRangeException(ERROR_MESSAGE_INVALID_DATE_RANGE);
+		} else if (start.isAfter(end)) {
+			throw new InvalidDateRangeException(ERROR_MESSAGE_INVALID_DATE_START_AFTER_END);
+		}
+		else if (status == null) {
+			return db.retrieveTasks(start, end);
+		} else {
+			for (Task task : db.retrieveTasks(start, end)) {
+				if (task.getStatus().equals(status)) {
+					tasks.add(task);
+				}
+			}
+		}
+		return tasks;
+	}
+
+	/**
+	 * Returns a list of all the tasks in the schedule, filtered by the given status.
+	 * E.g, if status is COMPLETED, a list of all completed tasks in the schedule would
+	 * be returned. Optionally filtered by a given Task status.
+	 * @param status Status of task, COMPLETED/INCOMPLETE/null
+	 * @return returns an ArrayList of tasks
+	 */
+	public ArrayList<Task> getAllTasks(Status status) {
+		if (status == null) {
+			return db.retrieveAll();
+		}
+
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		for (Task task : db.retrieveAll()) {
+			if (task.getStatus().equals(status)) {
+				tasks.add(task);
+			}
+		}	
+		return tasks;
+	}
+
+	/**
+	 * Returns all Floating Tasks in the Schedule, filtered by a given Task status.
+	 * Optionally filtered by a given Task status.
+	 * @param status Status of task, COMPLETED/INCOMPLETE/null
+	 * @return returns a list of all Floating Tasks found in the Schedule.
+	 */
+	public ArrayList<Task> getFloatingTasks(Status status) {
+		ArrayList<Task> listOfFloatingTasks = new ArrayList<Task>();
+
+		for (Task task : db.retrieveAll(TaskType.FLOATING_TASK)) {
+			if (status == null) {
+				listOfFloatingTasks.add(task);
+			} else {
+				if (task.getStatus().equals(status)) {
+					listOfFloatingTasks.add(task);
+				}
+			}
+		}
+
+		return listOfFloatingTasks;
+	}
+
+	/**
+	 * Returns all Deadline Tasks in the Schedule, filtered by a given Task status.
+	 * Optionally filtered by a given Task status.
+	 * @param status Status of task, COMPLETED/INCOMPLETE/null
+	 * @return returns a list of all Deadline Tasks found in schedule
+	 */
+	public ArrayList<Task> getDeadlineTasks(Status status) {
+		ArrayList<Task> listOfDeadlineTasks = new ArrayList<Task>();
+
+		for (Task task : db.retrieveAll(TaskType.DEADLINE_TASK)) {
+			if (status == null) {
+				listOfDeadlineTasks.add(task);
+			} else {
+				if (task.getStatus().equals(status)) {
+					listOfDeadlineTasks.add(task);
+				}
+			}
+		}
+
+		return listOfDeadlineTasks;
+	}
+
+	/**
+	 * Returns all Timed Tasks in the Schedule, filtered by a given Task status.
+	 * Optionally filtered by a given Task status.
+	 * @param status Status of task, COMPLETED/INCOMPLETE/null
+	 * @return returns a list of all Timed Tasks found in schedule
+	 */
+	public ArrayList<Task> getTimedTasks(Status status) {
+		ArrayList<Task> listOfTimedTasks = new ArrayList<Task>();
+
+		for (Task task : db.retrieveAll(TaskType.TIMED_TASK)) {
+			if (status == null) {
+				listOfTimedTasks.add(task);
+			} else {
+				if (task.getStatus().equals(status)) {
+					listOfTimedTasks.add(task);
+				}
+			}
+		}
+
+		return listOfTimedTasks;
+	}
+
+	/**
+	 * Returns the task with the given task id
+	 * @param taskId task id of task
+	 * @return returns the tasks with the give task id
+	 * @throws Exception if No task with the given task id is found
+	 */
+	public Task getTask(int taskId) throws Exception {
+		Task task = db.getTask(taskId);
+		if (task == null) {
+			throw new InvalidIdException(ERROR_MESSAGE_INVALID_ID);
+		}
+		return task;
+	}
+	
+	private void checkForTitle(Task task) throws MissingFieldException {
+		if (task.getTitle() == null || task.getTitle().equals("")) {
+			throw new MissingFieldException(ERROR_MESSAGE_MISSING_TITLE);
+		}
+	}
+	
+	private void checkForDeadline(DeadlineTask deadlineTask) throws MissingFieldException {
+		if (deadlineTask.getDeadline() == null) {
+			throw new MissingFieldException(ERROR_MESSAGE_MISSING_DEADLINE);
+		}
+	}
+	
+	private void checkForValidDateRange(TimedTask timedTask) throws InvalidDateRangeException {
+		DateTime start = timedTask.getStart();
+		DateTime end = timedTask.getEnd();
+		
+		if (start == null || end == null) {
+			throw new InvalidDateRangeException(ERROR_MESSAGE_MISSING_DATES);
+		}
+		
+		if (start.isAfter(end)) {
+			throw new InvalidDateRangeException(ERROR_MESSAGE_INVALID_DATE_START_AFTER_END);
+		}
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\Schedule.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\ScheduleATD.java
+	 */
+
+ *
+ */
+public class ScheduleATD {
+	private static final String ERROR_MESSAGE_INVALID_ID = "ID does not exist in schedule";
+	private static final String ERROR_MESSAGE_INVALID_FIELD = "Invalid field name";
+	private static final String ERROR_MESSAGE_INVALID_DEADLINE_ATTRIBUTE = "This type of task does not support a deadline";
+	private static final String ERROR_MESSAGE_INVALID_START_ATTRIBUTE = "This type of task does not support a start date";
+	private static final String ERROR_MESSAGE_INVALID_END_ATTRIBUTE = "This type of task does not support a end date";
+	private static final String ERROR_MESSAGE_INVALID_DATE_START_AFTER_END = "Start date cannot be after end date";
+	private static final String ERROR_MESSAGE_INVALID_DATE_RANGE = "Invalid date range";
+	private static final String ERROR_MESSAGE_MISSING_TITLE = "Task must have a title";
+	private static final String ERROR_MESSAGE_MISSING_DEADLINE = "A Deadline Task must have deadline";
+	private static final String ERROR_MESSAGE_MISSING_DATES = "Missing start/end date(s)";
+	
+	//Boundary cases for adding of timed tasks with 'either start/end date is null' partition//
+	@Test
+	public void AddingTimedTaskWithMissingDates() {
+		Schedule schedule = null;
+		TimedTask timeTask1 = new TimedTask("Timed tasks with null dates", "description", null, new DateTime());
+		TimedTask timeTask2 = new TimedTask("Timed tasks with null dates", "description", new DateTime(), null);
+		TimedTask timeTask3 = new TimedTask("Timed tasks with null dates", "description", null, null);
+
+		try {
+			schedule = new Schedule();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//adding timed task with start date as null
+		try {
+			schedule.addTask(timeTask1);
+		} catch (Exception expected) {
+			assertEquals(expected.getMessage(), ERROR_MESSAGE_MISSING_DATES);
+		}
+		
+		//adding timed task with end date as null
+		try {
+			schedule.addTask(timeTask2);
+		} catch (Exception expected) {
+			assertEquals(expected.getMessage(), ERROR_MESSAGE_MISSING_DATES);
+		}
+		
+		//adding timed task with both start and end as null
+		try {
+			schedule.addTask(timeTask3);
+		} catch (Exception expected) {
+			assertEquals(expected.getMessage(), ERROR_MESSAGE_MISSING_DATES);
+		}
+	}
+	
+	//Boundary cases for adding of timed tasks with 'start after end date' partition//
+	@Test
+	public void AddingATimedTaskWithStartAfterEnd() {
+		Schedule schedule = null;
+		TimedTask timeTask1 = new TimedTask("Timed task", "description", new DateTime().plusDays(10), new DateTime());
+
+		try {
+			schedule = new Schedule();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//adding a timetask with end date after start date
+		try {
+			schedule.addTask(timeTask1);
+		} catch (Exception expected) {
+			assertEquals(expected.getMessage(), ERROR_MESSAGE_INVALID_DATE_START_AFTER_END);
+		}
+	}
+
+	//Boundary cases for adding of timed tasks with 'start is before or equal end date' partition//
+	@Test
+	public void AddingATimedTaskWithStartBeforeOrEqualEnd() {
+		DateTime now = new DateTime();
+		Schedule schedule = null;
+		TimedTask timeTask1 = new TimedTask("Timed task", "description", now.minusDays(10), now);
+		TimedTask timeTask2 = new TimedTask("Timed task", "description", now, now);
+
+		try {
+			schedule = new Schedule();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//adding timed task with start before end date
+		try {
+			assertEquals(1, schedule.addTask(timeTask1));
+		} catch (Exception expected) {
+			;
+		}
+		
+		//adding timed task with start and end as the same date
+		try {
+			assertEquals(2, schedule.addTask(timeTask2));
+		} catch (Exception expected) {
+			;
+		}
+	}
+}
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\ScheduleATD.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\TasksFormatter.java
+	 */
+
+ *
+ */
+public class TasksFormatter {
+	
+	/**
+	 * Takes in a list of tasks and format them for display with the use of html tags
+	 * @param tasks
+	 * @return returns a String of the formated tasks, ready for display
+	 */
+	public static String formatTasks(ArrayList<Task> tasks) {
+		StringBuilder sb = new StringBuilder();
+		ArrayList<Task> floatingTasks = new ArrayList<Task>();
+		HashMap<LocalDate, ArrayList<Task>> timedAndDeadlineTasks = new HashMap<LocalDate, ArrayList<Task>>();
+	
+		groupTasksByDates(tasks, timedAndDeadlineTasks, floatingTasks);
+		ArrayList<LocalDate> sortedKeysInAscendingDate = sortKeySetByAscendingDate(timedAndDeadlineTasks.keySet());
+		
+		for (LocalDate date : sortedKeysInAscendingDate) {
+			printDateHeading(date, sb);
+			
+			for (Task task : timedAndDeadlineTasks.get(date)) {
+				if (isNewlyCreated(task) || isRecentlyModified(task)) {
+					highlightTask(task, sb);
+				} else if (task.getStatus().equals(Status.COMPLETED)) {
+					strikeOutTask(task, sb);
+				} else {
+					sb.append(formatTask(task));
+				}
+			}
+			sb.append("<hr>");
+		}
+
+		if (!floatingTasks.isEmpty()) {
+			printFloatingTaskHeading(sb);
+		}
+
+		for (Task task : floatingTasks) {
+			if (isNewlyCreated(task) || isRecentlyModified(task)) {
+				highlightTask(task, sb);
+			} else if (task.getStatus().equals(Status.COMPLETED)) {
+				strikeOutTask(task, sb);
+			} else { 
+				sb.append(formatTask(task));
+			}
+		}
+
+		return sb.toString();
+	}
+
+	private static void groupTasksByDates(ArrayList<Task> tasksToBeGrouped, 
+			HashMap<LocalDate, ArrayList<Task>> timedAndDeadlineTasks, ArrayList<Task> floatingTasks) {
+
+		for (Task task : tasksToBeGrouped) {
+			LocalDate date = null;
+
+			if (task instanceof DeadlineTask) {
+				date = ((DeadlineTask) task).getDeadline().toLocalDate();
+				addTaskToHashMap(timedAndDeadlineTasks, date, task);
+			} else if (task instanceof TimedTask) {
+				TimedTask taskToBeDisplayed = (TimedTask) task.makeCopy();
+				date = taskToBeDisplayed.getStart().toLocalDate();
+				LocalDate endDate = ((TimedTask)task).getEnd().toLocalDate();
+				
+				if (date.isEqual(endDate)){
+					addTaskToHashMap(timedAndDeadlineTasks, date, task);
+				} else {
+					LocalTime endTime = taskToBeDisplayed.getEnd().toLocalTime();
+					date = addTimedTaskToitsStartDate(timedAndDeadlineTasks, date, endDate, taskToBeDisplayed);
+					date = addTimedTaskToAllDatesBetweenItsStartAndEnd(timedAndDeadlineTasks, date, endDate, taskToBeDisplayed);
+					addTimedTaskToItsEndDate(timedAndDeadlineTasks, date, endDate, endTime, taskToBeDisplayed);
+				}
+			} else if (task instanceof FloatingTask) {
+				floatingTasks.add(task);
+			}
+		}
+	}
+	
+	private static String formatTask(Task task) {
+		if (task instanceof FloatingTask) {
+			return formatFloatingTask((FloatingTask) task);
+		} else if (task instanceof DeadlineTask) {
+			return formatDeadlineTask((DeadlineTask) task);
+		} else if (task instanceof TimedTask) {
+			return formatTimedTask((TimedTask) task);
+		}
+		
+		return "";
+	}
+	
+	private static ArrayList<LocalDate> sortKeySetByAscendingDate(Set<LocalDate> keySet) {
+		ArrayList<LocalDate> sortedDates = new ArrayList<LocalDate>(keySet);
+		Collections.sort(sortedDates, new LocalDateComparator());
+		
+		return sortedDates;
+	}
+	
+	private static boolean isNewlyCreated(Task task) {
+		DateTime dateCreated = task.getDateCreated();
+		DateTime currentDateTime = new DateTime();
+
+		return Seconds.secondsBetween(dateCreated, currentDateTime).isLessThan(Seconds.parseSeconds("PT5S"));
+	}
+
+	private static boolean isRecentlyModified(Task task) {
+		DateTime dateModified = task.getDateModified();
+		DateTime currentDateTime = new DateTime();
+
+		return Seconds.secondsBetween(dateModified, currentDateTime).isLessThan(Seconds.parseSeconds("PT5S"));
+	}
+
+	private static void highlightTask(Task task, StringBuilder sb) {
+		sb.append("<span style=\"background-color: #FFFF00\">");
+		sb.append("<marker>");
+		sb.append(formatTask(task));
+		sb.append("</span>");
+	}
+	
+	private static void printDateHeading(LocalDate date, StringBuilder sb) {
+		sb.append("<font face=\"century gothic\" size=\"6\" color=\"#4863A0\">");
+		sb.append(date.toString("EEE, dd MMM yyyy"));
+		sb.append("</font>");
+		sb.append("<br>");
+	}
+	
+	private static void printFloatingTaskHeading(StringBuilder sb) {
+		sb.append("<font face=\"century gothic\" size=\"6\" color=\"#4863A0\">");
+		sb.append("Floating Task");
+		sb.append("</font>");
+		sb.append("<br>");
+	}
+	
+	private static void strikeOutTask(Task task, StringBuilder sb) {
+		sb.append("<strike>");
+		sb.append(formatTask(task));
+		sb.append("</font>");
+		sb.append("</strike>");
+	}
+	
+	private static LocalDate addTimedTaskToitsStartDate(HashMap<LocalDate, ArrayList<Task>> tasksMap, LocalDate date, LocalDate endDate, TimedTask task) {
+		if (date.isBefore(endDate)) {
+			task.setEnd(date.toDateTime(LocalTime.parse("23:59"), null));
+			addTaskToHashMap(tasksMap, date, task.makeCopy());
+			date = date.plusDays(1);
+		}
+		
+		return date;
+	}
+	
+	private static LocalDate addTimedTaskToAllDatesBetweenItsStartAndEnd(HashMap<LocalDate, ArrayList<Task>> tasksMap, LocalDate date, LocalDate endDate, TimedTask task) {
+		while (date.isBefore(endDate)) {
+			task.setStart(date.toDateTime(LocalTime.parse("00:00"), null));
+			addTaskToHashMap(tasksMap, date, task.makeCopy());
+
+			date = date.plusDays(1);
+		}
+		return date;
+	}
+	
+	private static void addTimedTaskToItsEndDate(HashMap<LocalDate, ArrayList<Task>> tasksMap, LocalDate date, LocalDate endDate, LocalTime endTime, TimedTask task) {
+		task.setStart(date.toDateTime(LocalTime.parse("00:00"), null));
+		task.setEnd(date.toDateTime(endTime));
+		addTaskToHashMap(tasksMap, date, task.makeCopy());
+	}
+	
+	private static void addTaskToHashMap(HashMap<LocalDate, ArrayList<Task>> tasksMap, LocalDate date, Task task) {
+		if (tasksMap.containsKey(date)) {
+			tasksMap.get(date).add(task);
+		} else {
+			tasksMap.put(date, new ArrayList<Task>());
+			tasksMap.get(date).add(task);
+		}
+	}
+	
+	private static String formatFloatingTask(FloatingTask floatingTask) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<font face=\"century gothic\">");
+		sb.append("[Id: " + floatingTask.getTaskId() + "] ");
+		sb.append("<b>");
+		sb.append(floatingTask.getTitle() + " ");
+		sb.append("</b>");
+		
+		if (floatingTask.getDescription() != null && !floatingTask.getDescription().equals("")) {
+			sb.append("\n");
+			sb.append("<br>");
+			sb.append("<i>");
+			sb.append(" - " + floatingTask.getDescription().trim());
+			sb.append("</i>");
+		}
+		sb.append("</font>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	
+	private static String formatDeadlineTask(DeadlineTask deadlineTask) {
+		StringBuilder sb = new StringBuilder();
+		
+		if (deadlineTask.getDeadline().isBefore(new DateTime())) {
+			sb.append("<font face=\"century gothic\" color=\"#B6B6B4\">");
+			sb.append("[Id: " + deadlineTask.getTaskId() + "] ");
+			sb.append("<b>");
+			sb.append(deadlineTask.getTitle() + " ");
+			sb.append("</b>");
+			
+			sb.append("due at ");
+			sb.append("<b>");
+			sb.append(deadlineTask.getDeadline().toString("HH:mm"));
+			sb.append("</b>");
+		} else {
+			sb.append("<font face=\"century gothic\">");
+			sb.append("[Id: " + deadlineTask.getTaskId() + "] ");
+			sb.append("<b>");
+			sb.append(deadlineTask.getTitle() + " ");
+			sb.append("</b>");
+
+			sb.append("due at ");
+			sb.append("<font face=\"century gothic\" color=\"red\">");
+			sb.append("<b>");
+			sb.append(deadlineTask.getDeadline().toString("HH:mm"));
+			sb.append("</b>");
+			sb.append("</font>");
+		}
+
+		if (deadlineTask.getDescription() != null && !deadlineTask.getDescription().equals("")) {
+			sb.append("\n");
+			sb.append("<br>");
+			sb.append("<i>");
+			sb.append(" - " + deadlineTask.getDescription().trim());
+			sb.append("</i>");
+		}
+		sb.append("</font>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+	
+	private static String formatTimedTask(TimedTask timedTask) {
+		StringBuilder sb = new StringBuilder();
+
+		if (timedTask.getEnd().isBefore(new DateTime())) {
+			sb.append("<font face=\"century gothic\" color=\"#B6B6B4\">");
+			sb.append("[Id: " + timedTask.getTaskId() + "] ");
+			sb.append("<b>");
+			sb.append(timedTask.getTitle() + " ");
+			sb.append("</b>");
+
+			sb.append("from ");
+			sb.append("<b>");
+			sb.append(timedTask.getStart().toString("HH:mm"));
+			sb.append(" to ");
+			sb.append(timedTask.getEnd().toString("HH:mm"));
+			sb.append("</b>");
+		} else {
+			sb.append("<font face=\"century gothic\">");
+			sb.append("[Id: " + timedTask.getTaskId() + "] ");
+			sb.append("<b>");
+			sb.append(timedTask.getTitle() + " ");
+			sb.append("</b>");
+
+			sb.append("from ");
+			sb.append("<font face=\"century gothic\" color=\"red\">");
+			sb.append("<b>");
+			sb.append(timedTask.getStart().toString("HH:mm"));
+			sb.append(" to ");
+			sb.append(timedTask.getEnd().toString("HH:mm"));
+			sb.append("</b>");
+			sb.append("</font>");
+		}
+
+		if (timedTask.getDescription() != null && !timedTask.getDescription().equals("")) {
+			sb.append("\n");
+			sb.append("<br>");
+			sb.append("<i>");
+			sb.append(" - " + timedTask.getDescription().trim());
+			sb.append("</i>");
+		}
+		sb.append("</font>");
+		sb.append("<br>");
+		
+		return sb.toString();
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\TasksFormatter.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\Undoable.java
+	 */
+
+ *
+ */
+public interface Undoable {
+	public void undo() throws Exception;
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\logic\Undoable.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\DeadlineTask.java
+	 */
+
+ *
+ */
+public class DeadlineTask extends Task {
+	private DateTime deadline;
+
+	public DeadlineTask(String name, String description, DateTime deadline) {
+		super(name, description);
+		this.setDeadline(deadline);
+	}
+
+	public DeadlineTask(int taskId, String name, String description,
+			DateTime deadline) {
+		super(name, description);
+		this.setTaskId(taskId);
+		this.setDeadline(deadline);
+	}
+
+	public DateTime getDeadline() {
+		return deadline;
+	}
+
+	public void setDeadline(DateTime deadline) {
+		this.deadline = deadline;
+	}
+
+	public Task makeCopy() {
+		return new DeadlineTask(this.getTaskId(), this.getTitle(),
+				this.getDescription(), this.getDeadline());
+	}
+
+	public static final Comparator<DeadlineTask> COMPARE_BY_DATE = new Comparator<DeadlineTask>() {
+		@Override
+		public int compare(DeadlineTask task1, DeadlineTask task2) {
+			return task1.getDeadline().compareTo(task2.getDeadline());
+		}
+	};
+}
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\DeadlineTask.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\Task.java
+	 */
+
+ * 
+ */
+public abstract class Task implements Comparable<Task> {
+	public static enum Status {
+		COMPLETED, INCOMPLETE;
+	}
+
+	private int TaskId;
+	private String googleId; // Retrive after sync
+	private String title;
+	private String description;
+	private Status status;
+	private DateTime dateCreated;
+	private DateTime dateModified;
+
+	public Task(String name, String description) {
+		this.setTitle(name);
+		this.setDescription(description);
+		dateCreated = new DateTime();
+		dateModified = new DateTime();
+		this.setStatus(Status.INCOMPLETE);
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String name) {
+		this.title = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+	public int getTaskId() {
+		return TaskId;
+	}
+
+	public void setTaskId(int taskId) {
+		this.TaskId = taskId;
+	}
+
+	public String toString() {
+		return (this.getTitle() + " " + this.getDescription());
+	}
+
+	public abstract Task makeCopy();
+
+	public void setDateCreated(DateTime dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+	
+	/**
+	 * @return the dateCreated
+	 */
+	public DateTime getDateCreated() {
+		return dateCreated;
+	}
+
+	/**
+	 * @return the dateModified
+	 */
+	public DateTime getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(DateTime dateModified) {
+		this.dateModified = dateModified;
+	}
+	
+	/**
+	 * @param dateModified
+	 *          the dateModified to set
+	 */
+	public void updateDateModified() {
+		this.dateModified = new DateTime();
+	}
+
+	/**
+	 * @return the googleId
+	 */
+	public String getGoogleId() {
+		return googleId;
+	}
+
+	/**
+	 * @param googleCalendarEventId
+	 *          the googleCalendarEventId to set
+	 */
+	public void setGoogleId(String googleId) {
+		this.googleId = googleId;
+	}
+
+	public int compareTo(Task taskToCompare) {
+		int comparedId = taskToCompare.getTaskId();
+		// Sort tasks by taskId in ascending order
+		return this.TaskId - comparedId;
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\TimedTask.java
+	 */
+
+ *
+ */
+public class TimedTask extends Task {
+	private DateTime start;
+	private DateTime end;
+
+	public TimedTask(String name, String description, DateTime start, DateTime end) {
+		super(name, description);
+		this.setStart(start);
+		this.setEnd(end);
+	}
+
+	public TimedTask(int taskId, String name, String description, DateTime start, DateTime end) {
+		super(name, description);
+		this.setTaskId(taskId);
+		this.setStart(start);
+		this.setEnd(end);
+	}
+
+	public DateTime getStart() {
+		return start;
+	}
+
+	public void setStart(DateTime start) {
+		this.start = start;
+	}
+
+	public DateTime getEnd() {
+		return end;
+	}
+
+	public void setEnd(DateTime end) {
+		this.end = end;
+	}
+
+	public Task makeCopy() {
+		TimedTask copy = new TimedTask(this.getTaskId(), this.getTitle(),
+				this.getDescription(), this.getStart(), this.getEnd());
+		copy.setStatus(this.getStatus());
+		copy.setDateCreated(this.getDateCreated());
+		copy.setDateModified(this.getDateModified());
+		
+		return copy;
+	}
+
+	public static final Comparator<TimedTask> COMPARE_BY_DATE = new Comparator<TimedTask>() {
+		@Override
+		public int compare(TimedTask task1, TimedTask task2) {
+			if (task1.getEnd().isEqual(task2.getEnd())) {
+				return task1.getStart().compareTo(task2.getStart());
+			} else {
+				return task1.getEnd().compareTo(task2.getEnd());
+			}
+		}
+	};
+}
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\TimedTask.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\TypeOfOperation.java
+	 */
+
+ *
+ */
+public enum TypeOfOperation {
+	ADD, DELETE, EDIT;
+}
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\TypeOfOperation.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\View.java
+	 */
+
+ * 
+ */
+public class View {
+	private String feedBack;
+	private ArrayList<Task> tasks;
+	
+	public View(String feedBack, ArrayList<Task> tasks) {
+		this.setFeedBack(feedBack);
+		this.setTasks(tasks);
+	}
+	
+	public String getFeedBack() {
+		return feedBack;
+	}
+	
+	public void setFeedBack(String feedBack) {
+		this.feedBack = feedBack;
+	}
+
+	public ArrayList<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(ArrayList<Task> tasks) {
+		this.tasks = tasks;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		int index;
+		
+		sb.append("FEEDBACK: " + this.feedBack + "\n");
+		sb.append("TASKS:\n");
+		
+		for (int i = 0; i < this.tasks.size(); ++i) {
+			index = i+1;
+			sb.append(index + ". " + tasks.get(i));
+		}
+		
+		return sb.toString();
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\model\View.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\sync\GCalAuthenticator.java
+	 */
+
+ *
+ */
+public class GCalAuthenticator {
+	/**
+	 * Be sure to specify the name of your application. If the application name is {@code null} or
+	 * blank, the application will log a warning. Suggested format is "MyCompany-ProductName/1.0".
+	 */
+	private final String APPLICATION_NAME;
+
+	/** Directory to store user credentials. */
+	private final java.io.File DATA_STORE_DIR;
+			
+	/**
+	 * Global instance of the {@link DataStoreFactory}. The best practice is to make it a single
+	 * globally shared instance across your application.
+	 */
+	private FileDataStoreFactory dataStoreFactory;
+
+	/** Global instance of the JSON factory. */
+	private final JsonFactory JSON_FACTORY;
+
+	/** Global instance of the HTTP transport. */
+	private HttpTransport httpTransport;
+
+	@SuppressWarnings("unused")
+	private Calendar calendarClient;
+	private Tasks tasksClient;
+	
+	/**
+	 * Constructor for GCalAuthenticator
+	 * @param applicationName
+	 */
+	public GCalAuthenticator (String applicationName) {
+		this.APPLICATION_NAME = applicationName;
+		this.DATA_STORE_DIR =
+				new java.io.File(System.getProperty("user.home"), ".store/typetodo.credentials");
+		this.JSON_FACTORY = JacksonFactory.getDefaultInstance();
+		
+		try {
+			// initialize the transport
+			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+
+			// initialize the data store factory
+			dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
+
+			// authorization
+			Credential credential = authorize();
+
+			// set up global Calendar instance
+			calendarClient = new Calendar.Builder(httpTransport, JSON_FACTORY, credential)
+			.setApplicationName(APPLICATION_NAME).build();
+			
+			// Tasks client
+		    setTasksClient(new com.google.api.services.tasks.Tasks.Builder(httpTransport, JSON_FACTORY, credential)
+			    .setApplicationName(APPLICATION_NAME).build());
+
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
+	/**
+	 * Returns Google's Calendar client to access user's calendars and events
+	 * @return client of type Calendar
+	 */
+	public Calendar getClient() {
+		return calendarClient;
+	}
+
+	/** Authorizes the installed application to access user's protected data. */
+	private Credential authorize() throws Exception {
+		// load client secrets
+		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+				new InputStreamReader(this.getClass().getResourceAsStream("/client_secrets.json")));
+		if (clientSecrets.getDetails().getClientId().startsWith("Enter") ||
+				clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
+			System.out.println(
+					"Overwrite the src/main/resources/client_secrets.json file with the client secrets file "
+							+ "you downloaded from the Quickstart tool or manually enter your Client ID and Secret "
+							+ "from https://code.google.com/apis/console/?api=calendar#project:1017848623557 "
+							+ "into src/main/resources/client_secrets.json");
+			System.exit(1);
+		}
+
+		// Set up authorization code flow.
+		// Ask for only the permissions you need. Asking for more permissions will
+		// reduce the number of users who finish the process for giving you access
+		// to their accounts. It will also increase the amount of effort you will
+		// have to spend explaining to users what you are doing with their data.
+		// Here we are listing all of the available scopes. You should remove scopes
+		// that you are not actually using.
+		Set<String> scopes = new HashSet<String>();
+		scopes.add(CalendarScopes.CALENDAR);
+		scopes.add(CalendarScopes.CALENDAR_READONLY);
+		scopes.add(TasksScopes.TASKS);
+		scopes.add(TasksScopes.TASKS_READONLY);
+
+		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+				httpTransport, JSON_FACTORY, clientSecrets, scopes)
+		.setDataStoreFactory(dataStoreFactory)
+		.build();
+		// authorize
+		return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+	}
+
+	/**
+	 * @return the tasksClient
+	 */
+	public Tasks getTasksClient() {
+		return tasksClient;
+	}
+
+	/**
+	 * @param tasksClient the tasksClient to set
+	 */
+	public void setTasksClient(Tasks tasksClient) {
+		this.tasksClient = tasksClient;
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\sync\GCalAuthenticator.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\sync\SyncController.java
+	 */
+
+ *
+ */
+public class SyncController {
+	private static final String MESSAGE_SYNC = "Sync as of %s. Please type 'view all' to refresh";
+	private static final String MESSAGE_SYNC_FROM_LOCAL = "Syncing additional tasks from local schedule..";
+	private static final String MESSAGE_SYNC_EXISTING = "Syncing tasks that exist in both schedules..";
+	private static final String MESSAGE_SYNC_FROM_GOOGLE = "Syncing additional tasks from google schedule..";
+	private static final String DATE_FORMAT_FOR_LAST_SYNC = "EEE, dd MMM yyyy HH:mm";
+	private static final String PROPERTY_NAME_LAST_SYNC = "lastSyncDate";
+	
+	public DateTime lastSyncDate;
+
+	private GoogleSchedule googleSchedule;
+	private final DbController dataBase;
+	private final View view;
+
+	public SyncController(View view) throws IOException {
+		dataBase = DbController.getInstance();
+		this.view = view;
+		this.initializeLastSyncDate();
+		this.googleSchedule = null;
+	}
+
+	/**
+	 * Syncs the local schedule with the Google schedule
+	 * @throws Exception
+	 */
+	public void twoWaySync() throws Exception {
+		while (googleSchedule == null) {
+			this.connectToGoogleSchedule();
+		}
+		
+		(new SyncWorker(this, view)).execute(); //executes the sync on a separate thread
+	}
+
+	private void connectToGoogleSchedule() {
+		googleSchedule = new GoogleSchedule();
+	}
+	
+	private void syncAdditionalTasksFromLocalSchedule() throws Exception {
+		ArrayList<Task> localTasks = dataBase.retrieveAll();
+		for (int index = 0; index < localTasks.size(); ++index) {
+			Task localTask = localTasks.get(index);
+			Task googleTask = googleSchedule.retrieveTask(localTask);
+
+			if (googleTask == null) { // if task is not in google calendar
+				// Case 1a: task had not be sync before
+				if (localTask.getDateModified().isAfter(lastSyncDate)) {
+					try {
+						googleSchedule.addTask(localTask);
+					} catch (IOException e) {
+						throw new Exception("Failed to add task into google schedule");
+					}
+
+				dataBase.updateTask(localTask);
+
+				//task was added but later deleted. delete from local Schedule
+				} else if (localTask.getDateModified().isBefore(lastSyncDate)) { 
+					dataBase.deleteTask(localTask.getTaskId());
+				}
+			}
+		}
+	}
+
+	private void syncTasksThatExistInBothSchedule() {
+		ArrayList<Task> localTasks = dataBase.retrieveAll();
+
+		for (int index = 0; index < localTasks.size(); ++index) {
+			Task localTask = localTasks.get(index);
+			Task googleTask = googleSchedule.retrieveTask(localTask);
+			
+			//Task already exists in google schedule
+			if (googleTask != null) { 
+				//check for differences and take the one the latest modified date
+				this.syncTask(localTask, googleTask);
+			}
+		}
+	}
+
+	private void syncAdditionalTasksFromGoogleSchedule() throws Exception {
+		ArrayList<Task> googleTasks = googleSchedule.retrieveAllTasks();
+		for (Task googleTask : googleTasks) {
+
+			if (!this.hasTask(googleTask)) {
+				if (googleTask.getDateModified().isAfter(lastSyncDate)) {
+					googleTask.updateDateModified();
+					try {
+						dataBase.addTask(googleTask);
+					} catch (Exception e) {
+						throw new Exception("Failed to add task into local schedule");
+					}
+				}
+				//task was added but later deleted. Delete from gcal.
+				else if (googleTask.getDateModified().isBefore(lastSyncDate)) {
+					googleSchedule.deleteTask(googleTask);
+				}
+			}
+		}
+	}
+
+	private void syncTask(Task localTask, Task googleTask) {
+		if (googleTask.getDateModified().isAfter(localTask.getDateModified())) {
+			googleTask.setTaskId(localTask.getTaskId());
+			googleTask.setGoogleId(localTask.getGoogleId());
+			googleTask.setDateCreated(localTask.getDateCreated());
+			googleTask.setDateModified(localTask.getDateModified());
+			try {
+				dataBase.updateTask(googleTask);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (googleTask.getDateModified().isBefore(
+				localTask.getDateModified())) {
+			googleSchedule.updateTask(localTask);
+		}
+	}
+
+	private boolean hasTask(Task googleTask) {
+		ArrayList<Task> allTasksInDb = dataBase.retrieveAll();
+
+		if (allTasksInDb == null) {
+			return false;
+		}
+
+		for (Task task : allTasksInDb) {
+			if (task.getGoogleId() == null) {
+
+			} else {
+				if (task.getGoogleId().equals(googleTask.getGoogleId())) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+	
+	private void initializeLastSyncDate() {
+		if (dataBase.getProperty(PROPERTY_NAME_LAST_SYNC) != null) {
+			lastSyncDate = new DateTime(dataBase.getProperty(PROPERTY_NAME_LAST_SYNC));
+		} else {
+			lastSyncDate = new DateTime().minusYears(20);
+		}
+	}
+	
+	private void updateLastSyncDate() {
+		lastSyncDate = new DateTime();
+		dataBase.setProperty(PROPERTY_NAME_LAST_SYNC, lastSyncDate.toString());
+	}
+	
+	private class SyncWorker extends SwingWorker<Void, String>{
+		private View view;
+		private SyncController syncController;
+		
+		public SyncWorker(SyncController syncController, View view) throws IOException {
+			this.syncController = syncController;
+			this.view = view;
+		}
+		
+		@Override
+		protected Void doInBackground() throws Exception {
+			view.disableInput();
+			try {
+			publish(MESSAGE_SYNC_FROM_LOCAL);
+			syncController.syncAdditionalTasksFromLocalSchedule();
+			
+			publish(MESSAGE_SYNC_EXISTING);
+			syncController.syncTasksThatExistInBothSchedule();
+			
+			publish(MESSAGE_SYNC_FROM_GOOGLE);
+			syncController.syncAdditionalTasksFromGoogleSchedule();
+			
+			syncController.updateLastSyncDate();
+			publish(String.format(MESSAGE_SYNC, new DateTime().toString(DATE_FORMAT_FOR_LAST_SYNC)));
+			} catch (Exception e) {
+				publish("Sync is unsuccessful, please try again");
+			}
+			view.enableInput();
+			return null;
+		}
+		
+		@Override
+		protected void process(final List<String> chunks) {
+			// Updates the messages text area
+			for (final String progress : chunks) {
+				view.displayFeedBack(progress);
+			}
+		}
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\sync\SyncController.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\sync\SyncHelper.java
+	 */
+
+ *
+ */
+public class SyncHelper {
+	private static final String DATE_FORMAT_RFC3339 = "yyyy-MM-dd'T'H:mm:ss.SSSZZ";
+	
+	private static final DateTimeFormatter fmt = DateTimeFormat.forPattern(DATE_FORMAT_RFC3339);
+	
+	/**
+	 * Converts Google's DateTime format into Joda's DateTime format.
+	 * @param googleDateTime Google's DateTime format
+	 * @return returns the equivalent Joda's DateTime format
+	 */
+	public static org.joda.time.DateTime toJodaDateTime(DateTime googleDateTime) {
+		org.joda.time.DateTime jodaDateTime = fmt.parseDateTime(googleDateTime.toStringRfc3339());
+		return jodaDateTime;
+	}
+	
+	/**
+	 * Converts Joda's DateTime format into Google's DateTime format.
+	 * @param jodaDateTime Joda's DateTime format
+	 * @return returns the equivalent Google's DateTime format
+	 */
+	public static DateTime toGoogleDateTime(org.joda.time.DateTime jodaDateTime) {
+		//System.out.println(jodaDateTime.toString());
+		DateTime googleDateTime = DateTime.parseRfc3339(jodaDateTime.toString());
+		return googleDateTime;
+	}
+
+	/**
+	 * Converts the given local FloatingTask into a Google Task.
+	 * @param task FloatingTask
+	 * @return returns the equivalent Google Task of the Floating Task
+	 */
+	public static com.google.api.services.tasks.model.Task floatingTaskToGoogleTask(FloatingTask task) {
+		com.google.api.services.tasks.model.Task googleTask = 
+				new com.google.api.services.tasks.model.Task();
+		
+		String name = task.getTitle();
+		String description = task.getDescription();
+		String googleId = task.getGoogleId();
+		
+		googleTask.setTitle(name);
+		googleTask.setNotes(description);
+		
+		if(googleId != null) {
+			googleTask.setId(googleId);
+		}
+			
+		return googleTask;
+	}
+	
+	/**
+	 * Converts the given local DeadlineTask into a Google event.
+	 * @param task DeadlineTask
+	 * @return returns the equivalent Google Event of the DeadlineTask
+	 */
+	public static Event deadlineTaskToGoogleEvent(DeadlineTask task) {
+		Event googleEvent = new Event();
+		String name = "";
+		String description = "";
+		
+		name = task.getTitle();
+		description = task.getDescription();
+		DateTime deadline = toGoogleDateTime(((DeadlineTask) task).getDeadline());
+		
+		googleEvent.setSummary(name);
+		googleEvent.setDescription(description);
+		googleEvent.setStart(new EventDateTime().setDateTime(deadline));
+		googleEvent.setEnd(new EventDateTime().setDateTime(deadline));
+
+		return googleEvent;
+	}
+	
+	/**
+	 * Converts the given local TimedTask into a Google Event.
+	 * @param task TimedTask
+	 * @return returns the equivalent Google Event of the TimedTask
+	 */
+	public static Event timedTaskToGoogleEvent(TimedTask task) {
+		Event event = new Event();
+		event.setSummary(task.getTitle());
+		event.setDescription(task.getDescription());
+
+		DateTime start = toGoogleDateTime(((TimedTask) task).getStart());
+		DateTime end = toGoogleDateTime(((TimedTask) task).getEnd());
+
+		event.setStart(new EventDateTime().setDateTime(start));
+		event.setEnd(new EventDateTime().setDateTime(end));
+		
+		return event;
+	}
+	
+	/**
+	 * Converts the given Google event to either a DeadlineTask or a TimedTask.
+	 * @param event Google Event
+	 * @return returns the equivalent local Task of the Google Event
+	 */
+	public static Task googleEventToTask(Event event) {
+		Task task = null;
+		String name = "";
+		String description = "";
+		String googleId = "";
+		
+		name = event.getSummary();
+		description = event.getDescription();
+		googleId = event.getId();
+		
+		org.joda.time.DateTime dateModified = toJodaDateTime(event.getUpdated());
+		org.joda.time.DateTime start = toJodaDateTime(event.getStart().getDateTime());
+		org.joda.time.DateTime end = toJodaDateTime(event.getEnd().getDateTime());
+		
+		if (description ==  null) {
+			description = "";
+		}
+		
+		if (start.isEqual(end)) {
+			task = new DeadlineTask(name, description, end);
+		}
+		if (!start.isEqual(end)) {
+			task = new TimedTask(name, description, start, end);
+		}
+		
+		task.setGoogleId(googleId);
+		task.setDateModified(dateModified);
+		
+		return task;
+	}
+	
+	/**
+	 * Converts the given Google Task into a local FloatingTask
+	 * @param googleTask Google Task
+	 * @return returns the equivalent local FloatingTask of the Google Task
+	 */
+	public static Task googleTaskToFloatingTask(com.google.api.services.tasks.model.Task googleTask) {
+		Task task = null;
+		String name = "";
+		String description = "";
+		String googleId = "";
+		
+		name = googleTask.getTitle();
+		description = googleTask.getNotes();
+		googleId = googleTask.getId();
+		
+		if (description == null) {
+			description = "";
+		}
+		
+		org.joda.time.DateTime dateModified = toJodaDateTime(googleTask.getUpdated());
+		
+		task = new FloatingTask(name, description);
+		task.setGoogleId(googleId);
+		task.setDateModified(dateModified);
+		
+		if (googleTask.getCompleted() != null) {
+			task.setStatus(Status.COMPLETED);
+		}
+		
+		return task;
+	}
+}
+
+	// End of segment: C:\Users\Shiyu\workspace\cs2103aug2013-w11-2j\src\typetodo\sync\SyncHelper.java
+
+
+
+
+
