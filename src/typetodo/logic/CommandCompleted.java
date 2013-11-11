@@ -15,13 +15,14 @@ public class CommandCompleted implements Command, Undoable{
 	
 	@Override
 	public String execute() throws Exception {
-		taskBeforeMarking = schedule.updateTaskStatus(index, Status.COMPLETED);
+		taskBeforeMarking = schedule.getTask(index).makeCopy();
+		schedule.updateTaskStatus(index, Status.COMPLETED);
 		String feedback = String.format(MESSAGE_COMPLETED, taskBeforeMarking.getTitle());
 		return feedback;
 	}
 
 	@Override
 	public void undo() throws Exception {
-		schedule.editTask(taskBeforeMarking);
+		schedule.updateTask(taskBeforeMarking);
 	}
 }

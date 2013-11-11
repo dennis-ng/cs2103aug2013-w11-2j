@@ -22,12 +22,15 @@ import typetodo.sync.SyncHandler;
 
 public class CommandParser {
 	private Schedule schedule;
-	private ScheduleController sc;
-	private SyncHandler sync;
+	private MainController sc;
+	private SyncHandler syncController;
+	private CurrentTaskListManager taskListManager;
 
-	public CommandParser(ScheduleController sc, Schedule schedule) {
+	public CommandParser(MainController sc, Schedule schedule, CurrentTaskListManager taskListManager, SyncHandler syncController) {
 		this.sc = sc;
 		this.schedule = schedule;
+		this.taskListManager = taskListManager;
+		this.syncController = syncController;
 	}
 
 	/**
@@ -392,29 +395,20 @@ public class CommandParser {
 			break;
 
 		case DELETE:
-			try {
-				int index = this.getIndex(userInput);
-				command = new CommandDeleteTask(schedule, index);
-			} catch (Exception e) {
-				String keyword = this.getKeyword(userInput);
-				if (keyword == null) {
-					throw new InvalidFormatException(
-							"INVALID FORMAT. Please refer to catalog by entering 'help delete'");
-				}
-				command = new CommandDeleteTask(schedule, keyword);
-			}
-			break;
+			int index = this.getIndex(userInput);
+			command = new CommandDeleteTask(schedule, index);
+		break;
 
 		case UPDATE:
-			int index = this.getIndex(userInput);
+			int taskId = this.getIndex(userInput);
 			FieldName fieldName = this.getFieldName(userInput);
 			Object newValue = this.getNewValue(userInput);
 
 			if (newValue instanceof String) {
-				command = new CommandEditTask(schedule, index, fieldName,
+				command = new CommandEditTask(schedule, taskId, fieldName,
 						(String) newValue);
 			} else if (newValue instanceof DateTime) {
-				command = new CommandEditTask(schedule, index, fieldName,
+				command = new CommandEditTask(schedule, taskId, fieldName,
 						(DateTime) newValue);
 			} else {
 				throw new InvalidFormatException(
@@ -434,7 +428,7 @@ public class CommandParser {
 
 		case DISPLAY:
 			if (this.isViewAll(userInput)) {
-				command = new CommandView(schedule);
+				command = new CommandView(taskListManager);
 				break;
 			}
 
@@ -445,7 +439,7 @@ public class CommandParser {
 				throw new InvalidFormatException(
 						"INVALID FORMAT. Please refer to catalog by entering 'help display'");
 			}
-			command = new CommandView(schedule, dateTime);
+			command = new CommandView(taskListManager, dateTime);
 			break;
 
 		case DONE:
@@ -459,7 +453,7 @@ public class CommandParser {
 			break;
 
 		case HOME:
-			command = new CommandHome(schedule);
+			command = new CommandHome(taskListManager);
 			break;
 
 		case UNDO:
@@ -471,10 +465,10 @@ public class CommandParser {
 			if (helpType != "") {
 				CommandType commandType = getCommand(helpType);
 				HelpController helpController = new HelpController(commandType);
-				command = new CommandHelp(schedule, helpController);
+				command = new CommandHelp(helpController);
 			} else {
 				HelpController helpController = new HelpController(helpType);
-				command = new CommandHelp(schedule, helpController);
+				command = new CommandHelp(helpController);
 			}
 			break;
 
@@ -483,10 +477,7 @@ public class CommandParser {
 			break;
 
 		case SYNC:
-			if (sync == null) {
-				sync = new SyncHandler();
-			}
-			command = new CommandSync(sync);
+			command = new CommandSync(syncController);
 			break;
 
 		default:
