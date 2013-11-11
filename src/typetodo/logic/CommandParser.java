@@ -490,7 +490,7 @@ public class CommandParser {
 		case SEARCH:
 			try {
 				String keyword = this.getKeyword(userInput);
-				command = new CommandSearch(schedule, keyword);
+				command = new CommandSearch(taskListManager, keyword);
 			} catch (Exception e) {
 				throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_SEARCH);
 			}
