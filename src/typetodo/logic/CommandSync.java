@@ -1,23 +1,17 @@
 package typetodo.logic;
 
-import org.joda.time.DateTime;
-
-import typetodo.sync.SyncHandler;
+import typetodo.sync.SyncController;
 
 public class CommandSync implements Command{
-	private static final String MESSAGE_SYNC = "Sync as of " + new DateTime().toString("EEE, dd MMM yyyy HH:mm");
-	private SyncHandler sh;
+	private SyncController syncController;
 	
-	public CommandSync (SyncHandler sh) {
-		this.sh = sh;
+	public CommandSync (SyncController syncController) {
+		this.syncController = syncController;
 	}
 	
 	@Override
 	public String execute() throws Exception {
-		// TODO Auto-generated method stub
-		sh.twoWaySync();
-		return MESSAGE_SYNC;
+		syncController.twoWaySync();
+		return "null";
 	}
-	
-
 }

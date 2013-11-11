@@ -7,44 +7,34 @@ import typetodo.model.Task;
 
 public class CommandEditTask implements Command, Undoable{
 	private static final String MESSAGE_EDITED = "Edit successful";
-	private Schedule sc;
-	private Task taskBeforeEdit;
-	private int index;
+	private Schedule schedule;
+	private Task taskBeforeUpdate;
+	private int taskId;
 	private FieldName fieldName;
 	private String newString;
 	private DateTime newDateTime;
-	private Boolean newBoolean;
 	
-	public CommandEditTask(Schedule sc, int index, FieldName fieldName, String newValue) {
-		this.sc = sc;
-		this.index = index;
+	public CommandEditTask(Schedule schedule, int taskId, FieldName fieldName, String newValue) {
+		this.schedule = schedule;
+		this.taskId = taskId;
 		this.fieldName = fieldName;
 		this.newString = newValue;
 	}
 	
-	public CommandEditTask(Schedule sc, int index, FieldName fieldName, DateTime newDate) {
-		this.sc = sc;
-		this.index = index;
+	public CommandEditTask(Schedule schedule, int taskId, FieldName fieldName, DateTime newDate) {
+		this.schedule = schedule;
+		this.taskId = taskId;
 		this.fieldName = fieldName;
 		this.newDateTime = newDate;
 	}
 	
-	public CommandEditTask(Schedule sc, int index, FieldName fieldName, boolean newBoolean) {
-		this.sc = sc;
-		this.index = index;
-		this.fieldName = fieldName;
-		this.newBoolean = newBoolean;
-	}
-	
 	public String execute() throws Exception {
+		taskBeforeUpdate = schedule.getTask(taskId).makeCopy();
+		
 		if (newString != null) {
-			this.taskBeforeEdit = sc.editTask(index, fieldName, newString);
-		}
-		else if(newDateTime != null) {
-			this.taskBeforeEdit = sc.editTask(index, fieldName, newDateTime);
-		}
-		else if(newBoolean != null) {
-			this.taskBeforeEdit = sc.editTask(index, fieldName, newBoolean);
+			schedule.updateTask(taskId, fieldName, newString);
+		} else if(newDateTime != null) {
+			schedule.updateTask(taskId, fieldName, newDateTime);
 		}
 		
 		String feedback = String.format(MESSAGE_EDITED);
@@ -52,6 +42,7 @@ public class CommandEditTask implements Command, Undoable{
 	}
 	
 	public void undo() throws Exception {
-		sc.editTask(taskBeforeEdit);
+		schedule.updateTask(taskBeforeUpdate);
 	}
 }
+
