@@ -115,7 +115,8 @@ public class DateTimeParserTest {
 					.toLowerCase();
 
 			if (endAmPm.equals("pm")
-					&& (!startAmPm.equals("am") || !startAmPm.equals("pm"))) {
+					&& (!startAmPm.equals("am") && !startAmPm.equals("pm"))) {
+				System.out.println(startAmPm);
 				startAmPm = startAmPm + "pm";
 			}
 			result = result.substring(0, indexOfTo - 2) + " " + startAmPm

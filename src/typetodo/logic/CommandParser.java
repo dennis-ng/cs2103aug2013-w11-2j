@@ -329,7 +329,7 @@ public class CommandParser {
 					.toLowerCase();
 
 			if (endAmPm.equals("pm")
-					&& (!startAmPm.equals("am") || !startAmPm.equals("pm"))) {
+					&& !startAmPm.equals("am") && !startAmPm.equals("pm")) {
 				startAmPm = startAmPm + "pm";
 			}
 			result = result.substring(0, indexOfTo - 2) + " " + startAmPm
