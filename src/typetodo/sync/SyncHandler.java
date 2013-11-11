@@ -2,37 +2,78 @@ package typetodo.sync;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.SwingWorker;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import typetodo.db.DbController;
 import typetodo.model.Task;
+import typetodo.ui.View;
 
 public class SyncHandler {
+	private static final String MESSAGE_SYNC = "Sync as of %s";
+	
 	public DateTime lastSyncDate;
 
-	private final GCalHandler googleSchedule;
+	private GCalHandler googleSchedule;
 	private final DbController db;
+	private final View view;
 
-	public SyncHandler() throws IOException {
-		DateTimeFormatter fmt = DateTimeFormat.forPattern("H:mm d-MMM yyyy");
+	public SyncHandler(View view) throws IOException {
 		db = DbController.getInstance();
+		this.view = view;
+
 		if (db.getProperty("lastSyncDate") != null) {
 			lastSyncDate = new DateTime(db.getProperty("lastSyncDate"));
 		} else {
 			lastSyncDate = new DateTime().minusYears(20);
 		}
+		this.googleSchedule = null;
+	}
+	
+	private class SyncWorker extends SwingWorker<Void, String>{
+		private View view;
+		private SyncHandler syncController;
+		
+		public SyncWorker(SyncHandler syncController, View view) throws IOException {
+			this.syncController = syncController;
+			this.view = view;
+		}
+		
+		@Override
+		protected Void doInBackground() throws Exception {
+			publish("Syncing additional tasks from in local schedule..");
+			syncController.syncAdditionalTasksFromLocalSchedule();;
+			publish("Syncing tasks that exist in both schedule..");
+			syncController.syncTasksThatExistInBothSchedule();
+			publish("Syncing additional tasks from in google schedule..");
+			syncController.syncAdditionalTasksFromGoogleSchedule();
+			syncController.updateLastSyncDate();
+			publish(String.format(MESSAGE_SYNC, new DateTime().toString("EEE, dd MMM yyyy HH:mm")));
+			return null;
+		}
+		
+		@Override
+		protected void process(final List<String> chunks) {
+			// Updates the messages text area
+			for (final String progress : chunks) {
+				view.displayFeedBack(progress);
+			}
+		}
+	}
+
+	private void connectToGoogleSchedule() {
 		googleSchedule = new GCalHandler();
 	}
 
 	public void twoWaySync() throws Exception {
-		this.syncTasksThatExistInBothSchedule();
-		this.syncAdditionalTasksFromLocalSchedule();
-		this.syncAdditionalTasksFromGoogleSchedule();
-		lastSyncDate = new DateTime();
-		db.setProperty("lastSyncDate", lastSyncDate.toString());
+		while (googleSchedule == null) {
+			this.connectToGoogleSchedule();
+		}
+
+		(new SyncWorker(this, view)).execute();
 	}
 
 	private void syncAdditionalTasksFromLocalSchedule() throws Exception {
@@ -42,7 +83,6 @@ public class SyncHandler {
 			Task googleTask = googleSchedule.retrieveTask(localTask);
 
 			if (googleTask == null) { // if task is not in google calendar
-//				System.out.println(localTask.getTitle() + " is not in google system");
 				// Case 1a: task had not be sync before
 				if (localTask.getDateModified().isAfter(lastSyncDate)) {
 					try {
@@ -59,8 +99,6 @@ public class SyncHandler {
 
 				} else if (localTask.getDateModified().isBefore(lastSyncDate)) { // Case 
 					db.deleteTask(localTask.getTaskId());
-//					System.out.println("\"" + localTask.getTitle()
-//							+ "\" has been deleted from db");
 				}
 			}
 		}
@@ -76,8 +114,6 @@ public class SyncHandler {
 			if (googleTask != null) { // case 2: Task already exists in google
 																// calendar
 				// check for differences and take the one the lastest modified date
-//				System.out.println("\"" + localTask.getTitle()
-//						+ "\" exists in Google Calendar");
 				this.syncTask(localTask, googleTask);
 			}
 		}
@@ -86,6 +122,7 @@ public class SyncHandler {
 	private void syncAdditionalTasksFromGoogleSchedule() throws IOException {
 		ArrayList<Task> googleTasks = googleSchedule.retrieveAllTasks();
 		for (Task googleTask : googleTasks) {
+
 			if (!this.hasTask(googleTask)) {
 				if (googleTask.getDateModified().isAfter(lastSyncDate)) {
 					googleTask.updateDateModified();
@@ -95,14 +132,10 @@ public class SyncHandler {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-//					System.out.println("\"" + googleTask.getTitle()
-//							+ "\" has been added into db");
 				}
 				// Case 1b: task was added but later deleted. Delete from gcal.
 				else if (googleTask.getDateModified().isBefore(lastSyncDate)) {
 					googleSchedule.deleteTask(googleTask);
-//					System.out.println("\"" + googleTask.getTitle()
-//							+ "\" has been deleted from google calendar");
 				}
 			}
 		}
@@ -116,17 +149,12 @@ public class SyncHandler {
 			googleTask.updateDateModified(); // set modded day // to today.
 			try {
 				db.updateTask(googleTask);
-//				System.out.println("\"" + googleTask.getTitle()
-//						+ "\" has been updated in db");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (googleTask.getDateModified().isBefore(
 				localTask.getDateModified())) {
 			googleSchedule.updateTask(localTask);
-//			System.out.println("\"" + localTask.getTitle()
-//					+ "\" has been updated in Google Calendar");
 		}
 	}
 
@@ -148,5 +176,10 @@ public class SyncHandler {
 		}
 
 		return false;
+	}
+	
+	private void updateLastSyncDate() {
+		lastSyncDate = new DateTime();
+		db.setProperty("lastSyncDate", lastSyncDate.toString());
 	}
 }

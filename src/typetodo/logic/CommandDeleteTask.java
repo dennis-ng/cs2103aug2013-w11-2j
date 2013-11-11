@@ -7,25 +7,18 @@ public class CommandDeleteTask implements Command, Undoable{
 	
 	private Schedule sc;
 	private Task taskToBeDeleted;
-	private String keyword;
-	private Integer index;
+	private Integer taskId;
 	
-	public CommandDeleteTask(Schedule sc, String keyword){
+	public CommandDeleteTask(Schedule sc, int taskId) {
 		this.sc = sc;
-		this.keyword = keyword;
-	}
-	
-	public CommandDeleteTask(Schedule sc, int index) {
-		this.sc = sc;
-		this.index = index;
+		this.taskId = taskId;
 	}
 	
 	public String execute() throws Exception {
-		if (index != null) { //delete by index
-			taskToBeDeleted = sc.deleteTaskByIndex(index);
-		}
-		else {
-			taskToBeDeleted = sc.deleteTaskByKeyword(keyword);
+		this.taskToBeDeleted = sc.getTask(taskId).makeCopy();
+		
+		if (taskId != null) { 
+			sc.deleteTaskById(taskId);
 		}
 		
 		String feedback = String.format(MESSAGE_DELETED, taskToBeDeleted.getTitle());
@@ -36,3 +29,4 @@ public class CommandDeleteTask implements Command, Undoable{
 		sc.addTask(taskToBeDeleted);
 	}
 }
+
