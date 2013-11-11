@@ -2,6 +2,11 @@ package typetodo.logic;
 
 import typetodo.model.Task;
 
+/**
+ * 
+ * @author A0091024U
+ *
+ */
 public class CommandDeleteTask implements Command, Undoable{
 	private static final String MESSAGE_DELETED = "\"%s\" has been deleted from your schedule";
 	

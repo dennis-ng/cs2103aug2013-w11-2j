@@ -9,7 +9,7 @@ import typetodo.model.TimedTask;
 
 /**
  * Concrete command class for adding of a task
- * @author Shiyu
+ * @author A0091024U
  *
  */
 public class CommandAddTask implements Command, Undoable {

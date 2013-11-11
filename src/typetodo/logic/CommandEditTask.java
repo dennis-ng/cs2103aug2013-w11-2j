@@ -5,6 +5,11 @@ import org.joda.time.DateTime;
 import typetodo.model.FieldName;
 import typetodo.model.Task;
 
+/**
+ * 
+ * @author A0091024U
+ *
+ */
 public class CommandEditTask implements Command, Undoable{
 	private static final String MESSAGE_EDITED = "Edit successful";
 	private Schedule schedule;
