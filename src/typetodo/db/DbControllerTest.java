@@ -3,7 +3,6 @@ package typetodo.db;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
@@ -15,16 +14,36 @@ import typetodo.model.DeadlineTask;
 import typetodo.model.FloatingTask;
 
 public class DbControllerTest {
-	// Always start with a clean state
+	/**
+	 * Note: Every test assumes starting with clean state. Please make sure the
+	 * savedfiles folder does not exist or the files are empty files before
+	 * starting the test. This is required as the DbController needs to handle the
+	 * file directly.
+	 */
 
 	@Test
-	public void test2() {
+	public void PropertyTest() {
 		DbController db;
 		try {
 			db = DbController.getInstance();
-			assertEquals("Check property", "Date", db.getProperty("Test"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			DateTime timeProperty = new DateTime("2013-01-01T00:00:00.000+08:00");
+			/**
+			 * Property only takes in String, max length string is not tested as
+			 * Java's implementation of HashMap is assumed to be well-tested.
+			 */
+			// Boundary: property String length empty
+			db.setProperty("Empty", new String());
+			assertEquals("Empty property in memory", "", db.getProperty("Empty"));
+			db.reloadAllFiles();
+			assertEquals("Empty property in file", "", db.getProperty("Empty"));
+			// Boundary: property String length of a datetime
+			db.setProperty("DateTime", timeProperty.toString());
+			assertEquals("DateTime property in memory.", timeProperty.toString(),
+					db.getProperty("DateTime"));
+			db.reloadAllFiles();
+			assertEquals("DateTime property in file", timeProperty.toString(),
+					db.getProperty("DateTime"));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
