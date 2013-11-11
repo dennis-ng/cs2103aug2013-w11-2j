@@ -4,26 +4,26 @@ import java.util.Comparator;
 
 import org.joda.time.DateTime;
 
+/**
+ * 
+ * @author A0091024U
+ *
+ */
 public class TimedTask extends Task {
 	private DateTime start;
 	private DateTime end;
-	private boolean isBusy;
 
-	public TimedTask(String name, String description, DateTime start,
-			DateTime end, boolean isBusy) {
+	public TimedTask(String name, String description, DateTime start, DateTime end) {
 		super(name, description);
 		this.setStart(start);
 		this.setEnd(end);
-		this.setBusy(isBusy);
 	}
 
-	public TimedTask(int taskId, String name, String description, DateTime start,
-			DateTime end, boolean isBusy) {
+	public TimedTask(int taskId, String name, String description, DateTime start, DateTime end) {
 		super(name, description);
 		this.setTaskId(taskId);
 		this.setStart(start);
 		this.setEnd(end);
-		this.setBusy(isBusy);
 	}
 
 	public DateTime getStart() {
@@ -42,68 +42,14 @@ public class TimedTask extends Task {
 		this.end = end;
 	}
 
-	public boolean isBusy() {
-		return isBusy;
-	}
-
-	public void setBusy(boolean isBusy) {
-		this.isBusy = isBusy;
-	}
-
 	public Task makeCopy() {
 		TimedTask copy = new TimedTask(this.getTaskId(), this.getTitle(),
-				this.getDescription(), this.getStart(), this.getEnd(), this.isBusy());
+				this.getDescription(), this.getStart(), this.getEnd());
 		copy.setStatus(this.getStatus());
 		copy.setDateCreated(this.getDateCreated());
 		copy.setDateModified(this.getDateModified());
 		
 		return copy;
-	}
-
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		if (this.getEnd().isBefore(new DateTime())) {
-			sb.append("<font face=\"century gothic\" color=\"#B6B6B4\">");
-			sb.append("[Id: " + this.getTaskId() + "] ");
-			sb.append("<b>");
-			sb.append(this.getTitle() + " ");
-			sb.append("</b>");
-
-			sb.append("from ");
-			sb.append("<b>");
-			sb.append(this.getStart().toString("HH:mm"));
-			sb.append(" to ");
-			sb.append(this.getEnd().toString("HH:mm"));
-			sb.append("</b>");
-		} else {
-			sb.append("[Id: " + this.getTaskId() + "] ");
-			sb.append("<font face=\"century gothic\">");
-			sb.append("<b>");
-			sb.append(this.getTitle() + " ");
-			sb.append("</b>");
-
-			sb.append("from ");
-			sb.append("<font face=\"century gothic\" color=\"red\">");
-			sb.append("<b>");
-			sb.append(this.getStart().toString("HH:mm"));
-			sb.append(" to ");
-			sb.append(this.getEnd().toString("HH:mm"));
-			sb.append("</b>");
-			sb.append("</font>");
-		}
-
-		if (this.getDescription() != null && !this.getDescription().equals("")) {
-			sb.append("\n");
-			sb.append("<br>");
-			sb.append("<i>");
-			sb.append(" - " + this.getDescription().trim());
-			sb.append("</i>");
-		}
-		sb.append("</font>");
-		sb.append("<br>");
-		
-		return sb.toString();
 	}
 
 	public static final Comparator<TimedTask> COMPARE_BY_DATE = new Comparator<TimedTask>() {
