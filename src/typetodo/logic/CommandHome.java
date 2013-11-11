@@ -1,16 +1,16 @@
 package typetodo.logic;
 
 public class CommandHome implements Command {
-	private static final String MESSAGE_HOME = "Displaying Today's Tasks";
-	private Schedule sc;
+	private static final String MESSAGE_HOME = "Displaying Upcoming Tasks";
+	private CurrentTaskListManager taskListManager;
 	
-	public CommandHome(Schedule sc) {
-		this.sc = sc;
+	public CommandHome(CurrentTaskListManager taskListManager) {
+		this.taskListManager = taskListManager;
 	}
 	
 	@Override
 	public String execute() throws Exception {
-		sc.viewTasksofToday();
+		this.taskListManager.setByDefault();
 		String feedback = MESSAGE_HOME;
 		return feedback;
 	}
