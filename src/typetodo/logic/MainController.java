@@ -6,8 +6,16 @@ import java.util.Stack;
 import typetodo.sync.SyncController;
 import typetodo.ui.View;
 
+/**
+ * The MainController class controls the flow of TypeToDo and how its different components interact with
+ * each other.
+ * @author A0091024U
+ * 
+ */
 public class MainController {
-	private static final String MESSAGE_WELCOME = "Welcome to TypeToDo! Please enter 'help' for instructions.";
+	private static final String MESSAGE_WELCOME = "Welcome to TypeToDo! Please type 'help' for instructions.";
+	private static final String ERROR_MESSAGE_NOTHING_TO_UNDO = "Nothing to undo";
+	
 	private View view;
 	private Stack<Command> historyOfCommands;
 	private CommandParser commandParser;
@@ -24,10 +32,9 @@ public class MainController {
 		String htmlDisplayContent = "";
 		
 		try {
-			htmlDisplayContent = ViewHelper.generateHTMLDisplayContent(taskListManager.getCurrentTaskList());
+			htmlDisplayContent = TasksFormatter.formatTasks(taskListManager.getCurrentTaskList());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			view.displayErrorMessage(e.getMessage());
 		}
 		
 		view.displayTasks(htmlDisplayContent);
@@ -46,21 +53,17 @@ public class MainController {
 			}
 
 		} catch (Exception e) {
-			// TODO;
-			e.printStackTrace();
 			view.displayErrorMessage(e.getMessage());
 		}
 
 		String htmlDisplayContent = "";
 		try {
-			htmlDisplayContent = ViewHelper.generateHTMLDisplayContent(taskListManager.getCurrentTaskList());
+			htmlDisplayContent = TasksFormatter.formatTasks(taskListManager.getCurrentTaskList());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			view.displayErrorMessage(e.getMessage());
 		}
 		
 		view.displayTasks(htmlDisplayContent);
-		// view.displayTasks(schedule.getCurrentListOfTasks());
 	}
 
 	public void undo() throws Exception {
@@ -68,10 +71,10 @@ public class MainController {
 			try {
 				((Undoable) this.historyOfCommands.pop()).undo();
 			} catch (Exception e) {
-
+				view.displayErrorMessage(e.getMessage());
 			}
 		} else {
-			throw new Exception("Nothing to undo");
+			throw new Exception(ERROR_MESSAGE_NOTHING_TO_UNDO);
 		}
 	}
 	
