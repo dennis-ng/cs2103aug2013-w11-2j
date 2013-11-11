@@ -4,7 +4,6 @@ package typetodo.db;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,6 +13,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -47,18 +50,40 @@ public class DbController {
 	// Controllers and external libraries
 	private static DbController mainDbHandler;
 	private final Gson gson;
+	private static Logger logger;
+	private static FileHandler logFileHandler;
 
-	private DbController() throws IOException, JsonSyntaxException,
-			FileNotFoundException {
-
-		gson = initialiseGson();
+	private DbController() throws IOException, JsonSyntaxException {
+		initializeLogger();
+		gson = initializeGson();
 		tasksCache = new TreeMap<Integer, Task>();
 		properties = new HashMap<String, String>();
 		initializeFiles();
 		reloadAllFiles();
 	}
 
-	private Gson initialiseGson() {
+	public static DbController getInstance() throws IOException,
+			JsonSyntaxException {
+		if (mainDbHandler == null) {
+			mainDbHandler = new DbController();
+		}
+		return mainDbHandler;
+	}
+
+	private void initializeLogger() {
+		logger = Logger.getLogger(DbController.class.getName());
+		try {
+			logFileHandler = new FileHandler("error.log", false);
+		} catch (SecurityException | IOException e) {
+			e.printStackTrace();
+		}
+		logger = Logger.getLogger(this.getClass().getName());
+		logFileHandler.setFormatter(new SimpleFormatter());
+		logger.addHandler(logFileHandler);
+		logger.setLevel(Level.INFO);
+	}
+
+	private Gson initializeGson() {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
 		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
@@ -66,18 +91,10 @@ public class DbController {
 		return gsonBuilder.setPrettyPrinting().create();
 	}
 
-	public void reloadAllFiles() {
+	public void reloadAllFiles() throws JsonSyntaxException, IOException {
 		for (String fileName : allFiles.keySet()) {
 			this.loadFile(fileName);
 		}
-	}
-
-	public static DbController getInstance() throws IOException,
-			JsonSyntaxException, FileNotFoundException {
-		if (mainDbHandler == null) {
-			mainDbHandler = new DbController();
-		}
-		return mainDbHandler;
 	}
 
 	private void initializeFiles() throws IOException {
@@ -96,33 +113,43 @@ public class DbController {
 	}
 
 	/**
-	 * @throws FileNotFoundException
+	 * @throws IOException
 	 *           During loadFile, if directory exist but file does not
 	 * @throws JsonSyntaxException
 	 *           contents of the file to load is incorrect
 	 */
-	private void loadFile(String fileName) throws JsonSyntaxException {
+	private void loadFile(String fileName) throws JsonSyntaxException,
+			IOException {
 		StringBuilder fileToTextBuffer = new StringBuilder();
+		File fileToLoad = allFiles.get(fileName);
+		BufferedReader reader;
 		try {
-			File fileToLoad = allFiles.get(fileName);
-			BufferedReader reader = new BufferedReader(new FileReader(fileToLoad));
+			reader = new BufferedReader(new FileReader(fileToLoad));
 			String nextLine;
 			while ((nextLine = reader.readLine()) != null) {
 				fileToTextBuffer.append(nextLine);
 			}
 			reader.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.toString());
+			throw e;
 		}
 		if (!fileToTextBuffer.toString().isEmpty()) {
-			if (fileName.equals(FILENAME_TASK)) {
-				Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
-				}.getType();
-				tasksCache = gson.fromJson(fileToTextBuffer.toString(), collectionType);
-			} else if (fileName.equals(FILENAME_PROPERTIES)) {
-				Type collectionType = new TypeToken<HashMap<String, Object>>() {
-				}.getType();
-				properties = gson.fromJson(fileToTextBuffer.toString(), collectionType);
+			try {
+				if (fileName.equals(FILENAME_TASK)) {
+					Type collectionType = new TypeToken<TreeMap<Integer, Task>>() {
+					}.getType();
+					tasksCache = gson.fromJson(fileToTextBuffer.toString(),
+							collectionType);
+				} else if (fileName.equals(FILENAME_PROPERTIES)) {
+					Type collectionType = new TypeToken<HashMap<String, Object>>() {
+					}.getType();
+					properties = gson.fromJson(fileToTextBuffer.toString(),
+							collectionType);
+				}
+			} catch (JsonSyntaxException e) {
+				logger.log(Level.SEVERE, e.toString());
+				throw e;
 			}
 		}
 	}
@@ -143,7 +170,7 @@ public class DbController {
 			}
 			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.toString());
 		}
 	}
 

@@ -346,6 +346,7 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 					try {
 						sc = new MainController(cmdFrame, new Schedule());
 					} catch (IOException e) {
+						cmdFrame.setAlwaysOnTop(false);
 						JOptionPane.showMessageDialog(null, MESSAGE_ERROR_INITIALIZING);
 						e.printStackTrace();
 						System.exit(0);
