@@ -406,6 +406,8 @@ public class DbController {
 
 	/**
 	 * 
+	 * @param taskType
+	 *          Only DeadlineTask, TimedTask and Floating task will be considered.
 	 * @return An arraylist of all the specific type of tasks in the system. An
 	 *         empty arraylist will be returned if nothing is found or if type of
 	 *         task is incorrect.
@@ -440,9 +442,11 @@ public class DbController {
 	 * @param searchCriteria
 	 * @return An arraylist of all the tasks that meets the searching criteria. An
 	 *         empty arraylist will be returned if nothing is found.
-	 * @throws Exception
+	 * @throws NullPointerException
+	 *           searchCriteria is null
 	 */
-	public ArrayList<Task> retrieveContaining(String searchCriteria) {
+	public ArrayList<Task> retrieveContaining(String searchCriteria)
+			throws NullPointerException {
 		List<DeadlineTask> deadlineTasks = new ArrayList<DeadlineTask>();
 		List<TimedTask> timedTasks = new ArrayList<TimedTask>();
 		List<FloatingTask> floatingTasks = new ArrayList<FloatingTask>();
@@ -467,12 +471,15 @@ public class DbController {
 	/**
 	 * 
 	 * @param searchCriteria
+	 * @param taskType
+	 *          Only DeadlineTask, TimedTask and Floating task will be considered.
 	 * @return An arraylist of all the tasks that meets the searching criteria. An
 	 *         empty arraylist will be returned if nothing is found.
-	 * @throws Exception
+	 * @throws NullPointerException
+	 *           searchCriteria is null
 	 */
 	public ArrayList<Task> retrieveContaining(String searchCriteria,
-			TaskType taskType) {
+			TaskType taskType) throws NullPointerException {
 		ArrayList<Task> selectedTasks = new ArrayList<Task>();
 		for (Task taskInCache : tasksCache.values()) {
 			if (foundInTask(taskInCache, searchCriteria)) {
