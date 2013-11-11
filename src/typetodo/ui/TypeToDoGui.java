@@ -33,8 +33,8 @@ import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-import typetodo.logic.Schedule;
 import typetodo.logic.MainController;
+import typetodo.logic.Schedule;
 
 public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		WindowListener {
@@ -279,6 +279,18 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	}
 
 	@Override
+	public boolean disableInput() {
+		txtCmd.setEnabled(false);
+		return !txtCmd.isEnabled();
+	}
+
+	@Override
+	public boolean enableInput() {
+		txtCmd.setEnabled(true);
+		return txtCmd.isEnabled();
+	}
+
+	@Override
 	public void displayFeedBack(String feedBack) {
 		feedbackDialog.setFeedbackText(feedBack);
 	}
@@ -300,77 +312,74 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	}
 
 	private static File f;
-    private static FileChannel channel;
-    private static FileLock lock;
-    
+	private static FileChannel channel;
+	private static FileLock lock;
+
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) {
 		try {
-            f = new File("RingOnRequest.lock");
-            // Check if the lock exist
-            if (f.exists()) {
-                // if exist try to delete it
-                f.delete();
-            }
-            // Try to get the lock
-            channel = new RandomAccessFile(f, "rw").getChannel();
-            lock = channel.tryLock();
-            if(lock == null)
-            {
-            	// File is lock by other application
-            	channel.close();
-            	
-            	throw new RuntimeException("Only 1 instance of MyApp can run.");
-            }
-            // Add shutdown hook to release lock when application shutdown
-            ShutdownHook shutdownHook = new ShutdownHook();
-            Runtime.getRuntime().addShutdownHook(shutdownHook);
+			f = new File("RingOnRequest.lock");
+			// Check if the lock exist
+			if (f.exists()) {
+				// if exist try to delete it
+				f.delete();
+			}
+			// Try to get the lock
+			channel = new RandomAccessFile(f, "rw").getChannel();
+			lock = channel.tryLock();
+			if (lock == null) {
+				// File is lock by other application
+				channel.close();
 
-            SwingUtilities.invokeLater(new Runnable() {
-            	public void run() {
-            		TypeToDoGui cmdFrame = new TypeToDoGui();
-            		try {
-            			sc = new MainController(cmdFrame, new Schedule());
-            		} catch (IOException e) {
-            			// TODO Auto-generated catch block
-            			e.printStackTrace();
-            		}
-            	}
-            });
-            try {
-            	Thread.sleep(10000);
-            } catch (InterruptedException e) {
-            	e.printStackTrace();
-            }
+				throw new RuntimeException("Only 1 instance of TypeToDo can run.");
+			}
+			// Add shutdown hook to release lock when application shutdown
+			ShutdownHook shutdownHook = new ShutdownHook();
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-		}
-		catch(IOException e)
-		{
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					TypeToDoGui cmdFrame = new TypeToDoGui();
+					try {
+						sc = new MainController(cmdFrame, new Schedule());
+					} catch (IOException e) {
+						JOptionPane.showMessageDialog(null, MESSAGE_ERROR_INITIALIZING);
+						e.printStackTrace();
+						System.exit(0);
+					}
+				}
+			});
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} catch (IOException e) {
 			throw new RuntimeException("Could not start process.", e);
 		}
 	}
 
-    public static void unlockFile() {
-        // release and delete file lock
-        try {
-            if(lock != null) {
-                lock.release();
-                channel.close();
-                f.delete();
-            }
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-    }
- 
-    static class ShutdownHook extends Thread {
- 
-        public void run() {
-            unlockFile();
-        }
-    }
-}
+	public static void unlockFile() {
+		// release and delete file lock
+		try {
+			if (lock != null) {
+				lock.release();
+				channel.close();
+				f.delete();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
+	static class ShutdownHook extends Thread {
+
+		public void run() {
+			unlockFile();
+		}
+	}
+}

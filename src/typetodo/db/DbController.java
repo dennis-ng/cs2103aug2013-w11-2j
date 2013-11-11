@@ -50,15 +50,20 @@ public class DbController {
 
 	private DbController() throws IOException, JsonSyntaxException,
 			FileNotFoundException {
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
-		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
-				new DateTimeTypeAdapter());
-		gson = gsonBuilder.setPrettyPrinting().create();
+
+		gson = initialiseGson();
 		tasksCache = new TreeMap<Integer, Task>();
 		properties = new HashMap<String, String>();
 		initializeFiles();
 		reloadAllFiles();
+	}
+
+	private Gson initialiseGson() {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
+		gsonBuilder.registerTypeHierarchyAdapter(DateTime.class,
+				new DateTimeTypeAdapter());
+		return gsonBuilder.setPrettyPrinting().create();
 	}
 
 	public void reloadAllFiles() {
@@ -212,7 +217,16 @@ public class DbController {
 
 	/**
 	 * @param taskId
-	 *          askId of the task that exist in the database.
+	 *          taskId of the task to check for existent in the database.
+	 * @return returns true if the taskId is found, or false if not found
+	 */
+	public boolean containsTask(int taskId) {
+		return tasksCache.containsKey(taskId);
+	}
+
+	/**
+	 * @param taskId
+	 *          taskId of the task that exist in the database.
 	 * @return returns the task if the taskId is valid, or null if invalid
 	 */
 	public Task getTask(int taskId) {
