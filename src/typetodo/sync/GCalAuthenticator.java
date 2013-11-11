@@ -22,11 +22,10 @@ import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 
 /**
- * This class is used to gain access(via OAuth2) to the user's Google Calendar. Upon completion
- * of OAuth2, it generates a Calendar client which can be used to access/manipulate protected data
- * in the user's Google Calendar.
- * The client can be retrieved with the getClient() method.
- * @author Phan Shi Yu
+ * This class is used to gain access(via OAuth2) to the user's Google Calendar and Tasks. Upon completion
+ * of OAuth2, it generates both Calendar and Task clients which can be used to access/manipulate protected data
+ * in the user's Google	Schedule.
+ * @author A0091024U
  *
  */
 public class GCalAuthenticator {

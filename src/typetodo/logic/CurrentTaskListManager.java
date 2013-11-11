@@ -8,6 +8,12 @@ import typetodo.model.Task;
 import typetodo.model.Task.Status;
 import typetodo.model.TaskType;
 
+/**
+ * The CurrentTaskListManager is a class used to manage and sustain the current list of tasks that 
+ * will be displayed to the user. 
+ * @author A0091024U
+ *
+ */
 public class CurrentTaskListManager {
 	Schedule schedule;
 	private ArrayList<Task> currentTaskList;
@@ -23,17 +29,26 @@ public class CurrentTaskListManager {
 		this.setByDefault();
 	}
 
+	/**
+	 * Gets the current list of task based on the current set of attributes
+	 * @return returns a the current list of tasks
+	 * @throws Exception 
+	 */
 	public ArrayList<Task> getCurrentTaskList() throws Exception {
 		if (keyword != null) {
 			currentTaskList = schedule.search(keyword);
 		} else if (type != null) {
-			if (type.equals(TaskType.FLOATING_TASK)) {
-				currentTaskList = schedule.getFloatingTasks(status);
-			} else if (type.equals(TaskType.DEADLINE_TASK)) {
-				currentTaskList = schedule.getDeadlineTasks(status);
-			} else if (type.equals(TaskType.TIMED_TASK)) {
-				currentTaskList = schedule.getTimedTasks(status);
-			} 
+			switch (type) {
+				case FLOATING_TASK :
+					currentTaskList = schedule.getFloatingTasks(status);
+					break;	
+				case DEADLINE_TASK :
+					currentTaskList = schedule.getDeadlineTasks(status);
+					break;		
+				case TIMED_TASK :
+					currentTaskList = schedule.getTimedTasks(status);
+					break;
+			}
 		} else {
 			currentTaskList = schedule.getTasksByDateRange(start, end, status);
 		}
@@ -46,7 +61,12 @@ public class CurrentTaskListManager {
 	}
 	
 	public void setBySearchResult(String keyword) {
-		this.keyword = keyword;
+		if (keyword == null) {
+			this.keyword = "";
+		} else {
+			this.keyword = keyword;
+		}
+		
 		this.start = null;
 		this.end = null;
 		this.type = null;

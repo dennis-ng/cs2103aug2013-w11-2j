@@ -386,8 +386,7 @@ public class CommandParser {
 				DateTime start = dates.get(0);
 				DateTime end = dates.get(1);
 
-				command = new CommandAddTask(schedule, title, description,
-						start, end, false);
+				command = new CommandAddTask(schedule, title, description, start, end);
 			} else {
 				throw new InvalidFormatException(
 						"INVALID FORMAT. Please refer to catalog by entering 'help add'");

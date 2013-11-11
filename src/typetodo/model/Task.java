@@ -6,12 +6,12 @@ import org.joda.time.DateTime;
  * This abstract class is used to create 3 types of task, namely, TimedTask,
  * Deadline Task, Floating Task
  * 
- * @author Phan Shi Yu
+ * @author A0091024U
  * 
  */
 public abstract class Task implements Comparable<Task> {
 	public static enum Status {
-		COMPLETED, INCOMPLETE, DISCARDED;
+		COMPLETED, INCOMPLETE;
 	}
 
 	private int TaskId;

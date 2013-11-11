@@ -12,43 +12,44 @@ import typetodo.model.Task.Status;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
-//RFC3339 format:
-public class Converter {
-	//RFC3339 format:
-	private static final DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd'T'H:mm:ss.SSSZZ");
+
+/**
+ * The syncHelper is to act as a translator between the Google and Local Schedule. It provides methods to convert 
+ * Google DateTime to Joda DateTime, Events to local tasks and vice versa.
+ * @author A0091024U
+ *
+ */
+public class SyncHelper {
+	private static final String DATE_FORMAT_RFC3339 = "yyyy-MM-dd'T'H:mm:ss.SSSZZ";
 	
+	private static final DateTimeFormatter fmt = DateTimeFormat.forPattern(DATE_FORMAT_RFC3339);
+	
+	/**
+	 * Converts Google's DateTime format into Joda's DateTime format.
+	 * @param googleDateTime Google's DateTime format
+	 * @return returns the equivalent Joda's DateTime format
+	 */
 	public static org.joda.time.DateTime toJodaDateTime(DateTime googleDateTime) {
 		org.joda.time.DateTime jodaDateTime = fmt.parseDateTime(googleDateTime.toStringRfc3339());
 		return jodaDateTime;
 	}
 	
+	/**
+	 * Converts Joda's DateTime format into Google's DateTime format.
+	 * @param jodaDateTime Joda's DateTime format
+	 * @return returns the equivalent Google's DateTime format
+	 */
 	public static DateTime toGoogleDateTime(org.joda.time.DateTime jodaDateTime) {
 		//System.out.println(jodaDateTime.toString());
 		DateTime googleDateTime = DateTime.parseRfc3339(jodaDateTime.toString());
 		return googleDateTime;
 	}
 
-	public static Event timedTaskToEvent(TimedTask task) {
-		Event event = new Event();
-		event.setSummary(task.getTitle());
-		event.setDescription(task.getDescription());
-
-		DateTime start = toGoogleDateTime(((TimedTask) task).getStart());
-		DateTime end = toGoogleDateTime(((TimedTask) task).getEnd());
-
-		event.setStart(new EventDateTime().setDateTime(start));
-		event.setEnd(new EventDateTime().setDateTime(end));
-
-		if(((TimedTask) task).isBusy()) {
-			event.setTransparency("opaque");
-		}
-		else {
-			event.setTransparency("transparent");
-		}
-		
-		return event;
-	}
-
+	/**
+	 * Converts the given local FloatingTask into a Google Task.
+	 * @param task FloatingTask
+	 * @return returns the equivalent Google Task of the Floating Task
+	 */
 	public static com.google.api.services.tasks.model.Task floatingTaskToGoogleTask(FloatingTask task) {
 		com.google.api.services.tasks.model.Task googleTask = 
 				new com.google.api.services.tasks.model.Task();
@@ -67,6 +68,11 @@ public class Converter {
 		return googleTask;
 	}
 	
+	/**
+	 * Converts the given local DeadlineTask into a Google event.
+	 * @param task DeadlineTask
+	 * @return returns the equivalent Google Event of the DeadlineTask
+	 */
 	public static Event deadlineTaskToGoogleEvent(DeadlineTask task) {
 		Event googleEvent = new Event();
 		String name = "";
@@ -81,10 +87,33 @@ public class Converter {
 		googleEvent.setStart(new EventDateTime().setDateTime(deadline));
 		googleEvent.setEnd(new EventDateTime().setDateTime(deadline));
 
-		//TODO: set completed
 		return googleEvent;
 	}
 	
+	/**
+	 * Converts the given local TimedTask into a Google Event.
+	 * @param task TimedTask
+	 * @return returns the equivalent Google Event of the TimedTask
+	 */
+	public static Event timedTaskToGoogleEvent(TimedTask task) {
+		Event event = new Event();
+		event.setSummary(task.getTitle());
+		event.setDescription(task.getDescription());
+
+		DateTime start = toGoogleDateTime(((TimedTask) task).getStart());
+		DateTime end = toGoogleDateTime(((TimedTask) task).getEnd());
+
+		event.setStart(new EventDateTime().setDateTime(start));
+		event.setEnd(new EventDateTime().setDateTime(end));
+		
+		return event;
+	}
+	
+	/**
+	 * Converts the given Google event to either a DeadlineTask or a TimedTask.
+	 * @param event Google Event
+	 * @return returns the equivalent local Task of the Google Event
+	 */
 	public static Task googleEventToTask(Event event) {
 		Task task = null;
 		String name = "";
@@ -99,26 +128,15 @@ public class Converter {
 		org.joda.time.DateTime start = toJodaDateTime(event.getStart().getDateTime());
 		org.joda.time.DateTime end = toJodaDateTime(event.getEnd().getDateTime());
 		
-		boolean isBusy = false;
-		
 		if (description ==  null) {
 			description = "";
-		}
-		
-		if (event.getTransparency() != null) {
-			if (event.getTransparency().equals("opaque")) {
-				isBusy = true;
-			}
-			/*else if (event.getTransparency().equals("transparent")) {
-				isBusy = false
-			}*/
 		}
 		
 		if (start.isEqual(end)) {
 			task = new DeadlineTask(name, description, end);
 		}
 		if (!start.isEqual(end)) {
-			task = new TimedTask(name, description, start, end, isBusy);
+			task = new TimedTask(name, description, start, end);
 		}
 		
 		task.setGoogleId(googleId);
@@ -127,7 +145,12 @@ public class Converter {
 		return task;
 	}
 	
-	public static Task googleTaskToTask(com.google.api.services.tasks.model.Task googleTask) {
+	/**
+	 * Converts the given Google Task into a local FloatingTask
+	 * @param googleTask Google Task
+	 * @return returns the equivalent local FloatingTask of the Google Task
+	 */
+	public static Task googleTaskToFloatingTask(com.google.api.services.tasks.model.Task googleTask) {
 		Task task = null;
 		String name = "";
 		String description = "";
