@@ -5,18 +5,18 @@ import typetodo.model.Task.Status;
 
 public class CommandCompleted implements Command, Undoable{
 	private static final String MESSAGE_COMPLETED = "\"%s\" has been marked as completed";
-	private int index;
+	private int taskId;
 	private Task taskBeforeMarking;
 	private Schedule schedule;
-	public CommandCompleted(Schedule schedule, int index) {
+	public CommandCompleted(Schedule schedule, int taskId) {
 		this.schedule = schedule;
-		this.index = index;
+		this.taskId = taskId;
 	}
 	
 	@Override
 	public String execute() throws Exception {
-		taskBeforeMarking = schedule.getTask(index).makeCopy();
-		schedule.updateTaskStatus(index, Status.COMPLETED);
+		taskBeforeMarking = schedule.getTask(taskId).makeCopy();
+		schedule.updateTaskStatus(taskId, Status.COMPLETED);
 		String feedback = String.format(MESSAGE_COMPLETED, taskBeforeMarking.getTitle());
 		return feedback;
 	}
