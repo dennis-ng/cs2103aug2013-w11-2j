@@ -7,6 +7,11 @@ import typetodo.model.FloatingTask;
 import typetodo.model.Task;
 import typetodo.model.TimedTask;
 
+/**
+ * Concrete command class for adding of a task
+ * @author Shiyu
+ *
+ */
 public class CommandAddTask implements Command, Undoable {
 	private static final String MESSAGE_ADDED = "\"%s\" has been added to your schedule";
 	private Schedule schedule;
@@ -23,9 +28,9 @@ public class CommandAddTask implements Command, Undoable {
 		this.taskToBeAdded = new DeadlineTask(title, description, deadline);
 	}
 	
-	public CommandAddTask(Schedule sc, String title, String description, DateTime start, DateTime end, boolean isBusy) {
+	public CommandAddTask(Schedule sc, String title, String description, DateTime start, DateTime end) {
 		this.schedule = sc;
-		this.taskToBeAdded = new TimedTask(title, description, start, end, isBusy);
+		this.taskToBeAdded = new TimedTask(title, description, start, end);
 	}
 	
 	public String execute() throws Exception {
