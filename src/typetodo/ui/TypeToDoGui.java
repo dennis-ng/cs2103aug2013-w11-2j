@@ -275,6 +275,18 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	}
 
 	@Override
+	public boolean disableInput() {
+		txtCmd.setEnabled(false);
+		return !txtCmd.isEnabled();
+	}
+
+	@Override
+	public boolean enableInput() {
+		txtCmd.setEnabled(true);
+		return txtCmd.isEnabled();
+	}
+
+	@Override
 	public void displayFeedBack(String feedBack) {
 		feedbackDialog.setFeedbackText(feedBack);
 	}
@@ -308,8 +320,8 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 					sc = new ScheduleController(cmdFrame, new Schedule());
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, MESSAGE_ERROR_INITIALIZING);
-					System.exit(0);
 					e.printStackTrace();
+					System.exit(0);
 				}
 			}
 		});
