@@ -104,32 +104,6 @@ public class CommandParser {
 		throw new InvalidCommandException(MESSAGE_EXCEPTION_INVALID);
 	}
 
-	private TaskType getTaskType(String userInput)
-			throws InvalidCommandException {
-		Scanner scanner = new Scanner(userInput);
-		// Extract the taskType in view <task type>
-		scanner.next();// throw command "view"
-		String taskType = scanner.next().toLowerCase();
-		scanner.close();
-
-		HashMap<TaskType, List<String>> typeSynonyms = new HashMap<TaskType, List<String>>();
-		/** hard coded library of possible various user command inputs. */
-		typeSynonyms.put(TaskType.DEADLINE_TASK,
-				Arrays.asList("deadline", "due"));
-		typeSynonyms.put(TaskType.FLOATING_TASK,
-				Arrays.asList("floating", "normal", "float"));
-		typeSynonyms.put(TaskType.TIMED_TASK,
-				Arrays.asList("timedtask", "timed", "slot"));
-
-		for (TaskType type : typeSynonyms.keySet()) {
-			if (typeSynonyms.get(type).contains(taskType)) {
-				return type;
-			}
-		}
-
-		throw new InvalidCommandException(MESSAGE_EXCEPTION_INVALID);
-	}
-
 	/**
 	 * Extracts and returns the title from the user input.
 	 * 
@@ -325,8 +299,15 @@ public class CommandParser {
 			jodaDates.add(validDates);
 		}
 
-		if ((dateField.contains(" to ") && jodaDates.size() == 1)
-				|| jodaDates.size() == 0) {
+		// only one date field in a timed task
+		if (dateField.contains(" to ") && jodaDates.size() == 1) {
+			System.out.println("datef:" + dateField);
+			throw new InvalidDateTimeException(
+					MESSAGE_EXCEPTION_DATETIME_FORMAT);
+		}
+
+		// invalid dateField
+		if (jodaDates.size() == 0 && containsNumeric(dateField)) {
 			throw new InvalidDateTimeException(
 					MESSAGE_EXCEPTION_DATETIME_FORMAT);
 		}
@@ -348,13 +329,24 @@ public class CommandParser {
 					.toLowerCase();
 
 			if (endAmPm.equals("pm")
-					&& (!startAmPm.equals("am") || !startAmPm.equals("pm"))) {
+					&& !startAmPm.equals("am") && !startAmPm.equals("pm")) {
 				startAmPm = startAmPm + "pm";
 			}
 			result = result.substring(0, indexOfTo - 2) + " " + startAmPm
 					+ result.substring(indexOfTo);
 		}
 		return result;
+	}
+
+	private boolean containsNumeric(String userInput) {
+		boolean doesContain = false;
+		int len = userInput.length();
+		for (int i = 0; i < len; i++) {
+			if (Character.isDigit(userInput.charAt(i))) {
+				doesContain = true;
+			}
+		}
+		return doesContain;
 	}
 
 	private String getHelpType(String userInput) throws InvalidCommandException {
@@ -460,7 +452,8 @@ public class CommandParser {
 				DateTime start = dates.get(0);
 				DateTime end = dates.get(1);
 
-				command = new CommandAddTask(schedule, title, description, start, end);
+				command = new CommandAddTask(schedule, title, description,
+						start, end);
 			} else {
 				throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_ADD);
 			}
@@ -492,29 +485,26 @@ public class CommandParser {
 				String keyword = this.getKeyword(userInput);
 				command = new CommandSearch(taskListManager, keyword);
 			} catch (Exception e) {
-				throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_SEARCH);
+				throw new InvalidFormatException(
+						MESSAGE_EXCEPTION_INVALID_SEARCH);
 			}
 			break;
 
 		case DISPLAY:
 			DateTime dateTime;
-			TaskType taskType;
 
 			if (this.isViewAll(userInput)) {
 				command = new CommandView(taskListManager);
 				break;
 			}
+
 			try {
-				taskType = getTaskType(userInput);
-				command = new CommandView(taskListManager,taskType);
-			} catch (Exception e) {
-				try {
-					dateTime = this.getDates(userInput).get(0);
-					System.out.println("task date: " + dateTime);
-					command = new CommandView(taskListManager, dateTime);
-				} catch (Exception ex) {
-					throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_DISPLAY);
-				}
+				dateTime = this.getDates(userInput).get(0);
+				System.out.println("task date: " + dateTime);
+				command = new CommandView(taskListManager, dateTime);
+			} catch (Exception ex) {
+				throw new InvalidFormatException(
+						MESSAGE_EXCEPTION_INVALID_DISPLAY);
 			}
 
 			break;
@@ -560,16 +550,16 @@ public class CommandParser {
 			// TODO:
 			throw new Error();
 		}
-		
+
 		return command;
 	}
-	
+
 	private static Logger logger = Logger.getLogger("ParserLogger");
 
 	public void logParser() {
 		logger.log(Level.INFO, "going to start processing");
 		try {
-			//TODO
+			// TODO
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "process error", e);
 			logger.log(Level.INFO, "end of processing");
