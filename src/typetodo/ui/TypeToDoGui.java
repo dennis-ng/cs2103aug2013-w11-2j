@@ -11,8 +11,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.URL;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -29,8 +33,8 @@ import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import typetodo.logic.MainController;
 import typetodo.logic.Schedule;
-import typetodo.logic.ScheduleController;
 
 public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		WindowListener {
@@ -48,7 +52,7 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 	private static FeedbackDialog feedbackDialog;
 	private Image imgLogo;
 
-	private static ScheduleController sc;
+	private static MainController sc;
 	private final LinkedList<String> inputHistory;
 	private int historyIndex;
 
@@ -307,23 +311,75 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 		feedbackDialog.setTableOfTasks(helpMessage);
 	}
 
+	private static File f;
+	private static FileChannel channel;
+	private static FileLock lock;
+
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) {
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				TypeToDoGui cmdFrame = new TypeToDoGui();
-				try {
-					sc = new ScheduleController(cmdFrame, new Schedule());
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, MESSAGE_ERROR_INITIALIZING);
-					e.printStackTrace();
-					System.exit(0);
-				}
+		try {
+			f = new File("RingOnRequest.lock");
+			// Check if the lock exist
+			if (f.exists()) {
+				// if exist try to delete it
+				f.delete();
 			}
-		});
+			// Try to get the lock
+			channel = new RandomAccessFile(f, "rw").getChannel();
+			lock = channel.tryLock();
+			if (lock == null) {
+				// File is lock by other application
+				channel.close();
+
+				throw new RuntimeException("Only 1 instance of TypeToDo can run.");
+			}
+			// Add shutdown hook to release lock when application shutdown
+			ShutdownHook shutdownHook = new ShutdownHook();
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					TypeToDoGui cmdFrame = new TypeToDoGui();
+					try {
+						sc = new MainController(cmdFrame, new Schedule());
+					} catch (IOException e) {
+						JOptionPane.showMessageDialog(null, MESSAGE_ERROR_INITIALIZING);
+						e.printStackTrace();
+						System.exit(0);
+					}
+				}
+			});
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} catch (IOException e) {
+			throw new RuntimeException("Could not start process.", e);
+		}
+	}
+
+	public static void unlockFile() {
+		// release and delete file lock
+		try {
+			if (lock != null) {
+				lock.release();
+				channel.close();
+				f.delete();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	static class ShutdownHook extends Thread {
+
+		public void run() {
+			unlockFile();
+		}
 	}
 }

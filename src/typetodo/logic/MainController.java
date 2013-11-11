@@ -1,26 +1,35 @@
 package typetodo.logic;
 
+import java.io.IOException;
 import java.util.Stack;
 
-import typetodo.db.DbController;
+import typetodo.sync.SyncController;
 import typetodo.ui.View;
 
-public class ScheduleController {
+public class MainController {
 	private static final String MESSAGE_WELCOME = "Welcome to TypeToDo! Please enter 'help' for instructions.";
 	private View view;
 	private Stack<Command> historyOfCommands;
 	private CommandParser commandParser;
-	private Schedule schedule;
-	private DbController db;
-
-	public ScheduleController(View view, Schedule schedule) {
+	private CurrentTaskListManager taskListManager;
+	private SyncController syncController;
+	
+	public MainController(View view, Schedule schedule) throws IOException {
 		this.view = view;
-		this.commandParser = new CommandParser(this, schedule);
+		this.syncController = new SyncController(view);
+		this.taskListManager = new CurrentTaskListManager(schedule);
+		this.commandParser = new CommandParser(this, schedule, taskListManager, syncController);
 		this.historyOfCommands = new Stack<Command>();
-		this.schedule = schedule;
-
-		String htmlDisplayContent = ViewHelper
-				.generateHTMLDisplayContent(schedule.getCurrentListOfTasks());
+		
+		String htmlDisplayContent = "";
+		
+		try {
+			htmlDisplayContent = ViewHelper.generateHTMLDisplayContent(taskListManager.getCurrentTaskList());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		view.displayTasks(htmlDisplayContent);
 		view.displayFeedBack(MESSAGE_WELCOME);
 	}
@@ -42,8 +51,14 @@ public class ScheduleController {
 			view.displayErrorMessage(e.getMessage());
 		}
 
-		String htmlDisplayContent = ViewHelper
-				.generateHTMLDisplayContent(schedule.getCurrentListOfTasks());
+		String htmlDisplayContent = "";
+		try {
+			htmlDisplayContent = ViewHelper.generateHTMLDisplayContent(taskListManager.getCurrentTaskList());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		view.displayTasks(htmlDisplayContent);
 		// view.displayTasks(schedule.getCurrentListOfTasks());
 	}
@@ -59,4 +74,5 @@ public class ScheduleController {
 			throw new Exception("Nothing to undo");
 		}
 	}
+	
 }

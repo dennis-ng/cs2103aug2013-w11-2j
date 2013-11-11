@@ -9,27 +9,27 @@ import typetodo.model.TimedTask;
 
 public class CommandAddTask implements Command, Undoable {
 	private static final String MESSAGE_ADDED = "\"%s\" has been added to your schedule";
-	private Schedule sc;
+	private Schedule schedule;
 	private int taskId;
 	private Task taskToBeAdded;
 	
 	public CommandAddTask(Schedule sc, String title, String description) {
-		this.sc = sc;
+		this.schedule = sc;
 		this.taskToBeAdded = new FloatingTask(title, description);
 	}
 	
 	public CommandAddTask(Schedule sc, String title, String description, DateTime deadline) {	
-		this.sc = sc;
+		this.schedule = sc;
 		this.taskToBeAdded = new DeadlineTask(title, description, deadline);
 	}
 	
 	public CommandAddTask(Schedule sc, String title, String description, DateTime start, DateTime end, boolean isBusy) {
-		this.sc = sc;
+		this.schedule = sc;
 		this.taskToBeAdded = new TimedTask(title, description, start, end, isBusy);
 	}
 	
 	public String execute() throws Exception {
-		taskId = sc.addTask(taskToBeAdded);
+		taskId = schedule.addTask(taskToBeAdded);
 		
 		String feedback;
 		feedback = String.format(MESSAGE_ADDED, taskToBeAdded.getTitle());
@@ -37,6 +37,6 @@ public class CommandAddTask implements Command, Undoable {
 	}
 	
 	public void undo() throws Exception{
-		sc.deleteTaskById(taskId);
+		schedule.deleteTaskById(taskId);
 	}
 }
