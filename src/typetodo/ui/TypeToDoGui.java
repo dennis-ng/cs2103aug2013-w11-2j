@@ -47,14 +47,14 @@ public class TypeToDoGui extends JFrame implements View, NativeKeyListener,
 			+ "Please go to Preferences>Security & Privacy>Privacy>Acessibility to allow Jar Launcher.";
 
 	private static TypeToDoGui mainGui;
-	private static CommandPanel cmdPanel;
-	private static JTextField txtCmd;
-	private static FeedbackDialog feedbackDialog;
+	private final CommandPanel cmdPanel;
+	private final JTextField txtCmd;
+	private final FeedbackDialog feedbackDialog;
 	private Image imgLogo;
+	private LinkedList<String> inputHistory;
+	private int historyIndex;
 
 	private static MainController sc;
-	private final LinkedList<String> inputHistory;
-	private int historyIndex;
 
 	private TypeToDoGui() {
 
