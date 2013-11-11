@@ -348,37 +348,36 @@ public class DbController {
 		LocalDate rangeEnd = endDay.toLocalDate();
 		if (rangeEnd.isBefore(rangeStart)) {
 			throw new InvalidDateRangeException(EXCEPTION_MSG_INVALID_DATE_RANGE);
-		} else {
-			for (Task taskInCache : tasksCache.values()) {
-				switch (taskType) {
-				// Only add the type of task that is needed
-					case DEADLINE_TASK:
-						if (taskInCache instanceof DeadlineTask) {
-							DeadlineTask deadlineTask = (DeadlineTask) taskInCache;
-							// Get the localdate only so that we can compare without time
-							LocalDate deadline = deadlineTask.getDeadline().toLocalDate();
-							if (isWithin(deadline, rangeStart, rangeEnd)) {
-								selectedTasks.add(taskInCache);
-							}
-						}
-						break;
-					case TIMED_TASK:
-						if (taskInCache instanceof TimedTask) {
-							TimedTask timedTask = (TimedTask) taskInCache;
-							// Get the localdate only so that we can compare without time
-							LocalDate taskStart = timedTask.getStart().toLocalDate();
-							LocalDate taskEnd = timedTask.getEnd().toLocalDate();
-
-							if (isWithin(taskStart, taskEnd, rangeStart, rangeEnd)) {
-								selectedTasks.add(timedTask);
-							}
-						}
-						break;
-					case FLOATING_TASK:
-						if (taskInCache instanceof FloatingTask) {
+		}
+		for (Task taskInCache : tasksCache.values()) {
+			switch (taskType) {
+			// Only add the type of task that is needed
+				case DEADLINE_TASK:
+					if (taskInCache instanceof DeadlineTask) {
+						DeadlineTask deadlineTask = (DeadlineTask) taskInCache;
+						// Get the localdate only so that we can compare without time
+						LocalDate deadline = deadlineTask.getDeadline().toLocalDate();
+						if (isWithin(deadline, rangeStart, rangeEnd)) {
 							selectedTasks.add(taskInCache);
 						}
-				}
+					}
+					break;
+				case TIMED_TASK:
+					if (taskInCache instanceof TimedTask) {
+						TimedTask timedTask = (TimedTask) taskInCache;
+						// Get the localdate only so that we can compare without time
+						LocalDate taskStart = timedTask.getStart().toLocalDate();
+						LocalDate taskEnd = timedTask.getEnd().toLocalDate();
+
+						if (isWithin(taskStart, taskEnd, rangeStart, rangeEnd)) {
+							selectedTasks.add(timedTask);
+						}
+					}
+					break;
+				case FLOATING_TASK:
+					if (taskInCache instanceof FloatingTask) {
+						selectedTasks.add(taskInCache);
+					}
 			}
 		}
 		return selectedTasks;
