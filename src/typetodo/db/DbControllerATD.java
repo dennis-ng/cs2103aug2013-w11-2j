@@ -6,7 +6,6 @@ import static org.junit.Assert.assertEquals;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import typetodo.model.DeadlineTask;
 import typetodo.model.FloatingTask;
 
 public class DbControllerATD {
@@ -88,11 +87,6 @@ public class DbControllerATD {
 			FloatingTask floatingTask1 = new FloatingTask("floatingTask1", "Desc");
 			FloatingTask floatingTask2 = new FloatingTask("floatingTask2", "Desc");
 			FloatingTask floatingTask3 = new FloatingTask("floatingTask3", "Desc");
-			DateTime date = new DateTime();
-			DateTime deadline = new DateTime();
-
-			DeadlineTask deadlineTask = new DeadlineTask(1, "deadlineTask", "Desc",
-					deadline);
 			db = DbController.getInstance();
 			/**
 			 * Test for adding first 3 tasks and the generation of taskId
