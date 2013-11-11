@@ -10,7 +10,7 @@ import org.junit.Test;
 import typetodo.model.TimedTask;
 
 /**
- * 
+ * This unit tests assumes that schedule is empty
  * @author A0091024U
  *
  */
@@ -85,6 +85,7 @@ public class ScheduleATD {
 	}
 
 	//Boundary cases for adding of timed tasks with 'start is before or equal end date' partition//
+	@Test
 	public void AddingATimedTaskWithStartBeforeOrEqualEnd() {
 		DateTime now = new DateTime();
 		Schedule schedule = null;
