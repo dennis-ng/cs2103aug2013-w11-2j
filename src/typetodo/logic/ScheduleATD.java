@@ -5,20 +5,16 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 
 import org.joda.time.DateTime;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import typetodo.model.TimedTask;
 
 /**
  * 
- * @author Shiyu
+ * @author A0091024U
  *
  */
 public class ScheduleATD {
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
 	private static final String ERROR_MESSAGE_INVALID_ID = "ID does not exist in schedule";
 	private static final String ERROR_MESSAGE_INVALID_FIELD = "Invalid field name";
 	private static final String ERROR_MESSAGE_INVALID_DEADLINE_ATTRIBUTE = "This type of task does not support a deadline";
