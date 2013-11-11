@@ -1,3 +1,4 @@
+//@author: A0090941E
 package typetodo.logic;
 
 import java.util.ArrayList;
@@ -6,10 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
-
 
 import typetodo.exception.InvalidCommandException;
 import typetodo.exception.InvalidDateTimeException;
@@ -18,19 +20,42 @@ import typetodo.exception.InvalidFormatException;
 import typetodo.exception.MissingFieldException;
 import typetodo.exception.ReservedCharacterException;
 import typetodo.model.FieldName;
+import typetodo.model.TaskType;
 import typetodo.sync.SyncController;
 
 public class CommandParser {
 	private Schedule schedule;
 	private MainController sc;
 	private SyncController syncController;
+	private HelpController helpController;
 	private CurrentTaskListManager taskListManager;
 
-	public CommandParser(MainController sc, Schedule schedule, CurrentTaskListManager taskListManager, SyncController syncController) {
+	private static final String MESSAGE_EXCEPTION_INVALID = "Invalid command, please refer to catalog by entering 'help'.";
+	private static final String MESSAGE_EXCEPTION_MISSING_COLON = "Missing ';'";
+	private static final String MESSAGE_EXCEPTION_MISSING_TITLE = "Title of task is missing, please refer to catalog by entering 'help'";
+	private static final String MESSAGE_EXCEPTION_RESERVED_CHAR_DESCRIPTION = "';' is a reserved character and should not be found in the description";
+	private static final String MESSAGE_EXCEPTION_RESERVED_CHAR_TITLE = "'+' is a reserved character and should not be found in the title";
+	private static final String MESSAGE_EXCEPTION_MISSING_FIELDNAME = "Field Name is missing, please refer to catalog by entering 'help edit'";
+	private static final String MESSAGE_EXCEPTION_MISSING_NEWVALUE = "New value is missing, please refer to catalog by entering 'help edit'";
+	private static final String MESSAGE_EXCEPTION_DATETIME_FORMAT = "Please specify both date and time in all fields. Please use 'mm/dd' format if you want to type standard date.";
+	private static final String MESSAGE_EXCEPTION_RESERVED_CHAR_1 = "'<' is a reserved character and cannot be used";
+	private static final String MESSAGE_EXCEPTION_RESERVED_CHAR_2 = "'>' is a reserved character and cannot be used";
+	private static final String MESSAGE_EXCEPTION_RESERVED_CHAR_3 = "'[' is a reserved character and cannot be used";
+	private static final String MESSAGE_EXCEPTION_RESERVED_CHAR_4 = "']' is a reserved character and cannot be used";
+	private static final String MESSAGE_EXCEPTION_INVALID_ADD = "INVALID FORMAT. Please refer to catalog by entering 'help add'";
+	private static final String MESSAGE_EXCEPTION_INVALID_EDIT = "INVALID FORMAT. Please refer to catalog by entering 'help edit'";
+	private static final String MESSAGE_EXCEPTION_INVALID_SEARCH = "INVALID FORMAT. Please refer to catalog by entering 'help search'";
+	private static final String MESSAGE_EXCEPTION_INVALID_DISPLAY = "INVALID FORMAT. Please refer to catalog by entering 'help display'";
+	private static final String MESSAGE_EXCEPTION_INVALID_DONE = "INVALID FORMAT. Please refer to catalog by entering 'help done'";
+
+	public CommandParser(MainController sc, Schedule schedule,
+			CurrentTaskListManager taskListManager,
+			SyncController syncController, HelpController helpController) {
 		this.sc = sc;
 		this.schedule = schedule;
 		this.taskListManager = taskListManager;
 		this.syncController = syncController;
+		this.helpController = helpController;
 	}
 
 	/**
@@ -76,8 +101,33 @@ public class CommandParser {
 			}
 		}
 
-		throw new InvalidCommandException(
-				"Invalid command, please refer to catalog by entering 'help'.");
+		throw new InvalidCommandException(MESSAGE_EXCEPTION_INVALID);
+	}
+
+	private TaskType getTaskType(String userInput)
+			throws InvalidCommandException {
+		Scanner scanner = new Scanner(userInput);
+		// Extract the taskType in view <task type>
+		scanner.next();// throw command "view"
+		String taskType = scanner.next().toLowerCase();
+		scanner.close();
+
+		HashMap<TaskType, List<String>> typeSynonyms = new HashMap<TaskType, List<String>>();
+		/** hard coded library of possible various user command inputs. */
+		typeSynonyms.put(TaskType.DEADLINE_TASK,
+				Arrays.asList("deadline", "due"));
+		typeSynonyms.put(TaskType.FLOATING_TASK,
+				Arrays.asList("floating", "normal", "float"));
+		typeSynonyms.put(TaskType.TIMED_TASK,
+				Arrays.asList("timedtask", "timed", "slot"));
+
+		for (TaskType type : typeSynonyms.keySet()) {
+			if (typeSynonyms.get(type).contains(taskType)) {
+				return type;
+			}
+		}
+
+		throw new InvalidCommandException(MESSAGE_EXCEPTION_INVALID);
 	}
 
 	/**
@@ -94,7 +144,7 @@ public class CommandParser {
 	private String getTitle(String userInput) throws InvalidFormatException,
 			MissingFieldException, ReservedCharacterException {
 		if (userInput.indexOf(';') == -1) {
-			throw new InvalidFormatException("Missing ';'");
+			throw new InvalidFormatException(MESSAGE_EXCEPTION_MISSING_COLON);
 		}
 
 		Scanner scanner = new Scanner(userInput);
@@ -104,11 +154,10 @@ public class CommandParser {
 		scanner.close();
 
 		if (title.equals("")) {
-			throw new MissingFieldException(
-					"Title of task is missing, please refer to catalog by entering 'help'");
+			throw new MissingFieldException(MESSAGE_EXCEPTION_MISSING_TITLE);
 		} else if (title.contains("+")) {
 			throw new ReservedCharacterException(
-					"'+' is a reserved character and should not be found in the title");
+					MESSAGE_EXCEPTION_RESERVED_CHAR_TITLE);
 		} else {
 			assert title != "" && !title.contains("+") && !title.contains(";");
 			return title.trim();
@@ -143,7 +192,7 @@ public class CommandParser {
 
 		if (description.indexOf(';') != -1) {
 			throw new ReservedCharacterException(
-					"';' is a reserved character and should not be found in the description");
+					MESSAGE_EXCEPTION_RESERVED_CHAR_DESCRIPTION);
 		}
 
 		return description.trim();
@@ -187,8 +236,7 @@ public class CommandParser {
 			fieldName = this.convertToFieldName(scanner.next());
 		} catch (NoSuchElementException e) {
 			scanner.close();
-			throw new MissingFieldException(
-					"Field Name is missing, please refer to catalog by entering 'help edit'");
+			throw new MissingFieldException(MESSAGE_EXCEPTION_MISSING_FIELDNAME);
 		}
 		scanner.close();
 
@@ -216,8 +264,7 @@ public class CommandParser {
 			newValue = scanner.nextLine().trim();
 		} catch (NoSuchElementException e) {
 			scanner.close();
-			throw new MissingFieldException(
-					"New value is missing, please refer to catalog by entering 'help edit'");
+			throw new MissingFieldException(MESSAGE_EXCEPTION_MISSING_NEWVALUE);
 		}
 		scanner.close();
 
@@ -267,7 +314,8 @@ public class CommandParser {
 
 		scanner.close();
 
-		dateField = dateField.replaceAll("-", " to ").toLowerCase();
+		dateField = modifyDate(dateField);
+
 		List<java.util.Date> javaDates = new PrettyTimeParser()
 				.parse(dateField);
 		ArrayList<DateTime> jodaDates = new ArrayList<DateTime>();
@@ -277,12 +325,36 @@ public class CommandParser {
 			jodaDates.add(validDates);
 		}
 
-		if (dateField.contains(" to ") && jodaDates.size() == 1) {
+		if ((dateField.contains(" to ") && jodaDates.size() == 1)
+				|| jodaDates.size() == 0) {
 			throw new InvalidDateTimeException(
-					"Please specify both date and time in all fields. Please use 'dd/mm' format if you want to type standard date.");
+					MESSAGE_EXCEPTION_DATETIME_FORMAT);
 		}
 
 		return jodaDates;
+	}
+
+	// modify parsed-in date time input into a system-readable one
+	private String modifyDate(String dateInput) {
+		String result, startAmPm, endAmPm;
+		result = dateInput.toLowerCase().replaceAll("-", " to ");
+		result = result.toLowerCase().replaceAll("tmr", "tomorrow");
+
+		int indexOfTo = result.indexOf(" to ");
+		if (indexOfTo != -1) {
+			endAmPm = result.substring(result.trim().length() - 2)
+					.toLowerCase().trim();
+			startAmPm = result.substring(indexOfTo - 2, indexOfTo).trim()
+					.toLowerCase();
+
+			if (endAmPm.equals("pm")
+					&& (!startAmPm.equals("am") || !startAmPm.equals("pm"))) {
+				startAmPm = startAmPm + "pm";
+			}
+			result = result.substring(0, indexOfTo - 2) + " " + startAmPm
+					+ result.substring(indexOfTo);
+		}
+		return result;
 	}
 
 	private String getHelpType(String userInput) throws InvalidCommandException {
@@ -330,9 +402,11 @@ public class CommandParser {
 	private boolean isViewAll(String userInput) {
 		Scanner scanner = new Scanner(userInput);
 		scanner.next(); // discard user command
-		if (scanner.next().equals("all")) {
-			scanner.close();
-			return true;
+		if (scanner.hasNext()) {
+			if (scanner.next().equals("all")) {
+				scanner.close();
+				return true;
+			}
 		}
 		scanner.close();
 
@@ -343,19 +417,19 @@ public class CommandParser {
 			throws ReservedCharacterException {
 		if (userInput.indexOf("<") != -1) {
 			throw new ReservedCharacterException(
-					"'<' is a reserved character and cannot be used");
+					MESSAGE_EXCEPTION_RESERVED_CHAR_1);
 		}
 		if (userInput.indexOf(">") != -1) {
 			throw new ReservedCharacterException(
-					"'>' is a reserved character and cannot be used");
+					MESSAGE_EXCEPTION_RESERVED_CHAR_2);
 		}
 		if (userInput.indexOf("[") != -1) {
 			throw new ReservedCharacterException(
-					"'[' is a reserved character and cannot be used");
+					MESSAGE_EXCEPTION_RESERVED_CHAR_3);
 		}
 		if (userInput.indexOf("]") != -1) {
 			throw new ReservedCharacterException(
-					"']' is a reserved character and cannot be used");
+					MESSAGE_EXCEPTION_RESERVED_CHAR_4);
 		}
 	}
 
@@ -388,15 +462,14 @@ public class CommandParser {
 
 				command = new CommandAddTask(schedule, title, description, start, end);
 			} else {
-				throw new InvalidFormatException(
-						"INVALID FORMAT. Please refer to catalog by entering 'help add'");
+				throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_ADD);
 			}
 			break;
 
 		case DELETE:
 			int index = this.getIndex(userInput);
 			command = new CommandDeleteTask(schedule, index);
-		break;
+			break;
 
 		case UPDATE:
 			int taskId = this.getIndex(userInput);
@@ -410,8 +483,7 @@ public class CommandParser {
 				command = new CommandEditTask(schedule, taskId, fieldName,
 						(DateTime) newValue);
 			} else {
-				throw new InvalidFormatException(
-						"INVALID FORMAT. Please refer to catalog by entering 'help edit'");
+				throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_EDIT);
 			}
 			break;
 
@@ -420,25 +492,31 @@ public class CommandParser {
 				String keyword = this.getKeyword(userInput);
 				command = new CommandSearch(schedule, keyword);
 			} catch (Exception e) {
-				throw new InvalidFormatException(
-						"INVALID FORMAT. Please refer to catalog by entering 'help search'");
+				throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_SEARCH);
 			}
 			break;
 
 		case DISPLAY:
+			DateTime dateTime;
+			TaskType taskType;
+
 			if (this.isViewAll(userInput)) {
 				command = new CommandView(taskListManager);
 				break;
 			}
-
-			DateTime dateTime;
 			try {
-				dateTime = this.getDates(userInput).get(0);
-			} catch (IndexOutOfBoundsException e) {
-				throw new InvalidFormatException(
-						"INVALID FORMAT. Please refer to catalog by entering 'help display'");
+				taskType = getTaskType(userInput);
+				command = new CommandView(taskListManager,taskType);
+			} catch (Exception e) {
+				try {
+					dateTime = this.getDates(userInput).get(0);
+					System.out.println("task date: " + dateTime);
+					command = new CommandView(taskListManager, dateTime);
+				} catch (Exception ex) {
+					throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_DISPLAY);
+				}
 			}
-			command = new CommandView(taskListManager, dateTime);
+
 			break;
 
 		case DONE:
@@ -446,8 +524,7 @@ public class CommandParser {
 				int indexOfCompletedTask = this.getIndex(userInput);
 				command = new CommandCompleted(schedule, indexOfCompletedTask);
 			} catch (Exception e) {
-				throw new InvalidFormatException(
-						"INVALID FORMAT. Please refer to catalog by entering 'help done'");
+				throw new InvalidFormatException(MESSAGE_EXCEPTION_INVALID_DONE);
 			}
 			break;
 
@@ -463,10 +540,10 @@ public class CommandParser {
 			String helpType = getHelpType(userInput);
 			if (helpType != "") {
 				CommandType commandType = getCommand(helpType);
-				HelpController helpController = new HelpController(commandType);
+				helpController = new HelpController(commandType);
 				command = new CommandHelp(helpController);
 			} else {
-				HelpController helpController = new HelpController(helpType);
+				helpController = new HelpController(helpType);
 				command = new CommandHelp(helpController);
 			}
 			break;
@@ -483,7 +560,19 @@ public class CommandParser {
 			// TODO:
 			throw new Error();
 		}
+		
 		return command;
 	}
+	
+	private static Logger logger = Logger.getLogger("ParserLogger");
 
+	public void logParser() {
+		logger.log(Level.INFO, "going to start processing");
+		try {
+			//TODO
+		} catch (Exception e) {
+			logger.log(Level.WARNING, "process error", e);
+			logger.log(Level.INFO, "end of processing");
+		}
+	}
 }
