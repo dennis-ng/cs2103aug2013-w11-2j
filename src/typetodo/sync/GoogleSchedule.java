@@ -14,15 +14,16 @@ import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 
-public class GCalHandler {
+public class GoogleSchedule {
+	private static final String APPLICATION_NAME = "TypeToDo";
 	private GCalAuthenticator authenticator;
 	private final com.google.api.services.calendar.Calendar gCalendarClient;
 	private final com.google.api.services.tasks.Tasks gTasksClient;
 	private String gCalendarId;
 	private String gTaskListId;
 	
-	public GCalHandler() {
-		authenticator = new GCalAuthenticator("TypeToDo");
+	public GoogleSchedule() {
+		authenticator = new GCalAuthenticator(APPLICATION_NAME);
 		gCalendarClient = authenticator.getClient();
 		gTasksClient = authenticator.getTasksClient();
 		
@@ -34,25 +35,25 @@ public class GCalHandler {
 	}
 	
 	/**
-	 * Adds a task into the Google System.
+	 * Adds a task into the Google Schedule
 	 * @param taskToBeAdded Task to be added
 	 * @throws IOException 
 	 */
 	public void addTask(Task taskToBeAdded) throws IOException {
 		if (taskToBeAdded instanceof TimedTask) {
 //			System.out.println(taskToBeAdded);
-			Event event = Converter.timedTaskToEvent((TimedTask) taskToBeAdded);
+			Event event = SyncHelper.timedTaskToGoogleEvent((TimedTask) taskToBeAdded);
 			Event result = gCalendarClient.events().insert(gCalendarId, event).execute();
 			taskToBeAdded.setGoogleId(result.getId()); //append GCal's id to task
 		}
 		else if(taskToBeAdded instanceof DeadlineTask) {
-			Event event = Converter.deadlineTaskToGoogleEvent((DeadlineTask) taskToBeAdded);
+			Event event = SyncHelper.deadlineTaskToGoogleEvent((DeadlineTask) taskToBeAdded);
 			Event result = gCalendarClient.events().insert(gCalendarId, event).execute();
 			taskToBeAdded.setGoogleId(result.getId()); //append GCal's id to task
 		}
 		else if(taskToBeAdded instanceof FloatingTask) {
 			com.google.api.services.tasks.model.Task googleTask = 
-					Converter.floatingTaskToGoogleTask((FloatingTask) taskToBeAdded);
+					SyncHelper.floatingTaskToGoogleTask((FloatingTask) taskToBeAdded);
 
 			com.google.api.services.tasks.model.Task result = 
 					gTasksClient.tasks().insert(gTaskListId, googleTask).execute();
@@ -62,7 +63,7 @@ public class GCalHandler {
 	}
 
 	/**
-	 * Deletes a task from the Google System.
+	 * Deletes a task from the Google Schedule.
 	 * @param taskToBeDeleted Task to be deleted
 	 * @throws IOException if task to be deleted does not exist in the Google System
 	 */
@@ -98,7 +99,7 @@ public class GCalHandler {
 	}
 
 	/**
-	 * Returns all Tasks found in the Google System
+	 * Returns all Tasks found in the Google Schedule.
 	 * @return Returns an ArrayList of tasks found in the Google System
 	 */
 	public ArrayList<Task> retrieveAllTasks() {
@@ -116,7 +117,7 @@ public class GCalHandler {
 
 		for (Event event : feed.getItems()) {
 			if (!event.getStatus().equals("cancelled")) {
-				tasks.add(Converter.googleEventToTask(event));
+				tasks.add(SyncHelper.googleEventToTask(event));
 			}
 		}
 
@@ -132,10 +133,10 @@ public class GCalHandler {
 		if (taskList != null) {
 			for (com.google.api.services.tasks.model.Task googleTask : taskList) {
 				if ((googleTask.getDeleted() != null) && !googleTask.getDeleted()) {
-					tasks.add(Converter.googleTaskToTask(googleTask));
+					tasks.add(SyncHelper.googleTaskToFloatingTask(googleTask));
 				}
 				if (googleTask.getDeleted() == null) {
-					tasks.add(Converter.googleTaskToTask(googleTask));
+					tasks.add(SyncHelper.googleTaskToFloatingTask(googleTask));
 				}
 			}
 		}
@@ -144,9 +145,9 @@ public class GCalHandler {
 	}
 
 	/**
-	 * Retrieves and return equivalent Task from the Google System
+	 * Retrieves and return equivalent Task from the Google Schedule.
 	 * @param task Local Task
-	 * @return Returns the equivalent Task from the Google System
+	 * @return Returns the equivalent Task from the Google Schedule
 	 */
 	public Task retrieveTask(Task task) {
 		if (task.getGoogleId() == null) {
@@ -165,7 +166,7 @@ public class GCalHandler {
 					return null;
 				}
 				
-				return Converter.googleEventToTask(event);	
+				return SyncHelper.googleEventToTask(event);	
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -179,7 +180,7 @@ public class GCalHandler {
 					return null;
 				}
 				
-				return Converter.googleTaskToTask(googleTask);
+				return SyncHelper.googleTaskToFloatingTask(googleTask);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -190,7 +191,7 @@ public class GCalHandler {
 	}
 
 	/**
-	 * Updates a task in Google Calendar.
+	 * Updates a task in Google Schedule.
 	 * @param taskToBeUpdated
 	 */
 	public void updateTask(Task taskToBeUpdated) {
@@ -198,7 +199,7 @@ public class GCalHandler {
 		String googleId = taskToBeUpdated.getGoogleId();
 		
 		if (taskToBeUpdated instanceof TimedTask) {
-			event = Converter.timedTaskToEvent((TimedTask) taskToBeUpdated);
+			event = SyncHelper.timedTaskToGoogleEvent((TimedTask) taskToBeUpdated);
 			try {
 				gCalendarClient.events().update(gCalendarId, googleId, event).execute();
 			} catch (IOException e) {
@@ -207,7 +208,7 @@ public class GCalHandler {
 			}
 		}
 		else if (taskToBeUpdated instanceof DeadlineTask) {
-			event = Converter.deadlineTaskToGoogleEvent((DeadlineTask) taskToBeUpdated);
+			event = SyncHelper.deadlineTaskToGoogleEvent((DeadlineTask) taskToBeUpdated);
 			try {
 				gCalendarClient.events().update(gCalendarId, googleId, event).execute();
 			} catch (IOException e) {
@@ -217,7 +218,7 @@ public class GCalHandler {
 		}
 		else if (taskToBeUpdated instanceof FloatingTask) {
 			com.google.api.services.tasks.model.Task googleTask = 
-					Converter.floatingTaskToGoogleTask((FloatingTask) taskToBeUpdated);
+					SyncHelper.floatingTaskToGoogleTask((FloatingTask) taskToBeUpdated);
 			try {
 				gTasksClient.tasks().update(gTaskListId, googleId, googleTask).execute();
 			} catch (IOException e) {
